@@ -1,0 +1,36 @@
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile.backend
+    volumes:
+      - ./backend:/app
+    ports:
+      - "5001:5001"
+    environment:
+      - MONGO_URI=mongodb://db:27017/crypto-mern
+    depends_on:
+      - db
+
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile.frontend
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules  # Volume anonyme pour node_modulesF
+    ports:
+      - "3000:3000"
+    environment:
+      - REACT_APP_API_URL=http://localhost:5000
+    depends_on:
+      - backend
+  db:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    volumes:
+      - crypto-mern_db:/data/db
+
+volumes:
+  crypto-mern_db:
