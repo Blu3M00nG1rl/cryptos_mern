@@ -1,0 +1,65 @@
+/* Conteneur principal */
+.left-nav-cointainer {
+  position: fixed;
+  left: 0;
+  top: 80px; /* Pour éviter de chevaucher la navbar */
+  width: 64px;
+  height: calc(100vh - 80px);
+  background-color: rgba(243, 255, 246, 0.95); /* très pâle menthe */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1.25rem 0;
+  border-right: 1px solid rgba(36,55,70,0.02);
+  z-index: 90;
+  box-shadow: 2px 0 6px rgba(36,55,70,0.02);
+}
+
+/* Conteneur des icônes */
+.icons {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+/* Style des liens/icônes */
+.icon-bis a {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  padding: 0.5rem;
+}
+
+.icon-bis a img {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+}
+
+/* Effet de survol */
+.icon-bis a:hover {
+  background-color: rgba(255, 183, 197, 0.14); /* rose pâle au hover */
+  transform: scale(1.05);
+}
+
+/* Style pour l'icône active */
+.icon-bis a.active-left-nav {
+  background-color: #D6C8FF; /* lavande active */
+}
+
+/* Responsive (optionnel) */
+@media (max-width: 768px) {
+  .left-nav-cointainer {
+    width: 50px;
+  }
+  .icon-bis a img {
+    width: 20px;
+    height: 20px;
+  }
+}

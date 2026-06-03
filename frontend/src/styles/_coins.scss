@@ -1,0 +1,23 @@
+.coin-page {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.card {
+    border-radius: 0.75rem;
+    border: none;
+    background: rgba(255,255,255,0.95);
+    color: #243746;
+}
+
+.table-responsive {
+    overflow-x: auto;
+}
+
+.btn {
+    transition: all 0.2s;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+}

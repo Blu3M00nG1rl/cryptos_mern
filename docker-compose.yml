@@ -5,6 +5,7 @@ services:
       dockerfile: backend/Dockerfile.backend
     volumes:
       - ./backend:/app
+      - /app/node_modules
     ports:
       - "5001:5001"
     environment:
@@ -18,11 +19,11 @@ services:
       dockerfile: frontend/Dockerfile.frontend
     volumes:
       - ./frontend:/app
-      - /app/node_modules  # Volume anonyme pour node_modulesF
+      - /app/node_modules
     ports:
       - "3000:3000"
     environment:
-      - REACT_APP_API_URL=http://localhost:5000
+      - REACT_APP_API_URL=http://localhost:5001
     depends_on:
       - backend
   db:

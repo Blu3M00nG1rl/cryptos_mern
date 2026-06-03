@@ -1,0 +1,569 @@
+"no","id","symbol","name","date_achat","montant","portefeuille","wallet","exchange","date_verification","observation"
+"863","0x","zrx","0x","1970-01-01","0","0",,,"1970-01-01",
+"613","ark","ark","Ark","1970-01-01","0","0",,,"1970-01-01","
+
+"
+"33453","notcoin","not","Notcoin",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"677","basic-attention-token","bat","Basic Attention Token","1970-01-01","0","0",,,"1970-01-01","Adresse portefeuille récompenses BAT : 0xF105f702E0eB62d8FA23a4974262B80bccb6Ed24"
+"869","propy","pro","Propy","1970-01-01","0","0",,,"1970-01-01",
+"825","binancecoin","bnb","Binance Coin","2019-07-09","510.02787191629","8.98281884","Voir Fichier Excel","Voir Fichier Excel","2026-03-19","Rabby EWC BSC
+Lista DAO (https://lista.org/liquid-staking/BNB) 0,7941 BNB disponibles le 25/04/26"
+"12632","pancakeswap-token","cake","PancakeSwap","1970-01-01","0","0",,,"1970-01-01",
+"50648","deep","deep","DeepBook",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"1","bitcoin","btc","Bitcoin","2018-03-25","11763.7717813172","1.00305831","Voir fichier Excel","Voir fichier Excel","2026-04-21","Adresses Blockchain :
+bc1q6nke68rdx4wss4zqy57a2g3jkywfu0lqn7p9jk (0,80022151)
+bc1qwwhnxlgzd57rpcspxzn8urmkn5dnqjd08x4jd7 (0,18979207)
+bc1q0upukcs7stamuvv3w7rad3gg8dyxt7ym8c27yu (0,01)
+
+Electrum
+Lancer en console avec la commande (à partir de Téléchargements) : 
+python3 ~/Téléchargements/Electrum-4.7.0/run_electrum
+
+
+"
+"780","bitcoin-cash","bch","Bitcoin Cash","2023-08-05","422.873732807466","0.69222036","Electron Cash",,"2026-05-23",
+"21061","biconomy","bico","Biconomy",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"975","cardano","ada","Cardano","1970-01-01","0","0",,,"1970-01-01",
+"877","chainlink","link","ChainLink","2024-03-03","16.503113704897","56.44715509","Rabby Principal Arbitrum",,"2026-04-05","Placés en lending sur Dolomite à 1,21%
+https://app.dolomite.io/earn"
+"1481","cosmos","atom","Cosmos","2021-12-11","10.724754431226","4.653845","Keplr Leger Cosmos Hub",,"2026-05-05","3,49 ATOM sur BKEX non comptabilisés
+https://bkex.zendesk.com/hc/en-us/articles/19022106904729
+
+Voir le Yield ATOM-DATOM sur
+https://app.osmosis.zone/pools
+
+"
+"20582","aurora-near","aurora","Aurora","1970-01-01","0","0",,,"1970-01-01",
+"24413","stargate-finance","stg","Stargate Finance","1970-01-01","0","0",,,"1970-01-01",
+"7310","crypto-com-chain","cro","Crypto.com Coin","2023-03-20","0.121922870152","6623.49",,"Cryptobanque","2026-03-10","CRO bloqués en staking de carte jusqu'au 24 avril 2026"
+"9956","dai","dai","Dai","1970-01-01","0","0","Voir Fichier Excel","Voir FIchier Excel","1970-01-01",
+"878","decentraland","mana","Decentraland","1970-01-01","0","0",,,"1970-01-01","Il n’est pas possible de miner du Decentraland ou de faire du staking sur la plateforme. "
+"329","decred","dcr","Decred","1970-01-01","0","0",,,"1970-01-01","Adresse blockchain : DsXn9dWQXGGeRUPyeEJUXVmu8gookbRuGzq
+"
+"63","digibyte","dgb","DigiByte","1970-01-01","0","0",,,"1970-01-01",
+"69816","kgen","kgen","KGeN",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"5","dogecoin","doge","Dogecoin","2023-01-29","0.084248752509","17191.136","Exodus Doge",,"2026-03-13",
+"54919","sosovalue","soso","SoSoValue",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"1109","electroneum","etn","Electroneum","1970-01-01","0","0",,,"1970-01-01","Il reste 4,8 ETN sur le wallet le 28 mars 2025, jour de la suppression de l'ETN du fichier excel (valeur 0,01 €)
+Appli Web ou Android : https://my.electroneum.com/
+
+Nouvelle adresse publique suite à migration :
+0x8E6CAc52Dcfa25c9888A0F5A018901d2b34b37C0
+
+Le Wallet Android est un custodial wallet (comme un exchange)
+
+Pour avoir un private key utiliser le Desktop GUI Wallet
+(https://github.com/andrepatta/etn-desktop-wallet/releases/tag/v1.0-beta.0)
+"
+"34057","virtual-protocol","virtual","Virtuals Protocol",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"1102","enjincoin","enj","Enjin Coin","1970-01-01","0","0",,,"1970-01-01",
+"279","ethereum","eth","Ethereum","1970-01-01","0","0","Voir fichier Excel","Voir fichier Excel","1970-01-01",
+"453","ethereum-classic","etc","Ethereum Classic","1970-01-01","0","0",,,"1970-01-01",
+"5010","everipedia","iq","Everipedia","1970-01-01","0","0",,,"1970-01-01","
+"
+"25380","usdd","usdd","USDD",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"542","golem","glm","Golem","1970-01-01","0","0",,,"1970-01-01",
+"19785","ethereum-name-service","ens","Ethereum Name Service","2024-06-12","18.818999316125","5.0366019","Rabby EWC Ethereum",,"2026-04-24",
+"3406","havven","snx","Synthetix Network Token","1970-01-01","0","0",,,"1970-01-01",
+"3348","holotoken","hot","Holo","1970-01-01","0","0",,,"1970-01-01",
+"1060","icon","icx","ICON","1970-01-01","0","0",,,"1970-01-01","
+"
+"692","iota","miota","IOTA","1970-01-01","0","0",,,"1970-01-01","Adresse Blockchain : iota1qp0q65nk6udqz8rjsl0az6606ysjpxfrgssc5eq6mj4c7rwvr0zvqggfezw
+"
+"4128","solana","sol","Solana","2026-02-03","77.795314390346","97.7772","Phantom Wallet Compte 1",,"2026-05-30"," 28,50922 SOL en staking directement sur le Wallet (Validateur MERIA)
++59,834 SOL en staking directement sur le Wallet (8,68%)
+
+Pour voir le staking cliquer sur le token SOLANA
+Simuler le swap PSOL-SOL pour voir le montant de SOL en staking"
+"53640","redstone-oracles","red","RedStone",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"38043","zksync","zk","ZKsync",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"31924","pyth-network","pyth","Pyth Network","2024-04-21","0.625534742051","1151.57282","Phantom Wallet",,"2026-04-18","1000 PYTH stakés sur https://staking.pyth.network/ (APY 8%)
+Oracle Integrity Staking (OIS)"
+"26455","aptos","apt","Aptos","1970-01-01","0","0",,,"1970-01-01",
+"52230","banana-for-scale-2","bananas31","Banana For Scale",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"1047","kucoin-shares","kcs","KuCoin Shares","2026-03-03","6.545710742252","44.715","Rabby PlayToEarn Ethereum",,"2026-05-30",
+"2","litecoin","ltc","Litecoin","1970-01-01","0","0",,,"1970-01-01",
+"7137","livepeer","lpt","Livepeer","2024-06-21","15.027679748773","4.13096021","Rabby EWC Arbitrum",,"2026-04-29","stakés sur https://explorer.livepeer.org/accounts/0x6Af84B23CA509cA4D76E5e51917Cf222677339A8/delegating"
+"3370","quant-network","qnt","Quant","2022-11-09","112.031685058402","10.13800984","Rabby Principal Ethereum",,"2026-05-24",
+"480","neo","neo","NEO","1970-01-01","0","0",,,"1970-01-01",
+"16724","osmosis","osmo","Osmosis","1970-01-01","0","0",,,"1970-01-01",
+"684","qtum","qtum","Qtum",NULL,NULL,"0",NULL,NULL,NULL,NULL
+"3447","ontology","ont","Ontology","1970-01-01","0","0",,,"1970-01-01",
+"55616","vaulta","a","Vaulta",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"35494","blast","blast","Blast",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"11955","dia-data","dia","DIA",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"8284","terra-luna","lunc","Terra Luna Classic","1970-01-01","0","0",,,"1970-01-01","
+"
+"17569","joe","joe","JOE","2022-04-25","0","0","Metamask Ledger :  Blockchain Avalanche",,"2022-09-12","Récompenses de farming (0,576) Non intégré car solde inférieur à 1 euro"
+"1031","request-network","req","Request","1970-01-01","0","0",,,"1970-01-01",
+"289","siacoin","sc","Siacoin","1970-01-01","0","0",,,"1970-01-01","Blockchain Wallet adresses :
+f71511838469d56ae75069bff56b14752409b2854ede192a1be850a2674e25dbdea880a929be
+99ec09827e2f26c67afb7abd20049f9f263b3fdb6363d94b0f0d268bda1199311ccd762465ef
+
+"
+"100","stellar","xlm","Stellar","1970-01-01","0","0",,,"1970-01-01","Adresse blockchain : GBONWD6XMGD73M6PBSYEJEOFOWCGHMOS7FXEL5JB2Q6ETLVYM7DLPFJ6
+Activer l'appli Stellar sur le ledger pour activer le wallet Ledger Account Viewer"
+"54912","four","form","Four","1970-01-01","0","0",,,"1970-01-01",
+"949","storj","storj","Storj","1970-01-01","0","0",,,"1970-01-01",
+"325","tether","usdt","Tether","1970-01-01","0","0","Voir Fichier Excel","Voir Fichier Excel","1970-01-01",
+"1094","tron","trx","TRON","1970-01-01","0","0",,,"1970-01-01","Tronlink:
+TUv4N9swkh7Zb7yh864r7oSqVaah5Pj2HV
+
+Atomic Tron Blockchain :
+TMih68sQxDDGsXwh2vKWfaLrZnjzeeZ6rt
+
+Exodus Tron Blockchain :
+TL3ZXWrLh9TrQ7jJnytYK5udY7Jm6USQr2"
+"68423","sapien-2","sapien","Sapien","1970-01-01","0","0",,,"1970-01-01",
+"68061","somnia","somi","Somnia","2025-09-02","0.000000000001","6.65523163","Rabby EWC SOMI",,"2026-04-15","Launchpad
+Visible sur https://explorer.somnia.network/address/0x6Af84B23CA509cA4D76E5e51917Cf222677339A8
+Échangeables contre de l'usdc sur
+https://somnex.xyz/#/swap/0x0000000000000000000000000000000000000000/0x28bec7e30e6faee657a03e19bf1128aad7632a00"
+"6319","usd-coin","usdc","USD Coin","2025-04-25","0.855456614858","2132.85","Voir Fichier Excel","Voir Fichier Excel","2026-03-08",
+"1167","vechain","vet","VeChain","1970-01-01","0","0",,,"1970-01-01","Adresse Blockchain : 0x21d64E09D48571F438077801313b20278C3AF0c1
+Les récompenses de holding sont en VTHO
+"
+"203","verge","xvg","Verge","2024-05-28","0.00508076","1000.438754",,"MEXC","2026-03-31",
+"425","waves","waves","Waves","1970-01-01","0","0",,,"1970-01-01",
+"28660","venom","venom","Venom",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"1372","wax","waxp","WAX",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"691","zencash","zen","Horizen","1970-01-01","0","0",,,"1970-01-01",
+"24210","chain-2","xcn","Chain","1970-01-01","0","0",,,"1970-01-01",
+"50236","catizen","cati","Catizen","1970-01-01","0","0",,,"1970-01-01","Launchpad Binance"
+"19155","ssv-network","ssv","SSV Network","1970-01-01","0","0",,,"1970-01-01",
+"1371","aelf","elf","aelf","2024-01-15","0.5963896775","340.236705","Rabby EWC Ethereum",,"2026-03-15",
+"4380","algorand","algo","Algorand","1970-01-01","0","0",,,"1970-01-01","Adresse Blockchain Pera Wallet : NPV4A6ZY3HSJSL542JGZOF66AQJMODWG7YWP7LRR43DCIVJH4UCGKWWPYY"
+"38019","debridge","dbr","deBridge",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"525","ardor","ardr","Ardor",NULL,NULL,"0",NULL,NULL,NULL,NULL
+"14796","zignaly","zig","ZIGChain","2025-12-07","0.047771572521","826.7937259","Rabby EWC BSC",,"2026-03-13",
+"4645","constellation-labs","dag","Constellation","1970-01-01","0","0",,,"1970-01-01",
+"19","dash","dash","Dash",NULL,NULL,"0",NULL,NULL,NULL,NULL
+"3688","hedera-hashgraph","hbar","Hedera Hashgraph","1970-01-01","0","0",,,"1970-01-01",
+"2523","iostoken","iost","IOST",NULL,NULL,"0",NULL,NULL,NULL,NULL
+"385","lisk","lsk","Lisk",NULL,NULL,"0",NULL,NULL,NULL,NULL
+"913","loopring","lrc","Loopring","1970-01-01","0","0",,,"1970-01-01",
+"30061","wrapped-beacon-eth","wbeth","Wrapped Beacon ETH",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"4001","fantom","ftm","Fantom",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"1364","maker","mkr","Maker",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"3412","ravencoin","rvn","Ravencoin","1970-01-01","0","0",,,"1970-01-01",
+"53859","vine","vine","Vine",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"44","ripple","xrp","XRP","2026-02-15","1.242061799632","6126.6494","Ledger XRP",,"2026-05-15",
+"24384","cow-protocol","cow","CoW Protocol",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"779","status","SNT","Status",NULL,NULL,"0",NULL,NULL,NULL,NULL
+"398","steem","steem","Steem",NULL,NULL,"0",NULL,NULL,NULL,NULL
+"976","tezos","xtz","Tezos","1970-01-01","0","0",,,"1970-01-01",
+"2538","theta-token","theta","Theta Network","1970-01-01","0","0",,,"1970-01-01","Adresse Blockchain : 0x32E6718ca566f8F2cAe2759859e77Cbba751C304
+(THETA Wallet)
+
+"
+"486","zcash","zec","Zcash","2026-02-07","196.452185675262","0.81182896","YWallet",,"2026-05-07","Wallet client lourd Ubuntu"
+"2069","blockstack","stx","Blockstack","1970-01-01","0","0",,,"1970-01-01","Blockchain Leather Wallet 1 : SP3ESGY4K3YRH6EFBWDEP4MAJ6DD3PBZK9MSQKFPM
+Blockchain Leather Wallet 2 : SP17SPFZJP8VX82F2FEWKV2DYEW13D54518V9R7E1
+"
+"51232","syrup","syrup","Maple Finance",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"8834","chiliz","chz","Chiliz","1970-01-01","0","0",,,"1970-01-01",
+"4713","matic-network","matic","Matic Network","1970-01-01","0","0",,,"1970-01-01",
+"9026","ftx-token","ftt","FTX Token","1970-01-01","0","0",,,"1970-01-01","Liquidation (voir https://restructuring.ra.kroll.com/FTX/)
+Mail du 7 juillet indiquant que le FTT ne seraient pas remboursés.
+Your Unique Customer Code is 00511953
+Your claim(s) were scheduled on the Schedules and Statements of FTX Trading Ltd. as:
+BTC[0.0046921922585850]
+ETH[0.0001272000000000]
+FTT[4.0385844700000000]
+LEO[180.4406826100000000]
+SAND[38.1903678000000000]
+SHIB[21656708.8565932200000000]
+USD[0.6812789533346375]
+XAUT[0.0000000060000000]"
+"9566","nervos-network","ckb","Nervos Network","1970-01-01","0","0",,,"1970-01-01",
+"752","numeraire","nmr","Numeraire","1970-01-01","0","0",,,"1970-01-01",
+"8029","theta-fuel","tfuel","Theta Fuel","1970-01-01","0","0",,,"1970-01-01","Blockchain : 0x32E6718ca566f8F2cAe2759859e77Cbba751C304
+Staking Minimum 10000 TFUEL"
+"5230","vethor-token","vtho","VeThor Token","1970-01-01","0","0",,,"1970-01-01",
+"50882","hyperliquid","hype","Hyperliquid",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"32528","memecoin-2","meme","Memecoin","1970-01-01","0","0",,,"1970-01-01",
+"13395","bonfida","fida","Bonfida",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"22617","astar","astr","Astar","1970-01-01","0","0",,"Gate.io","1970-01-01",
+"13442","staked-ether","steth","Staked Ether","2026-04-08","1938.17565979503","0.44972974","Rabby AvaxWallet Ethereum(0.24731572)+Rabby Phantom_Ethereum Ethereum(0,20241402)",,"2026-04-10",
+"9761","kava","kava","Kava",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"662","gnosis","gno","Gnosis","2024-05-20","267.196051772529","0.63810068","Rabby EWC Ethereum",,"2026-04-26",
+"8365","reserve-rights-token","rsr","Reserve Rights Token","1970-01-01","0","0",,,"1970-01-01",
+"10481","tether-gold","xaut","Tether Gold","1970-01-01","0","0",,,"1970-01-01",
+"6595","thorchain","rune","Thorchain","1970-01-01","0","0",,,"1970-01-01",
+"11939","shiba-inu","shib","Shiba Inu","2026-03-05","0.000004869164","275881136","Rabby AvaxWallet Ethereum(247.120.991)+Rabby Airdrops Ethereum(13.452.679)+Rabby Phantom_Ethereum Ethereum(15307466)",,"2026-03-19",
+"55294","skyai","skyai","SkyAI",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"19252","clearpool","cpool","Clearpool",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"15861","spell-token","spell","Spell Token","1970-01-01","0","0",,,"1970-01-01",
+"10840","hive","hive","Hive","1970-01-01","0","0",,,"1970-01-01",
+"9545","band-protocol","band","Band Protocol","1970-01-01","0","0",,,"1970-01-01",
+"11610","bitget-token","bgb","Bitget Token","2026-04-16","1.719669266683","304.87419801","Rabby Airdrops Ethereum(146.41783793)+Rabby Principal Ethereum(158.45636008)",,"2026-05-31",
+"16746","floki-inu","floki","Floki Inu","2022-12-13","0.000111166312","1612517.17362269","Rabby Ledger BSC(965194,42362269)+Rabby EWC BSC(647322,75)",,"2026-03-20",
+"39651","ripple-usd","rlusd","Ripple USD",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"39200","g-token","g","Gravity","2024-07-20","0.054564154829","2306.70940819","Rabby EWC BSC",,"2026-04-13",
+"10951","uma","uma","UMA","1970-01-01","0","0",,,"1970-01-01",
+"16840","railgun","rail","Railgun","2024-09-04","1.575891610628","24.30573147","Rabby Principal : Ethereum(3,00310082) + Rabby Airdrops Ethereum (21,30263065)",,"2026-03-25","24 stakés sur 
+https://rail.governance.fi/
+unloking 30 jours
+
+A voir (utilisation de l'anonymat via railgun)
+https://www.youtube.com/watch?v=ja9Fj2mUDSQ
+
+3 RAIL unlocked le 22 mai 2026 (30 jours de délai)
+21 RAIL unlocked le 25 mai 2026 (30 jours de délai)"
+"27032","safe","safe","Safe",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"12409","amp-token","amp","Amp","1970-01-01","0","0",,,"1970-01-01",
+"10775","compound-governance-token","comp","Compound","1970-01-01","0","0",,,"1970-01-01",
+"11849","yearn-finance","yfi","yearn.finance",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"52622","pudgy-penguins","pengu","Pudgy Penguins","1970-01-01","0","0",,,"1970-01-01",
+"37869","subsquid","sqd","SQD",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"9519","pax-gold","paxg","PAX Gold","1970-01-01","0","0",,,"1970-01-01",
+"10886","energy-web-token","ewt","Energy Web Token","1970-01-01","0","0",,,"1970-01-01",
+"12171","polkadot","dot","Polkadot","1970-01-01","0","0",,,"1970-01-01","Multichain porfolio :
+https://portfolio.subscan.io/account/15PgmMcPW5fcsu9YT62iytdHTSSSe6zqCwaiGs5rM3R31iqu
+
+0,01 DOT sur la blockchain AssetHub :
+Adresse 5GTPd2MKeJQ9SN92VSyiqjo8bpSnwoSh8SrE7a6VnxPWqCSU
+
+"
+"11095","just","jst","JUST","1970-01-01","0","0",,,"1970-01-01","Lending possible sur JustLend mais APR trop faible (0,29%)"
+"4284","helium","hnt","Helium","1970-01-01","0","0",,,"1970-01-01",
+"23597","stepn","gmt","STEPN","1970-01-01","0","0",,,"1970-01-01",
+"69096","zero-gravity","0g","0G","1970-01-01","0","0",,,"1970-01-01",
+"12124","curve-dao-token","crv","Curve DAO Token","1970-01-01","0","0",,,"1970-01-01",
+"69414","giggle-fund","giggle","Giggle Fund",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"12817","filecoin","fil","Filecoin",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"12645","aave","aave","Aave [New]","1970-01-01","0","0",,,"1970-01-01",
+"12271","sushi","sushi","Sushi",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"4343","arweave","ar","Arweave","2024-05-30","29.618137176473","9.75036","Wander Wallet",,"2026-04-19",
+"7598","wrapped-bitcoin","wbtc","Wrapped Bitcoin","1970-01-01","0","0",,,"1970-01-01",
+"12335","elrond-erd-2","egld","MultiversX","1970-01-01","0","0",,,"1970-01-01",
+"28161","across-protocol","acx","Across Protocol",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"36179","aethir","ath","Aethir",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"37441","eigenlayer","eigen","Eigenlayer",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"30980","mantle","mnt","Mantle",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"38108","sonic-3","s","Sonic (prev. FTM)","2025-01-18","0.65767696399","321.3950838","Rabby Principal : Sonic",,"2026-05-14","Upgrade from fantom
+320 S stakés à 4,85% sur https://my.soniclabs.com/stake
+"
+"30663","gho","gho","GHO",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"69040","aster-2","aster","Aster",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"1877","origintrail","trac","OriginTrail","1970-01-01","0","0",,,"1970-01-01",
+"5163","zelcash","flux","Flux","1970-01-01","0","0",,,"1970-01-01",
+"12504","uniswap","uni","Uniswap","1970-01-01","0","0",,,"1970-01-01",
+"12559","avalanche-2","AVAX","Avalanche","2021-10-15","31.456661388686","47.9322","Rabby Principal Avalanche (41,6252)+Rabby Airdrops Avalanche (6,307)",,"2026-05-25","6,0719 AVAX sur Rabby Airdrops (4,97%)
+en staking sur https://www.hypha.sh/unstake
+41,3978 AVAX sur Rabby Principal (5,01%)
+en liquid staking sur https://app.benqi.fi/savax
+
+"
+"13245","skale","skl","SKALE",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"13397","the-graph","grt","The Graph","1970-01-01","0","0",,,"1970-01-01",
+"13162","oasis-network","rose","Oasis Network","1970-01-01","0","0",,,"1970-01-01",
+"10365","near","near","Near","2024-04-17","4.901904532204","12.4699","MyNearWallet",,"2026-04-28","placés sur le vault de rhea Finance (https://app.rhea.finance/vaultV2) 
+APY 4,81%"
+"12882","injective-protocol","inj","Injective Protocol","2023-08-04","28.835711138869","26.161934","Keplr EWC INJ",,"2026-05-21","Tester le https://injhub.com/community-buyback si disponible
+
+Staking sur
+https://injhub.com/stake/my-staking/
+20 INJ stakés sur Keplr
+6 INJ stakés sur Allnodes
+
+Délai de unstaking : 21 jours"
+"2090","rocket-pool","rpl","Rocket Pool","2023-03-09","37.65829271071","1.82713326","Rabby EWC Ethereum(1,29713326)","MEXC(0,53)","2026-03-14",
+"13469","1inch","1inch","1inch","1970-01-01","0","0",,,"1970-01-01",
+"33228","jito-governance-token","jto","Jito",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"12944","certik","ctk","CertiK","1970-01-01","0","0",,,"1970-01-01","
+
+"
+"66811","humanity","h","Humanity",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"25235","berachain-bera","bera","Berachain","1970-01-01","0","0",,,"1970-01-01",
+"53575","anime","anime","Animecoin","1970-01-01","0","0",,,"1970-01-01",
+"13446","flow","flow","Flow - Dapper Labs",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"11085","trust-wallet-token","twt","Trust Wallet Token","2022-12-19","1.254892759603","82","Trust Wallet (Android)",,"2026-05-16",
+"4344","harmony","one","Harmony","1970-01-01","0","0",,,"1970-01-01","Staking possible sur https://staking.harmony.one/portfolio/mainnet
+
+Metamask Principal : Blockchain Harmony A UTILISER AVEC CHROME
+
+
+"
+"29215","huma-finance","huma","Huma Finance","1970-01-01","0","0",,,"1970-01-01",
+"34515","degen-base","degen","Degen (Base)",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"12677","venus","xvs","Venus",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"5681","fetch-ai","fet","Fetch.ai","2025-05-23","0.992390566875","678.86","ASI Alliance Wallet",,"2026-03-24","660 FET stakés sur wallet
+600 sur BlueStake
+60 sur Blockscope.net
+10 sur Staking4all
+21 days of unstaking"
+"3334","iotex","iotx","IoTeX","1970-01-01","0","0",,,"1970-01-01",
+"20612","constitutiondao","people","ConstitutionDAO","2024-06-23","0.081380966784","811.04620665","Rabby EWC BSC",,"2026-04-30",
+"54087","jelly-my-jelly","jellyjelly","Jelly-My-Jelly",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"8713","stp-network","awe","AWE Network",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"12785","akash-network","akt","Akash Network","2025-07-27","1.202744863124","83.119","Keplr Ledger Akash(70.3634) + Keplr Principal Akash(12.7556)",,"2026-05-22","70 AKT stakés avec meria (Keplr Ledger)
+https://wallet.keplr.app/chains/akash
+
+12 AKT stakés avec meria (Keplr Principal)
+https://wallet.keplr.app/chains/akash"
+"12129","the-sandbox","sand","SAND","2022-04-25","1.2185722521","12.27961903","Rabby Phantom_Ethereum Polygon",,"2026-03-07","staking annulé sur sandbox.game/en/me/defi/ car KYC demandé
+"
+"14040","superfarm","super","SuperFarm","2025-07-11","0.662242217","314.88419834","Rabby PlayToEarn Ethereum",,"2026-05-15","Stakés sur https://staking.superverse.co/
+APY 1,88% en Ethereum"
+"2962","coti","coti","COTI",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"1104","power-ledger","powr","Power Ledger","1970-01-01","0","0",,,"1970-01-01",
+"763","metal","mtl","Metal",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"4379","celer-network","celr","Celer Network","1970-01-01","0","0",,,"1970-01-01","Staking impossible en dehors de la blockchain Ethereum
+https://sgn.celer.network/#/staking"
+"50767","world-liberty-financial","wlfi","World Liberty Financial",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"13029","axie-infinity","axs","Axie Infinity",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"3849","quark-chain","qkc","QuarkChain",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"14571","pundi-x-2","pundix","Pundi X","1970-01-01","0","0",,,"1970-01-01","
+
+"
+"12913","audius","audio","Audius",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"13928","raydium","ray","Raydium","2026-01-03","0.89320300183","213.029627","Phantom Wallet",,"2026-03-29","200 Ray staked at 6,31%
+https://raydium.io/portfolio/"
+"4630","orbs","orbs","Orbs","1970-01-01","0","0",,,"1970-01-01",
+"30118","crvusd","crvusd","crvUSD",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"4428","ecomi","omi","ECOMI",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"27008","coinbase-wrapped-staked-eth","cbeth","Coinbase Wrapped Staked ETH",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"11636","render-token","render","Render","2026-03-08","4.333391242574","69.79339","Phantom Wallet",,"2026-03-08",
+"15760","bitkub-coin","kub","Bitkub Coin",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"15595","metis-token","metis","Metis Token","2021-12-31","48.007069797982","1.39146","Binance Web3",,"2026-05-19",
+"3476","mass-vehicle-ledger","mvl","MVL",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"2484","ergo","erg","Ergo",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"50891","fartcoin","fartcoin","Fartcoin",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"23547","concordium","ccd","Concordium",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"6905","pirate-chain","arrr","Pirate Chain",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"69","monero","xmr","Monero","2026-04-03","282.165106645192","1.2013","Monero Wallet",,"2026-05-29",
+"39901","kaia","kaia","Kaia","1970-01-01","0","0",,,"1970-01-01",
+"34755","gigachad-2","giga","Gigachad",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"35801","kamino","kmno","Kamino",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"13079","conflux-token","cfx","Conflux","1970-01-01","0","0",,,"1970-01-01","
+
+"
+"8825","prometeus","prom","Prometeus","1970-01-01","0","0",,,"1970-01-01",
+"15628","mina-protocol","mina","Mina Protocol",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"5217","dusk-network","dusk","DUSK Network","2024-06-26","0.287434232738","202.69118335","Rabby EWC BSC",,"2026-05-06",
+"17233","immutable-x","imx","Immutable X","2024-03-28","2.319020762093","108.7352","Rabby EWC Immutable ZKEVM",,"2026-04-23","100 IMX staked à 9,06% sur https://imx.community/staking?t=stake
+1 NFT acheté pour pouvoir être éligible à l'APY
+visible sur https://tokentrove.com/collection/GodsUnchainedCosmetics?tab=wallet"
+"15687","apenft","nft","APENFT","1970-01-01","0","0",,,"1970-01-01","TMih68sQxDDGsXwh2vKWfaLrZnjzeeZ6rt"
+"14495","internet-computer","icp","Internet Computer","2024-05-01","11.95486040277","84.1771","Plug Wallet (Extension Chrome)",,"2026-04-21","80 ICP en staking sur https://waterneuron.fi/ à 16,7% APY
+(6 mois de délai pour unstake sans frais)"
+"15174","chia","xch","Chia",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"28624","flare-networks","flr","Flare",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"5992","gemini-dollar","gusd","Gemini Dollar",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"52302","alchemist-ai","alch","Alchemist AI",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"4639","bifrost","bfc","Bifrost",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"14899","kyber-network-crystal","knc","Kyber Network Crystal",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"31079","first-digital-usd","fdusd","First Digital USD","1970-01-01","0","0",,,"1970-01-01",
+"10366","smooth-love-potion","slp","Smooth Love Potion",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"13256","api3","api3","API3","1970-01-01","0","0",,,"1970-01-01",
+"15279","casper-network","cspr","Casper Network",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"11090","celo","celo","Celo","1970-01-01","0","0",,,"1970-01-01","Acheté pour alimenter la blockchain Celo"
+"22506","pocket-network","pokt","Pocket Network",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"12390","alchemy-pay","ach","Alchemy Pay",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"12493","gala","gala","Gala","1970-01-01","0","0",,,"1970-01-01",
+"17117","coin98","c98","Coin98",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"5111","beldex","bdx","Beldex",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"17358","yield-guild-games","ygg","Yield Guild Games","2024-06-13","0.738601016018","90.74268115","Rabby EWC BSC",,"2026-04-06",
+"54479","siren-2","siren","Siren",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"69149","niza-global-2","niza","Niza Global",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"13573","lido-dao","ldo","Lido DAO","1970-01-01","0","0",,,"1970-01-01",
+"15380","centrifuge","cfg","Centrifuge","2024-01-19","0.5581065457","622.7117","Rabby Gate.io Ethereum",,"2026-03-26","Migré vers le nouveau contrat le 01/06/2025
+(Centrifuge (CFG) migrated from their old contract to a new contract on ETH)"
+"14051","mask-network","mask","Mask Network",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"68339","doublezero","2z","DoubleZero","1970-01-01","0","0",,,"1970-01-01","Launchpad"
+"68507","linea","linea","Linea","2025-09-10","0.000000000001","123.54253412","Rabby EWC Linea",,"2026-05-08","Launchpad Binance
+Defi non utilisée car valeur inférieur à 1€"
+"15585","convex-finance","cvx","Convex Finance","1970-01-01","0","0",,,"1970-01-01",
+"8545","mx-token","mx","MX Token","2026-03-06","1.580179774","44.12012909",,"MEXC","2026-03-06",
+"4817","coinex-token","cet","CoinEx Token","2024-11-13","0.087745","994.80080654","Gate.io Wallet Ethereum",,"2026-03-27",
+"51440","tokenbot-2","clanker","tokenbot",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"20009","ronin","ron","Ronin","2024-05-16","2.189141948028","56.55","Ronin Wallet Extension Brave",,"2026-05-29","staking non disponible
+retester le staking sur https://app.roninchain.com/staking?t=staking
+Délai d'unstake : 3 jours."
+"16646","ecash","xec","eCash",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"18323","gmx","gmx","GMX","1970-01-01","0","0",,,"1970-01-01",
+"2518","weth","weth","WETH",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"1341","uquid-coin","uqc","Uquid Coin",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"9330","pay-coin","pci","Paycoin",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"38637","spark-2","spk","Spark","2025-06-16","0.000000000001","41.35684351","Rabby EWC BSC",,"2026-05-12","Launchpad"
+"10569","creditcoin-2","ctc","Creditcoin","1970-01-01","0","0",,,"1970-01-01",
+"14665","liquity","lqty","Liquity","1970-01-01","0","0",,,"1970-01-01",
+"11875","dkargo","dka","dKargo",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"24383","apecoin","ape","ApeCoin","1970-01-01","0","0",,,"1970-01-01",
+"13876","jasmycoin","jasmy","JasmyCoin","1970-01-01","0","0",,,"1970-01-01",
+"33613","ethena-usde","usde","Ethena USDe",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"35087","wormhole","w","Wormhole",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"51281","global-dollar","usdg","Global Dollar",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"55974","build-on","b","BUILDon",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"4490","aergo","aergo","Aergo",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"14631","aioz-network","aioz","AIOZ Network",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"9644","tellor","trb","Tellor","2024-02-12","107.777702753745","2.20832896","Rabby Principal Ethereum(0,14)+Rabby EWC Ethereum(2,06832896)",,"2026-04-07",
+"13860","auction","auction","Bounce","1970-01-01","0","0",,,"1970-01-01",
+"3449","true-usd","tusd","TrueUSD",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"29948","edu-coin","edu","Open Campus",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"50264","moo-deng","moodeng","Moo Deng",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"3014","concierge-io","ava","Travala.com",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"25751","kaspa","kas","Kaspa","2023-12-19","0.118636373586","1514.079","Kaspa Wallet",,"2026-03-11","Pas de staking car POW"
+"18623","magic","magic","Magic",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"51589","pippin","pippin","pippin",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"26149","euler","eul","Euler","1970-01-01","0","0",,,"1970-01-01",
+"26997","ethereum-pow-iou","ethw","EthereumPoW",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"12451","pha","pha","Phala Network",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"56092","resolv","resolv","Resolv","2025-06-06","0.000000000001","93.64461344","Rabby PlayToEarn Ethereum",,"2026-03-26","90 RESOLV stakés sur https://app.resolv.xyz/overview à 26,79%
+bloqués temporairement après la faille de mars 2026
+update 25/03/26 :
+Over the past 2 days, $77M+ has been redeemed for allowlisted wallets with pre-exploit USR, representing 90%+ of this group and marking strong progress in phase one of recovery.
+
+Next:
+• Redemption process for this group is actively being completed
+• Work on subsequent phases"
+"69380","anoma","xan","Anoma",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"13905","safepal","sfp","SafePal",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"23496","polymesh","polyx","Polymesh","1970-01-01","0","0",,,"1970-01-01","upgraded 1:1 to POLYX (Polymesh) par binance le 17 octobre 2022"
+"27277","axelar","axl","Axelar","2024-04-01","1.614417547762","40.072144","Rabby EWC BSC",,"2026-03-21",
+"12713","dexe","dexe","DeXe","1970-01-01","0","0",,,"1970-01-01",
+"12998","wemix-token","wemix","WEMIX","2026-03-21","0.240643187111","212.07","Rabby Xdc Wemix",,"2026-03-23",
+"8460","moviebloc","mbl","MovieBloc",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"28600","bonk","bonk","Bonk","2025-02-22","0.000000000001","2622.84552","Phantom Wallet",,"2026-05-27","Rewards Kamino"
+"40132","binance-staked-sol","bnsol","Binance Staked SOL",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"54035","story-2","ip","Story",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"33760","popcat","popcat","Popcat",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"24488","nym","nym","Nym",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"28205","sei-network","sei","Sei","2024-02-11","0.649072818724","2256.6021299","Rabby EWC Sei(1434,87369637)+Rabby Airdrops Sei(821,72843353)",,"2026-05-20","1430 SEI stakés sur https://www.splashing.xyz/defi (4%)
+Jetons de staking en lending sur Takara (4,54%) 
+https://app.takaralend.com/dashboard
+
+820 SEI stakés sur https://www.splashing.xyz/defi
+Jetons de staking en lending sur Takara 
+https://app.takaralend.com/dashboard"
+"53746","official-trump","trump","Official Trump",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"4463","okb","okb","OKB","2025-07-03","69.751135094588","8.62946303","Rabby OKex Wallet XLayer(1,054)+Rabby OKex Wallet Ethereum(7,57546303)",,"2026-03-27",
+"28453","blur","blur","Blur",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"28938","coredaoorg","core","Core","2024-09-17","0.8481781473","110"," Rabby Airdrops Core",,"2026-03-28","100 CORE en staking sur https://stake.coredao.org/liquid-staking/stcore
+à 4,16 %"
+"12538","velo","velo","Velo","2026-01-05","0.006536992","9428.878393","Rabby Airdrops BSC",,"2026-04-01","Farming possible sur https://velofinance.io/farms/bnb/live"
+"4519","xyo-network","xyo","XYO Network","2026-02-28","0.003354372029","7342.92853088","Rabby Principal Ethereum",,"2026-05-26","7000 xyo stakés sur https://xyo.network/fr/staking/stake
+Utiliser chromium et metamask pour que la connexion fonctionne"
+"16547","arbitrum","arb","Arbitrum","1970-01-01","0","0",,,"1970-01-01",
+"858","gas","gas","Gas","2023-11-25","7.387389254308","46.09695056","Neon Wallet(App Linux)",,"2026-04-22","Pour lancer le wallet :
+Aller dans Téléchargement et exécuter :
+blu3m00n@blu3m00n-NV4XMB-ME-MZ:~/Téléchargements$ ./NeonWallet-3.10.0-linux.AppImage --no-sandbox
+"
+"35958","ether-fi","ethfi","Ether.fi","1970-01-01","0","0",,,"1970-01-01","Launchpad Binance"
+"15069","pendle","pendle","Pendle","2024-06-14","4.73185574083","52.76927","Rabby Principal :  Ethereum",,"2026-04-02","50 PENDLE stakés sur
+https://app.pendle.finance/spendle/stake/in
+Unstaking has a 14-day cooldown, or instant for a 5% fee."
+"17980","the-open-network","ton","Toncoin","2024-04-30","5.103698875009","235.85","TonKeeper",,"2026-03-12","230.85 TON stakés sur https://app.tonstakers.com/ à 3,02%
+"
+"18125","adventure-gold","agld","Adventure Gold","2023-12-15","0.856173773834","4.311","Rabby Principal : Ethereum",,"2026-03-23",
+"29850","pepe","pepe","Pepe","2024-08-09","0.0000077099","21355418.752161","Rabby Ledger BSC(4089.7521609069)+Rabby Principal Ethereum(21351487)",,"2026-03-22",
+"26045","euro-coin","eurc","EURC",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"2341","arcblock","abt","Arcblock","2025-05-11","1.034057455","51.5066","Rabby PlayToEarn Ethereum",,"2026-03-19",
+"26375","sui","sui","Sui","1970-01-01","0","0",,,"1970-01-01",
+"68404","lombard-protocol","bard","Lombard",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"30162","ordinals","ordi","ORDI","2024-02-26","61.439880069257","4.71","Unisat Wallet (Extension Chrome)",,"2026-04-17","Extension Unisat Wallet utilisée avec Password et Seed de Trust Wallet
+
+(Les utilisateurs de trust wallet doivent désormais importer leur phrase de récupération dans un portefeuille dédié comme Xverse ou Unisat pour y accéder. 
+Statut actuel (avril 2026) : Le support des tokens BRC-20 et des inscriptions est désactivé dans Trust Wallet.) 
+
+Adresse BRC20 Bitcoin (bc1qmd5c4nej0utejfw7ylla8wys85x3v8jyjj3zar)
+"
+"8506","arpa","arpa","ARPA",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"34258","xai-blockchain","xai","Xai","2024-01-09","1.023743494747","128.42858143","Metamask EWC XAI",,"2026-06-03","https://app.xai.games/redeem
+Redeem en pending 180 jours (récupération le 01/09/26)"
+"35893","aevo-exchange","aevo","Aevo","2024-05-22","0.856409938656","667.97710676","Rabby EWC Ethereum",,"2026-04-10",
+"13459","cobak-token","cbk","Cobak",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"30929","arkham","arkm","Arkham","2024-06-09","2.1195267894","144","Rabby Gate.io Ethereum",,"2026-03-06",
+"35100","pixels","pixel","Pixels","2024-05-19","0.3113372485","253.708","Rabby Ronin",,"2026-05-31","pixels unstakés de https://staking.pixels.xyz/stakes
+car validateur inactif (withdraw après 3 jours de délai d'unstaking)
+Restaker 250 pixel sur le validateur pixel"
+"54411","kaito","kaito","KAITO",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"31069","worldcoin-wld","wld","Worldcoin","2024-04-13","6.06023498286","10.98003148","Rabby EWC Optimism",,"2026-04-14",
+"54342","pi-network","pi","Pi Network",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"31274","cyberconnect","cyber","CyberConnect",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"31059","mog-coin","mog","Mog Coin","1970-01-01","0","0",,,"1970-01-01",
+"53623","plume","plume","Plume","2025-08-18","0.000000000001","31.08205875","Rabby EWC Plume",,"2026-05-10","Launchpad"
+"36440","cat-in-a-dogs-world","mew","cat in a dogs world",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"55424","space-and-time","sxt","Space and Time","1970-01-01","0","0",,,"1970-01-01","Launchpad"
+"38501","orderly-network","order","Orderly",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"31967","celestia","tia","Celestia","2024-02-13","11.169346175858","166.356131","Keplr Blu3M00nAirdrops(0,407431)+Keplr Ledger(165,9487)",,"2026-04-03","160.1596 TIA en staking sur Keplr Principal
+https://wallet.keplr.app/chains/celestia
+avec la ledger connectée sur COSMOS
+
+Ne pas confondre Keplr Airdrops avec Keplr Blu3M00nAirdrops
+
+"
+"32251","big-time","bigtime","Big Time",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"17547","orca","orca","Orca",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"28452","bittensor","tao","Bittensor","1970-01-01","0","0",,,"1970-01-01",
+"26433","starknet","strk","Starknet",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"66819","newton-protocol","newt","Newton Protocol","1970-01-01","0","0",,,"1970-01-01","Launchpad"
+"34608","altlayer","alt","AltLayer","1970-01-01","0","0",,,"1970-01-01",
+"39699","dogs-2","dogs","Dogs","1970-01-01","0","0",,,"1970-01-01","Launchpad Binance"
+"33713","1000sats-ordinals","1000sats","1000SATS (Ordinals)",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"33566","dogwifcoin","wif","dogwifhat","2024-05-17","2.5747937108","74.445502","Phantom Wallet Compte 1",,"2026-05-13","Possibilité de lending sur https://save.finance/ si APR au moins égal à 1%
+Overview affichée à droite"
+"30496","snek","snek","Snek","2024-08-02","0.000845747828","8000",,"MEXC","2026-05-17",
+"29306","chaingpt","cgpt","ChainGPT",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"7427","stronghold-token","shx","Stronghold","2025-10-11","0.010705565556","36380","Freighter Wallet",,"2026-06-02",
+"32594","dydx-chain","dydx","dYdX",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"25266","apex-token-2","apex","ApeX","2024-06-13","2.273042976014","138.99486523","Rabby Phantom_Ethereum Arbitrum",,"2026-03-08",
+"52721","susds","susds","sUSDS",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"31212","paypal-usd
+","pyusd","PayPal USD",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"34289","manta-network","manta","Manta Network","1970-01-01","0","0",,,"1970-01-01","Launchpad"
+"26580","ondo-finance","ondo","Ondo","2024-05-14","0.8056170075","418.91243306","Rabby Gate.io Ethereum(342.73)+Rabby Ledger Ethereum(76,18243306)",,"2026-05-28",
+"22228","threshold-network-token","t","Threshold Network",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"31385","ozone-chain","ozo","Ozone Chain",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"26718","zetachain","zeta","ZetaChain",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"31745","aerodrome-finance","aero","Aerodrome Finance","1970-01-01","0","0",,,"1970-01-01",
+"37754","io","io","io.net","1970-01-01","0","0",,,"1970-01-01","Launchpad"
+"36530","Ethena","ena","Ethena",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"38058","taiko","taiko","Taiko",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"31744","banana-gun","banana","Banana Gun","1970-01-01","0","0",,,"1970-01-01",
+"51301","peanut-the-squirrel","pnut","Peanut the Squirrel",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"37812","mocaverse","moca","Moca Coin",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"38068","lista","lista","Lista DAO",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"32417","beam","beam","BEAM",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"35529","brett","brett","Brett",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"39488","neiro","neiro","Neiro",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"531","stratis","strax","Stratis",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"50717","goatseus-maximus","goat","Goatseus Maximus",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"40094","grass","grass","Grass",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"30256","cetus-protocol","cetus","Cetus Protocol",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"37689","carv","carv","CARV",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"51091","usual","usual","Usual","1970-01-01","0","0",,,"1970-01-01",
+"54558","falcon-finance","usdf","Falcon USD",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"29837","morpho","morpho","Morpho","2025-10-03","0.000000000001","0.7708152","Rabby EWC Base",,"2026-04-16","Launchpad"
+"39345","movement","move","Movement","1970-01-01","0","0",,,"1970-01-01",
+"51404","vana","vana","Vana","2024-12-16","0.000000000001","1.0479368","Rabby EWC Vana",,"2026-04-25","1 VANA en staking sur https://stake.vana.org/ à 10% APR
+
+VANA s'affiche à tort dans Rabby EWC testnet"
+"51415","peaq-2","peaq","peaq",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"51784","aixbt","aixbt","aixbt by Virtuals",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"37789","gamebuild","game","GameBuild",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"53022","bio-protocol","bio","Bio Protocol","2025-01-03","0.000000000001","18.15149014","Rabby EWC Base",,"2026-04-09","Launchpad Binance"
+"31126","toshi","toshi","Toshi",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"51100","comedian","ban","Comedian",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"2346","swftcoin","swftc","SWFTCOIN","2025-04-21","0.011602317","3737.90687597","Rabby Ledger Ethereum",,"2026-03-17",
+"8418","leo-token","leo","LEO Token",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"646","iexec-rlc","rlc","iExec RLC",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"55703","nexpace","nxpc","Nexpace","2025-05-15","0.000000000001","6.73988727","Rabby EWC BSC",,"2026-04-08","Launchpad"
+"66681","sahara-ai","sahara","Sahara AI","2025-06-25","0.000000000001","26.14115665","Rabby EWC BSC",,"2026-04-11","Launchpad Binance"
+"4376","newton-project","ab","AB","2026-03-07","0.002034117","38696.47682265","Rabby Phantom_Ethereum BSC",,"2026-03-07",
+"3695","nexo","nexo","NEXO",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"12591","wbnb","wbnb","Wrapped BNB","2026-04-05","509.613528055003","0.59762087","Rabby AvaxWallet BSC",,"2026-04-05",
+"55303","sign-global","sign","Sign","2025-04-28","0.000000000001","46.32061472","Rabby EWC BSC",,"2026-05-02","Binance Launchpad"
+"67905","succinct","prove","Succinct","2025-08-05","0.000000000001","3.25642926","Rabby EWC BSC",,"2026-05-01","Launchpad"
+"11038","cartesi","ctsi","Cartesi",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"68972","avantis","avnt","Avantis","1970-01-01","0","0",,,"1970-01-01","Launchpad"
+"69318","river","river","River",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"66481","egl1","egl1","EGL1",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"2912","xdce-crowd-sale","xdce","XDC Network","2026-03-10","0.027498081301","5815.18","XDC Web Wallet",,"2026-03-23","https://wallet.xinfin.network/#/wallet/dashboard (se connecter avec Rabby Xdc)"
+"6799","bitcoin-cash-sv","bchsv","Bitcoin SV",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"10807","btse-token","btse","BTSE Token",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"54023","venice-token","vvv","Venice Token",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"31401","spx6900","spx","SPX6900",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"37052","zebec-network","zbcn","Zebec Network",NULL,NULL,NULL,NULL,NULL,NULL,NULL
+"25244","optimism","op","Optimism",NULL,NULL,NULL,NULL,NULL,NULL,NULL

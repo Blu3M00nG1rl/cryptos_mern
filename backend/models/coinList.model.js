@@ -1,0 +1,51 @@
+const mongoose = require("mongoose");
+
+const coinSchema = new mongoose.Schema(
+    {
+        no: {
+            type: String,
+            required: true,
+            unique: true
+        },
+        coinId: {
+            type: String,
+            required: true,
+            unique: true
+        },
+        symbol: {
+            type: String,
+            required: true,
+            unique: true
+        },
+        name: {
+            type: String,
+            required: true,
+            unique: true
+        },
+        dateAchat: {
+            type: Date
+        },
+        nombre: {
+            type: Number
+        },
+        prix: {
+            type: Number
+        },
+        stockage: {
+            type: String
+        },
+        dateVerif: {
+            type: Date
+        },
+        observation: {
+            type: String
+        }
+    },
+    {
+        timestamps: true
+    }
+);
+
+const CoinModel = mongoose.model("coin", coinSchema);
+
+module.exports = CoinModel;

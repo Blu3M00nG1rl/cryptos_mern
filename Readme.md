@@ -31,6 +31,12 @@ $ docker compose up -d backend
 12 Installer cors pour donner les accès au front
 $ npm i -s cors
 
+13 Installer axion pour les uploads
+$ npm i -s axios
+
+14 Installer fs et csv-parser pour les import de csv
+$ npm i -s fs csv-parser
+
 image de coin.model
 https://assets.coingecko.com/coins/images/no/standard/coinId.png
 
@@ -67,5 +73,18 @@ components pour les composants
 9 Créer un dossier Routes dans components
 fichier index.js contenant les routes
 
-36min
+10 Installation d'axios
+$ npm i -s axios
+
+11 Installation de bootstrap
+$ npm i -s bootstrap
+
+2h51
+
+MONGO
+delete une table
+db.coins.deleteMany({})
+
+création import.js dans backend upload (copier sur uploads de copa (axios vers controller pour intéragir avec mongo))
+
 

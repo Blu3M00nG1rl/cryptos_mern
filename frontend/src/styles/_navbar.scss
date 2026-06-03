@@ -1,0 +1,80 @@
+/* Reset et base */
+nav {
+  width: 100%;
+  background-color: #A8E6CF; /* same vivid mint as .btn-primary */
+  color: #123d33; /* dark text for contrast */
+  padding: 1rem 2rem;
+  box-shadow: 0 4px 18px rgba(36, 55, 70, 0.03);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.nav-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  text-decoration: none;
+  color: white;
+}
+
+.logo img {
+  width: 2.5rem;
+  height: 2.5rem;
+  object-fit: contain;
+}
+
+.logo h3 {
+  margin: 0;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #123d33; /* dark mint text for contrast */
+}
+
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.nav-actions .search input {
+  background: #fff;
+  border: 1px solid rgba(18,61,51,0.06);
+  color: #123d33;
+  padding: 0.45rem 0.75rem;
+  border-radius: 10px;
+  width: 260px;
+  box-shadow: 0 1px 6px rgba(18,61,51,0.06);
+}
+
+.nav-actions .search input::placeholder {
+  color: #9aa9b4;
+}
+
+.nav-actions .btn {
+  padding: 0.45rem 0.8rem;
+}
+
+/* Style pour les liens actifs (optionnel) */
+a.active {
+  font-weight: bold;
+  color: #4cc9f0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  nav {
+    padding: 1rem;
+  }
+  .logo h3 {
+    font-size: 1.25rem;
+  }
+}

@@ -1,17 +1,24 @@
-import { BrowserRouter as Router, Routes, Route, Redirect} from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route} from 'react-router-dom';
 import Wallet from '../../pages/Wallet';
 import Coins from '../../pages/Coins';
 import Ventes from '../../pages/Ventes';
+import Navbar from '../Navbar';
+import LeftNav from '../LeftNav';
 
 const index = () => {
     return (
         <Router>
-            <Routes>
-                <Route path="/" element={<Wallet/>} />
-                <Route path="/coins" element={<Coins/>} />
-                <Route path="/ventes" element={<Ventes/>} />
-                <Route path="*" element={<Wallet/>} />
-            </Routes>
+            <Navbar />
+            <LeftNav />
+
+            <main className="coin-page">
+                <Routes>
+                    <Route path="/" element={<Wallet />} />
+                    <Route path="/coins" element={<Coins />} />
+                    <Route path="/ventes" element={<Ventes />} />
+                    <Route path="*" element={<Wallet />} />
+                </Routes>
+            </main>
         </Router>
     );
 };

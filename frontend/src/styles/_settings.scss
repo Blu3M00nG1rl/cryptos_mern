@@ -1,13 +1,136 @@
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    list-style-type: none;
-    outline: none;
-    border: none;
-    text-decoration: none;
+.btn:hover {
+    transform: translateY(-1px);
+}
 
-    &::selection {
-        background: yellow;
-    }    
+/* Baseline page styles */
+
+body {
+  font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+  background: linear-gradient(180deg, #FFF8FB 0%, #F7F6FF 50%, #F3FFF6 100%);
+  color: #243746;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Container max width */
+.container-max {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Layout principal */
+.coin-page {
+  margin-left: 80px; /* Largeur de la LeftNav + un peu de marge */
+  padding: 1.5rem 1.75rem;
+  transition: margin-left 0.3s ease;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Titre */
+.coin-page h1 {
+  color: #1a1a2e;
+  font-weight: 600;
+}
+
+/* Cartes */
+.card {
+  border: none;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  margin-bottom: 1.2rem;
+  background: rgba(255, 255, 255, 0.9);
+  color: #243746;
+}
+
+.card-header {
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid rgba(36, 55, 70, 0.06);
+}
+
+.card-body {
+  padding: 1.25rem;
+}
+
+/* Formulaire */
+.form-control {
+  border-radius: 6px;
+  border: 1px solid #ced4da;
+  padding: 0.5rem 1rem;
+}
+
+.form-control:focus {
+  border-color: #4cc9f0;
+  box-shadow: 0 0 0 0.2rem rgba(76, 201, 240, 0.25);
+}
+
+/* Boutons */
+.btn {
+  border-radius: 6px;
+  padding: 0.5rem 1rem;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.btn-primary {
+  background-color: #A8E6CF; /* menthe */
+  border-color: #A8E6CF;
+  color: #123d33;
+}
+
+.btn-outline-primary {
+  color: #D6C8FF; /* lavande */
+  border-color: #D6C8FF;
+}
+
+.btn-outline-danger {
+  color: #FFB7C5; /* rose */
+  border-color: #FFB7C5;
+}
+
+/* Tableau */
+.table-responsive {
+  overflow-x: auto;
+}
+
+.table {
+  margin-bottom: 0;
+}
+
+.table thead th {
+  background-color: #f8f9fa;
+  color: #495057;
+  font-weight: 600;
+  border-top: none;
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+  background-color: rgba(0, 0, 0, 0.02);
+}
+
+.table-hover tbody tr:hover {
+  background-color: rgba(76, 201, 240, 0.1);
+}
+
+/* Boutons d'action dans le tableau */
+.btn-sm {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.875rem;
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+  .coin-page {
+    margin-left: 60px;
+  }
+}
+
+@media (max-width: 768px) {
+  .coin-page {
+    margin-left: 0;
+    padding: 1rem;
+  }
+  .card, .table {
+    width: 100%;
+  }
 }

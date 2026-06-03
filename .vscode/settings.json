@@ -1,0 +1,15 @@
+{
+    "emmet.includeLanguages": {
+        "javascript": "javascriptreact",
+        "typescript": "typescriptreact"
+    },
+    "emmet.syntaxProfiles": {
+        "javascriptreact": {
+            "attr_quotes": "double"
+        },
+        "typescriptreact": {
+            "attr_quotes": "double"
+        }
+    },
+    "emmet.triggerExpansionOnTab": true
+}

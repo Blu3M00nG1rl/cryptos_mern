@@ -48,8 +48,6 @@ const coinSchema = new mongoose.Schema(
     }
 );
 
-coinSchema.index({ symbol: 1 });
-
 const CoinModel = mongoose.model("coin", coinSchema);
 
 module.exports = CoinModel;

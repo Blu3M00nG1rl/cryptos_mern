@@ -1,11 +1,16 @@
-const express = require('express');
-const bodyParser = require('body-parser');
-const coinRoutes = require('./routes/coin.routes');
 require('dotenv').config({path: './config/.env'});
-require('./config/db');
+const express = require('express');
+const connectDB = require("./config/db");
 const cors = require('cors');
 
+const bodyParser = require('body-parser');
+const coinRoutes = require('./routes/coin.routes');
+const coinsNonTrouveRoutes = require('./routes/coins_non_trouve.routes');
+const historyRoutes = require('./routes/history.routes');
+const walletRoutes = require('./routes/wallet.routes');
+
 const app = express();
+app.use(express.json());
 
 const corsOptions = {
     origin: process.env.CLIENT_URL,
@@ -22,9 +27,18 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}))
 
 // routes
-app.use('/backend/euro/coin', coinRoutes);
+app.use(process.env.API_URL+'/coin', coinRoutes);
+app.use(process.env.API_URL+'/coins_non_trouve', coinsNonTrouveRoutes);
+app.use(process.env.API_URL+'/history', historyRoutes);
+app.use(process.env.API_URL+'/wallet', walletRoutes);
 
 // server
-app.listen(process.env.PORT, () => {
-    console.log("Listening on port "+process.env.PORT)
-})
+const startServer = async () => {
+    await connectDB(); // 🔥 CRUCIAL
+
+    app.listen(process.env.PORT, () => {
+        console.log("Server running on port "+process.env.PORT);
+    });
+};
+
+startServer();
