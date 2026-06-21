@@ -1,5 +1,11 @@
 const Coin = require("../models/coin.model");
 const History = require("../models/history.model");
+const Bitcoin = require("../models/bitcoin.model");
+
+async function getMaxDiffValue() {
+    const row = await Bitcoin.findOne().sort({ diff: -1 }).lean();
+    return row ? row.diff : 0;
+}
 
 exports.getMyWallet = async (req, res) => {
     try {
@@ -19,9 +25,9 @@ exports.getMyWallet = async (req, res) => {
 
                 const prixAujourdhui = historyToday ? historyToday.prix : null;
 
-                // --- 2. Prix projection jours ---
+                // --- 2. Prix projection (maxDiff jours) ---
                 const targetDate = new Date();
-                targetDate.setDate(targetDate.getDate() - process.env.NB_JOURS_PROJECTION);
+                targetDate.setDate(targetDate.getDate() - maxDiff);
 
                 // 2A : prix le plus proche après projection jours
                 let historyPast = await History.findOne({

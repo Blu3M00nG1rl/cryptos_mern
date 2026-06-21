@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 
-const Ventes = ({ search = '' }) => {
+const Achats = ({ search = '' }) => {
+
     const [loading, setLoading] = useState(true);
     const [data, setData] = useState([]);
 
@@ -11,8 +12,10 @@ const Ventes = ({ search = '' }) => {
 
     const fetchData = async () => {
         try {
-            const res = await axios.get(`${process.env.REACT_APP_API_URL}/backend/history/ventes`);
-            setData(res.data);
+            const res = await axios.get(`${process.env.REACT_APP_API_URL}/backend/history/achats`);
+            setData(
+                [...res.data].sort((a, b) => (b.market_cap || 0) - (a.market_cap || 0))
+            );
         } catch (err) {
             console.error(err);
         } finally {
@@ -28,15 +31,20 @@ const Ventes = ({ search = '' }) => {
         c.name.toLowerCase().includes(normalizedSearch)
     );
 
-    const formatNumber = (value) => {
+    const formatNumber6 = (value) => {
         if (value === null || value === undefined) return "-";
-        return value.toLocaleString("fr-FR", { maximumFractionDigits: 2 });
+        return value.toLocaleString("fr-FR", { maximumFractionDigits: 6 });
+    };
+
+    const formatNumber0 = (value) => {
+        if (value === null || value === undefined) return "-";
+        return value.toLocaleString("fr-FR", { maximumFractionDigits: 0 });
     };
 
     return (
         <div>
             <div className="d-flex justify-content-between align-items-center mb-4">
-                <h1>Ventes</h1>
+                <h1>Achats</h1>
             </div>
 
             <div className="card p-4">
@@ -52,7 +60,7 @@ const Ventes = ({ search = '' }) => {
                                     <th>Portefeuille</th>
                                     <th>Prix Aujourd'hui</th>
                                     <th>Prix Hier</th>
-                                    <th>Évolution 24h</th>
+                                    <th>Évolution %</th>
                                     <th>Market Cap</th>
                                     <th>Volume</th>
                                 </tr>
@@ -63,15 +71,15 @@ const Ventes = ({ search = '' }) => {
                                         <td><strong>{coin.symbol}</strong></td>
                                         <td>{coin.name}</td>
                                         <td>{coin.nombre}</td>
-                                        <td>{formatNumber(coin.prixAuj)}</td>
-                                        <td>{formatNumber(coin.prixHier)}</td>
+                                        <td>{formatNumber6(coin.prixAuj)}</td>
+                                        <td>{formatNumber6(coin.prixHier)}</td>
                                         <td>
                                             {coin.evolution === null
                                                 ? "-"
-                                                : `${formatNumber(coin.evolution)} %`}
+                                                : `${formatNumber0(coin.evolution)} %`}
                                         </td>
-                                        <td>{formatNumber(coin.market_cap)}</td>
-                                        <td>{formatNumber(coin.volume)}</td>
+                                        <td>{formatNumber0(coin.market_cap)}</td>
+                                        <td>{formatNumber0(coin.total_volume)}</td>
                                     </tr>
                                 ))}
                             </tbody>
@@ -83,4 +91,4 @@ const Ventes = ({ search = '' }) => {
     );
 };
 
-export default Ventes;
+export default Achats;

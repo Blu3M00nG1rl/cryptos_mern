@@ -1,13 +1,25 @@
-const axios = require('axios');
 require('dotenv').config({ path: '../config/.env' });
+const axios = require('axios');
 
 // ===== PARAMS
 const marketCapMinEUR = process.env.MARKETCAP_MIN_EUR;
 const jnee = new Date().toISOString().slice(0, 10);
-const jneeProjection = new Date(Date.now() - process.env.NB_JOURS_PROJECTION * 24 * 60 * 60 * 1000);
+
+
+
+const getMaxDiff = async () => {
+    const endpoint = process.env.API_URL + "/bitcoin/max-diff";
+    try {
+        const response = await axios.get(endpoint);
+        return response.data.diff || 0;
+    } catch (error) {
+        console.log("Erreur récupération max_diff :", error.message);
+        return 0;
+    }
+};
 
 const coinFind = async (symbol) => {
-    const endpoint = process.env.API_URL + "/coin/" + symbol;
+    const endpoint = process.env.API_URL + "/coin/symbol/" + symbol;
     try {
         const response = await axios.get(endpoint);
         return response.data;   // <-- IMPORTANT
@@ -25,6 +37,15 @@ const coinNF = async (coinData) => {
     }
 }
 
+const coinNI = async (coinData) => {
+    const endpoint = process.env.API_URL + "/coins_non_importe/create";
+    try {
+        const response = await axios.post(endpoint, coinData);
+    } catch (error) {
+        //console.log("Erreur lors de la création du coin non importé :", error.message);
+    }
+}
+
 const history = async (historyData) => {
     const endpoint = process.env.API_URL + "/history/update";
     try {
@@ -37,9 +58,12 @@ const history = async (historyData) => {
 const deleteHistory = async (jneeProjection) => {
     const endpoint = process.env.API_URL + "/history/delete";
     try {
-        const response = await axios.delete(endpoint, jneeProjection);
+        const response = await axios.delete(endpoint, {
+            data: { jneeProjection }
+        });
+        console.log(response.data);
     } catch (error) {
-        //console.log("Erreur lors de suppression de l'historique :", error.message);
+        console.log("Erreur lors de suppression de l'historique :", error.message);
     }
 }
 
@@ -53,25 +77,26 @@ const deleteCoinsNF = async () => {
     }
 }
 
-// ===== MAIN
 async function importCrypto() {
-    console.log(new Date().toLocaleTimeString() + " - Début de la mise à jour.");
+    console.log("=== DEBUT IMPORT PRIX DU JOUR ===");
+    const maxDiff = await getMaxDiff();
+    const jneeProjection = new Date(Date.now() - maxDiff * 24 * 60 * 60 * 1000);
+    jneeProjection.setUTCHours(0, 0, 0, 0);
 
-    // ===== FX USD -> EUR
     const fxRes = await axios.get('https://api.frankfurter.app/latest?from=USD&to=EUR');
     const usdToEur = fxRes.data.rates.EUR;
 
     if (!usdToEur) throw new Error("Erreur récupération taux USD/EUR");
 
-    // ===== Suppression CoinsNF
     await deleteCoinsNF();
-
-    // ===== Nettoyage historique
     await deleteHistory(jneeProjection);
 
     let start = 0;
     const limit = 100;
     let stop = false;
+
+    // 👉 compteur global
+    let importedCount = 0;
 
     while (!stop) {
 
@@ -84,7 +109,6 @@ async function importCrypto() {
         for (const coin of data) {
 
             const symbol = coin.symbol.toLowerCase();
-            console.log(coin.rank);
             const marketCapEUR = coin.market_cap_usd * usdToEur;
 
             if (marketCapEUR < marketCapMinEUR) {
@@ -93,7 +117,6 @@ async function importCrypto() {
             }
 
             const existingCoin = await coinFind(symbol);
-
             const priceEUR = coin.price_usd * usdToEur;
             const volumeEUR = coin.volume24 * usdToEur;
 
@@ -106,23 +129,28 @@ async function importCrypto() {
                     market_cap: marketCapEUR,
                     volume: volumeEUR
                 });
-                console.log(symbol+ " non trouvé");
                 continue;
             }
 
             await history({
-                coinId: existingCoin._id,
+                coinId: existingCoin.coinId,
+                rank: existingCoin.rank,
                 journee: jnee,
                 prix: priceEUR,
                 market_cap: marketCapEUR,
                 total_volume: volumeEUR
             });
+
+            importedCount++; // 👉 compteur ici
         }
 
         start += limit;
     }
 
+    // 👉 total final
+    console.log("IMPORTED_COUNT=" + importedCount);
     console.log(new Date().toLocaleTimeString() + " - Fin de la mise à jour.");
+    console.log("=== FIN IMPORT PRIX DU JOUR ===");
 }
 
 importCrypto();

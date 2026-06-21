@@ -20,6 +20,10 @@ const coinSchema = new mongoose.Schema(
             type: String,
             required: true
         },
+        rank: {
+            type: String,
+            required: true
+        },
         picture: {
             type: String,
             default: "./random-coin.jpg"

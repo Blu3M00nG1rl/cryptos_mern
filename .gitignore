@@ -1,4 +1,6 @@
 /backend/config.env
 /backend/node_modules
+/backend/storage
 /frontend/node_modules
+/frontend/public/img/coins
 /frontend/.env

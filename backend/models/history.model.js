@@ -24,6 +24,8 @@ const historySchema = new mongoose.Schema(
     }
 );
 
+historySchema.index({ coinId: 1, journee: 1 });
+
 const HistoryModel = mongoose.model("history", historySchema);
 
 module.exports = HistoryModel;

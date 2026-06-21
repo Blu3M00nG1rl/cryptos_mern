@@ -6,8 +6,11 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const coinRoutes = require('./routes/coin.routes');
 const coinsNonTrouveRoutes = require('./routes/coins_non_trouve.routes');
+const coinsNonImporteRoutes = require('./routes/coins_non_importe.routes');
 const historyRoutes = require('./routes/history.routes');
 const walletRoutes = require('./routes/wallet.routes');
+const bitcoinRoutes = require('./routes/bitcoin.routes');
+const maintenanceRoutes = require('./routes/maintenance.routes');
 
 const app = express();
 app.use(express.json());
@@ -27,10 +30,14 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}))
 
 // routes
-app.use(process.env.API_URL+'/coin', coinRoutes);
-app.use(process.env.API_URL+'/coins_non_trouve', coinsNonTrouveRoutes);
-app.use(process.env.API_URL+'/history', historyRoutes);
-app.use(process.env.API_URL+'/wallet', walletRoutes);
+app.use(process.env.ROUTES_PREFIX+'/coin', coinRoutes);
+app.use(process.env.ROUTES_PREFIX+'/coins_non_trouve', coinsNonTrouveRoutes);
+app.use(process.env.ROUTES_PREFIX+'/coins_non_importe', coinsNonImporteRoutes);
+app.use(process.env.ROUTES_PREFIX+'/history', historyRoutes);
+app.use(process.env.ROUTES_PREFIX+'/wallet', walletRoutes);
+app.use(process.env.ROUTES_PREFIX+'/bitcoin', bitcoinRoutes);
+app.use(process.env.ROUTES_PREFIX + "/maintenance", maintenanceRoutes);
+
 
 // server
 const startServer = async () => {

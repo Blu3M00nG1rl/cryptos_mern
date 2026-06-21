@@ -79,6 +79,10 @@ $ npm i -s axios
 11 Installation de bootstrap
 $ npm i -s bootstrap
 
+12 Installation pour export excel
+$ npm install xlsx file-saver
+
+
 2h51
 
 MONGO

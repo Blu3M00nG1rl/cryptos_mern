@@ -1,80 +1,90 @@
-/* Reset et base */
 nav {
-  width: 100%;
-  background-color: #A8E6CF; /* same vivid mint as .btn-primary */
-  color: #123d33; /* dark text for contrast */
-  padding: 1rem 2rem;
-  box-shadow: 0 4px 18px rgba(36, 55, 70, 0.03);
-  position: sticky;
-  top: 0;
-  z-index: 100;
+    background: #b5f5d1; /* ta couleur menthe */
+    padding: 12px 20px;
+    border-bottom: 2px solid rgba(0,0,0,0.1);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
 }
 
+/* Conteneur principal */
 .nav-container {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  max-width: 1200px;
-  margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
 }
 
+/* Centrer le logo */
 .logo {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  text-decoration: none;
-  color: white;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
 }
 
 .logo img {
-  width: 2.5rem;
-  height: 2.5rem;
-  object-fit: contain;
+    width: 40px;
+    height: 40px;
 }
 
 .logo h3 {
-  margin: 0;
-  font-size: 1.4rem;
-  font-weight: 700;
-  color: #123d33; /* dark mint text for contrast */
+    margin: 0;
+    font-weight: 700;
+    color: #0b3d2e; /* vert foncé lisible */
 }
 
+/* Bouton Maj */
+.btn-info {
+    background: #0ea5e9;
+    border: none;
+    padding: 8px 16px;
+    font-weight: 600;
+    border-radius: 6px;
+    transition: 0.2s;
+}
+
+.btn-info:hover {
+    background: #0284c7;
+}
+
+/* Zone de recherche */
 .nav-actions {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
+    margin-left: auto;
 }
 
-.nav-actions .search input {
-  background: #fff;
-  border: 1px solid rgba(18,61,51,0.06);
-  color: #123d33;
-  padding: 0.45rem 0.75rem;
-  border-radius: 10px;
-  width: 260px;
-  box-shadow: 0 1px 6px rgba(18,61,51,0.06);
+.search input {
+    background: white;
+    border: 1px solid #ccc;
+    padding: 8px 14px;
+    border-radius: 6px;
+    width: 220px;
+    transition: 0.2s;
 }
 
-.nav-actions .search input::placeholder {
-  color: #9aa9b4;
+.search input:focus {
+    outline: none;
+    border-color: #0ea5e9;
 }
 
-.nav-actions .btn {
-  padding: 0.45rem 0.8rem;
+/* Message d’alerte */
+.alert {
+    margin-top: 10px;
+    padding: 10px 15px;
+    border-radius: 6px;
+    font-weight: 500;
+    text-align: center;
 }
 
-/* Style pour les liens actifs (optionnel) */
-a.active {
-  font-weight: bold;
-  color: #4cc9f0;
+.alert-success {
+    background: #0f5132;
+    color: #d1e7dd;
 }
 
-/* Responsive */
-@media (max-width: 768px) {
-  nav {
-    padding: 1rem;
-  }
-  .logo h3 {
-    font-size: 1.25rem;
-  }
+.alert-danger {
+    background: #842029;
+    color: #f8d7da;
 }
