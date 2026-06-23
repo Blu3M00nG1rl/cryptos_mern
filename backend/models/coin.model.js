@@ -31,12 +31,6 @@ const coinSchema = new mongoose.Schema(
         dateAchat: {
             type: Date
         },
-        nombre: {
-            type: Number
-        },
-        prix: {
-            type: Number
-        },
         stockage: {
             type: String
         },

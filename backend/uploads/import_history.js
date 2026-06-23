@@ -7,7 +7,7 @@ const fs = require("fs");
 const path = require("path");
 const csv = require("csv-parser");
 const History = require("../models/history.model");
-const Coin = require("../models/coin.model"); // <-- AJOUT
+const Coin = require("../models/coin.model"); 
 const CoinsNonImporte = require("../models/coins_non_importe.model");
 
 const historiquePath = path.join(__dirname, "../storage/historique");

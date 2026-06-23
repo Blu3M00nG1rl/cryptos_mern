@@ -21,3 +21,8 @@ exports.deleteCoinsNI = async (req, res) => {
     }
     
 }
+
+exports.getCoinsNI = async (req, res) => {
+    const data = await CoinsNonImporte.find().lean();
+    res.json(data);
+};

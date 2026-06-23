@@ -1,6 +1,7 @@
 const History = require("../models/history.model");
 const Coin = require("../models/coin.model");
 const Bitcoin = require("../models/bitcoin.model");
+const AchatCoin = require("../models/achatCoin.model");
 const { exec } = require("child_process");
 const fs = require("fs");
 const path = require("path");
@@ -33,13 +34,13 @@ exports.updateHistory = async (req, res) => {
 }
 
 exports.deleteHistory = async (req, res) => {
-    let { jneeProjection } = req.body;
+    let { jneeCible } = req.body;
 
     try {
-        jneeProjection = new Date(jneeProjection);
-        jneeProjection.setUTCHours(0, 0, 0, 0); // 🔥 important
+        jneeCible = new Date(jneeCible);
+        jneeCible.setUTCHours(0, 0, 0, 0); // 🔥 important
 
-        await History.deleteMany({ journee: { $lt: jneeProjection } });
+        await History.deleteMany({ journee: { $lt: jneeCible } });
 
         res.status(201).json({ message: "Suppression réussie" });
     } catch (err) {
@@ -119,23 +120,52 @@ exports.runImportH = async (req, res) => {
     }
 };
 
-exports.getExportData = async (req, res) => {
+exports.getRecapData = async (req, res) => {
     try {
-        // 🔥 Lire maxDiff directement dans MongoDB
         const maxDiff = await getMaxDiffValue();
-        console.log("maxDiff =", maxDiff);
 
         const today = new Date();
         today.setHours(0, 0, 0, 0);
 
-        // 🔥 Date de projection = today - maxDiff jours
-        const projectionDate = new Date(today);
-        projectionDate.setDate(projectionDate.getDate() - maxDiff);
+        const cibleDate = new Date(today);
+        cibleDate.setDate(cibleDate.getDate() - maxDiff);
 
         const tomorrow = new Date(today);
         tomorrow.setDate(tomorrow.getDate() + 1);
 
         const coins = await Coin.find().lean();
+
+        // 🔥 Une seule aggregation pour tous les achats
+        const achats = await AchatCoin.aggregate([
+            {
+                $group: {
+                    _id: { $toLower: "$symbol" },
+                    totalNombre: { $sum: "$nombre" },
+                    totalInvesti: { $sum: { $multiply: ["$nombre", "$prixAchat"] } }
+                }
+            },
+            {
+                $addFields: {
+                    prixAchatMoyen: {
+                        $cond: [
+                            { $eq: ["$totalNombre", 0] },
+                            0,
+                            { $divide: ["$totalInvesti", "$totalNombre"] }
+                        ]
+                    }
+                }
+            }
+        ]);
+
+        const mapAchats = new Map(
+            achats.map(a => [
+                a._id,
+                {
+                    totalNombre: a.totalNombre,
+                    prixAchatMoyen: a.prixAchatMoyen
+                }
+            ])
+        );
 
         const exportData = await Promise.all(
             coins.map(async (coin) => {
@@ -144,29 +174,39 @@ exports.getExportData = async (req, res) => {
                     journee: { $gte: today, $lt: tomorrow }
                 }).lean();
 
-                const projectionHistory = await History.findOne({
+                const cibleHistory = await History.findOne({
                     coinId: coin.coinId,
                     journee: {
-                        $gte: projectionDate,
-                        $lt: new Date(projectionDate.getTime() + 86400000)
+                        $gte: cibleDate,
+                        $lt: new Date(cibleDate.getTime() + 86400000)
                     }
                 }).lean();
+
+                let evolution = null;
+                if (todayHistory?.prix && cibleHistory?.prix) {
+                    evolution = ((todayHistory.prix - cibleHistory.prix) / cibleHistory.prix) * 100;
+                }
+
+                // 🔥 Récupérer les infos d’achat pour ce symbole
+                const key = coin.symbol.toLowerCase();
+                const achat = mapAchats.get(key);
 
                 return {
                     rank: coin.rank,
                     name: coin.name,
                     symbol: coin.symbol,
-                    nombre: coin.nombre || 0,
+                    nombre: achat ? achat.totalNombre : 0,
+                    prixCoin: achat ? achat.prixAchatMoyen : 0,
                     prixDuJour: todayHistory?.prix || null,
                     capitalisation: todayHistory?.market_cap || null,
                     volume24h: todayHistory?.total_volume || null,
-                    prixProjection: projectionHistory?.prix || null,
-                    dateProjection: projectionDate.toLocaleDateString("fr-FR")
+                    prixCible: cibleHistory?.prix || null,
+                    dateCible: cibleDate.toLocaleDateString("fr-FR"),
+                    evolution
                 };
             })
         );
 
-        // 🔥 Tri par market cap décroissant
         exportData.sort((a, b) => (b.capitalisation || 0) - (a.capitalisation || 0));
 
         res.status(200).json(exportData);
@@ -179,8 +219,13 @@ exports.getExportData = async (req, res) => {
 
 exports.getVentesData = async (req, res) => {
     try {
+        const maxDiff = await getMaxDiffValue();
+
         const today = new Date();
         today.setHours(0, 0, 0, 0);
+
+        const cibleDate = new Date(today);
+        cibleDate.setDate(cibleDate.getDate() - maxDiff);
 
         const yesterday = new Date(today);
         yesterday.setDate(yesterday.getDate() - 1);
@@ -188,44 +233,61 @@ exports.getVentesData = async (req, res) => {
         const tomorrow = new Date(today);
         tomorrow.setDate(tomorrow.getDate() + 1);
 
-        const coins = await Coin.find({ nombre: { $gt: 0 } }).lean();
+        const coins = await Coin.find().lean();
 
-        // Étape 1 : calcul brut
+        // Agrégation achats
+        const achats = await AchatCoin.aggregate([
+            {
+                $group: {
+                    _id: { $toLower: "$symbol" },
+                    totalNombre: { $sum: "$nombre" },
+                    totalInvesti: { $sum: { $multiply: ["$nombre", "$prixAchat"] } }
+                }
+            },
+            {
+                $addFields: {
+                    prixAchatMoyen: {
+                        $cond: [
+                            { $eq: ["$totalNombre", 0] },
+                            0,
+                            { $divide: ["$totalInvesti", "$totalNombre"] }
+                        ]
+                    }
+                }
+            }
+        ]);
+
+        const mapAchats = new Map(
+            achats.map(a => [
+                a._id,
+                {
+                    totalNombre: a.totalNombre,
+                    prixAchatMoyen: a.prixAchatMoyen
+                }
+            ])
+        );
+
         const ventesDataRaw = await Promise.all(
             coins.map(async (coin) => {
 
-                // Prix aujourd’hui
                 const todayHistory = await History.findOne({
                     coinId: coin.coinId,
                     journee: { $gte: today, $lt: tomorrow }
                 }).lean();
 
-                // Prix hier
                 const yesterdayHistory = await History.findOne({
                     coinId: coin.coinId,
                     journee: { $gte: yesterday, $lt: today }
                 }).lean();
 
-                // Prix min (plus ancien)
-                const oldestHistory = await History.findOne({
-                    coinId: coin.coinId
-                }).sort({ journee: 1 }).lean();
+                const prixAuj = todayHistory?.prix ?? null;
+                const prixHier = yesterdayHistory?.prix ?? null;
 
-                // Prix max (plus récent)
-                const newestHistory = await History.findOne({
-                    coinId: coin.coinId
-                }).sort({ journee: -1 }).lean();
-
-                const prixAuj = todayHistory?.prix || null;
-                const prixHier = yesterdayHistory?.prix || null;
-
-                // Calcul évolution
-                let evolution = null;
-                if (prixAuj && prixHier) {
-                    evolution = ((prixAuj - prixHier) / prixHier) * 100;
+                let evolution24 = null;
+                if (prixAuj !== null && prixHier !== null) {
+                    evolution24 = ((prixAuj - prixHier) / prixHier) * 100;
                 }
 
-                // Min & Max
                 const minHistory = await History.findOne({ coinId: coin.coinId })
                     .sort({ prix: 1 })
                     .lean();
@@ -234,38 +296,61 @@ exports.getVentesData = async (req, res) => {
                     .sort({ prix: -1 })
                     .lean();
 
-                // Fibonnaci
                 let fibVente = null;
-
-                if (minHistory?.prix && maxHistory?.prix) {
+                if (minHistory?.prix != null && maxHistory?.prix != null) {
                     const min = minHistory.prix;
                     const max = maxHistory.prix;
-
                     fibVente = (max - min) * 0.618 + min;
                 }
+
+                const key = coin.symbol.toLowerCase();
+                const achat = mapAchats.get(key);
+
+                const cibleHistory = await History.findOne({
+                    coinId: coin.coinId,
+                    journee: {
+                        $gte: cibleDate,
+                        $lt: new Date(cibleDate.getTime() + 86400000)
+                    }
+                }).lean();
+
+                let evolutionCible = null;
+
+                if (
+                    todayHistory?.prix !== null &&
+                    todayHistory?.prix !== undefined &&
+                    cibleHistory?.prix !== null &&
+                    cibleHistory?.prix !== undefined
+                ) {
+                    evolutionCible = ((todayHistory.prix - cibleHistory.prix) / cibleHistory.prix) * 100;
+                }
+
 
                 return {
                     symbol: coin.symbol,
                     name: coin.name,
-                    nombre: coin.nombre,
+                    nombre: achat ? achat.totalNombre : 0,
+                    prixCoin: achat ? achat.prixAchatMoyen : 0,
                     prixAuj,
                     prixHier,
-                    evolution,
+                    evolution24,
+                    evolutionCible,
                     fibVente,
-                    market_cap: todayHistory?.market_cap || null,
-                    volume: todayHistory?.total_volume || null
+                    market_cap: todayHistory?.market_cap ?? null,
+                    volume: todayHistory?.total_volume ?? null
                 };
             })
         );
 
-        // Étape 2 : filtre final
+        // 🔥 Filtre final corrigé
         const ventesData = ventesDataRaw.filter(
             item =>
-                item.evolution !== null &&
-                item.evolution < 0 &&
+                item.evolution24 !== null &&
+                item.evolution24 < 0 &&
                 item.prixAuj !== null &&
-                item.fibV !== null &&
-                item.prixAuj > item.fibVente
+                item.fibVente !== null &&
+                item.prixAuj > item.fibVente &&
+                item.nombre > 0
         );
 
         res.status(200).json(ventesData);
@@ -278,7 +363,8 @@ exports.getVentesData = async (req, res) => {
 
 exports.getAchatsData = async (req, res) => {
     try {
-        // 🔥 Récupérer maxDiff depuis Bitcoin
+        console.log("debut achats");
+
         const maxDiff = await getMaxDiffValue();
 
         const today = new Date();
@@ -290,21 +376,18 @@ exports.getAchatsData = async (req, res) => {
         const tomorrow = new Date(today);
         tomorrow.setDate(tomorrow.getDate() + 1);
 
-        // 🔥 Date de projection = today - maxDiff jours
-        const projectionDate = new Date(today);
-        projectionDate.setDate(projectionDate.getDate() - maxDiff);
+        const cibleDate = new Date(today);
+        cibleDate.setDate(cibleDate.getDate() - maxDiff);
 
-        const coins = await Coin.find({ nombre: { $gt: 0 } }).lean();
+        const coins = await Coin.find().lean();
 
-        // Prix du tether aujourd’hui
         const tetherHistory = await History.findOne({
             coinId: "tether",
             journee: { $gte: today, $lt: tomorrow }
         }).lean();
 
-        const prixTetherAuj = tetherHistory?.prix || null;
+        const prixTetherAuj = tetherHistory?.prix ?? null;
 
-        // 🔥 Évolution Bitcoin 24h
         let evolutionBitcoin = null;
 
         const btcToday = await History.findOne({
@@ -312,18 +395,95 @@ exports.getAchatsData = async (req, res) => {
             journee: { $gte: today, $lt: tomorrow }
         }).lean();
 
-        const btcYesterday = await History.findOne({
+        const btcCible = await History.findOne({
             coinId: "bitcoin",
-            journee: { $gte: yesterday, $lt: today }
+            journee: {
+                $gte: cibleDate,
+                $lt: new Date(cibleDate.getTime() + 86400000)
+            }
         }).lean();
 
-        if (btcToday?.prix && btcYesterday?.prix) {
-            evolutionBitcoin = ((btcToday.prix - btcYesterday.prix) / btcYesterday.prix) * 100;
-        }
 
-        // Étape 1 : calcul brut
+        evolutionBitcoin = ((btcToday.prix - btcCible.prix) / btcCible.prix) * 100;
+
+        // 🔥 Total USDC + USDT dans AchatCoin
+        const stableAgg = await AchatCoin.aggregate([
+            {
+                $match: {
+                    symbol: { $in: ["USDC", "USDT"] }
+                }
+            },
+            {
+                $group: {
+                    _id: { $toLower: "$symbol" },
+                    totalNombre: { $sum: "$nombre" }
+                }
+            }
+        ]);
+
+        const mapStable = new Map(
+            stableAgg.map(s => [s._id, s.totalNombre])
+        );
+
+        const totalUSDC = mapStable.get("usdc") || 0;
+        const totalUSDT = mapStable.get("usdt") || 0;
+
+        // 🔥 Prix du jour USDC / USDT
+        const usdcHistory = await History.findOne({
+            coinId: "usd-coin",
+            journee: { $gte: today, $lt: tomorrow }
+        }).lean();
+
+        const usdtHistory = await History.findOne({
+            coinId: "tether",
+            journee: { $gte: today, $lt: tomorrow }
+        }).lean();
+
+        const prixUSDC = usdcHistory?.prix || 0;
+        const prixUSDT = usdtHistory?.prix || 0;
+        const prixStable = (prixUSDC + prixUSDT)/2;
+
+        // 🔥 Valeur totale stable
+        const stableUSDC = totalUSDC * prixUSDC;
+        const stableUSDT = totalUSDT * prixUSDT;
+        const stables = stableUSDC + stableUSDT;
+
+        // 🔥 Agrégation achatcoins : totalNombre + prix moyen
+        const achats = await AchatCoin.aggregate([
+            {
+                $group: {
+                    _id: { $toLower: "$symbol" },
+                    totalNombre: { $sum: "$nombre" },
+                    totalInvesti: { $sum: { $multiply: ["$nombre", "$prixAchat"] } }
+                }
+            },
+            {
+                $addFields: {
+                    prixAchatMoyen: {
+                        $cond: [
+                            { $eq: ["$totalNombre", 0] },
+                            0,
+                            { $divide: ["$totalInvesti", "$totalNombre"] }
+                        ]
+                    }
+                }
+            }
+        ]);
+
+        const mapAchats = new Map(
+            achats.map(a => [
+                a._id,
+                {
+                    totalNombre: a.totalNombre,
+                    prixAchatMoyen: a.prixAchatMoyen
+                }
+            ])
+        );
+
         const achatsDataRaw = await Promise.all(
             coins.map(async (coin) => {
+                const key = coin.symbol.toLowerCase();
+                const achat = mapAchats.get(key);
 
                 const todayHistory = await History.findOne({
                     coinId: coin.coinId,
@@ -335,25 +495,25 @@ exports.getAchatsData = async (req, res) => {
                     journee: { $gte: yesterday, $lt: today }
                 }).lean();
 
-                const projectionHistory = await History.findOne({
+                const cibleHistory = await History.findOne({
                     coinId: coin.coinId,
                     journee: {
-                        $gte: projectionDate,
-                        $lt: new Date(projectionDate.getTime() + 86400000)
+                        $gte: cibleDate,
+                        $lt: new Date(cibleDate.getTime() + 86400000)
                     }
                 }).lean();
 
-                const prixAuj = todayHistory?.prix || null;
-                const prixHier = yesterdayHistory?.prix || null;
-                const prixProjection = projectionHistory?.prix || null;
+                const prixAuj = todayHistory?.prix ?? null;
+                const prixHier = yesterdayHistory?.prix ?? null;
+                const prixCible = cibleHistory?.prix ?? null;
 
                 let evolution = null;
-                if (prixAuj && prixProjection) {
-                    evolution = ((prixAuj - prixProjection) / prixProjection) * 100;
+                if (prixAuj !== null && prixCible !== null) {
+                    evolution = ((prixAuj - prixCible) / prixCible) * 100;
                 }
 
                 let evolution24h = null;
-                if (prixAuj && prixHier) {
+                if (prixAuj !== null && prixHier !== null) {
                     evolution24h = ((prixAuj - prixHier) / prixHier) * 100;
                 }
 
@@ -366,7 +526,7 @@ exports.getAchatsData = async (req, res) => {
                     .lean();
 
                 let fibAchat = null;
-                if (minHistory?.prix && maxHistory?.prix) {
+                if (minHistory?.prix != null && maxHistory?.prix != null) {
                     const min = minHistory.prix;
                     const max = maxHistory.prix;
                     fibAchat = (max - min) * 0.382 + min;
@@ -375,19 +535,20 @@ exports.getAchatsData = async (req, res) => {
                 return {
                     symbol: coin.symbol,
                     name: coin.name,
-                    nombre: coin.nombre,
                     prixAuj,
                     prixHier,
                     evolution,
                     evolution24h,
                     fibAchat,
-                    market_cap: todayHistory?.market_cap || null,
-                    total_volume: todayHistory?.total_volume || null
+                    market_cap: todayHistory?.market_cap ?? null,
+                    total_volume: todayHistory?.total_volume ?? null,
+                    nombre: achat ? achat.totalNombre : 0,
+                    prixCoin: achat ? achat.prixAchatMoyen : 0,
                 };
             })
         );
 
-        // Étape 2 : filtre final
+        // 🔥 Filtre 
         const achatsData = achatsDataRaw.filter(item =>
             item.evolution !== null &&
             item.evolution > 0 &&
@@ -396,15 +557,18 @@ exports.getAchatsData = async (req, res) => {
             item.prixAuj !== null &&
             item.fibAchat !== null &&
             item.prixAuj < item.fibAchat &&
-
             prixTetherAuj !== null &&
             item.evolution > (prixTetherAuj * 0.10) &&
-
             evolutionBitcoin !== null &&
             item.evolution > evolutionBitcoin
         );
 
-        res.status(200).json(achatsData);
+        res.status(200).json({
+            achatsData,
+            stables: stables,
+            prixStable: prixStable
+        });
+
 
     } catch (err) {
         console.error("Erreur getAchatsData:", err);
@@ -423,9 +587,9 @@ exports.getSyntheseData = async (req, res) => {
         const yesterday = new Date(today);
         yesterday.setDate(yesterday.getDate() - 1);
 
-        const projectionDate = new Date(today);
-        projectionDate.setDate(projectionDate.getDate() - maxDiff);
-        console.log(projectionDate);
+        const cibleDate = new Date(today);
+        cibleDate.setDate(cibleDate.getDate() - maxDiff);
+        console.log(cibleDate);
         const tomorrow = new Date(today);
         tomorrow.setDate(tomorrow.getDate() + 1);
 
@@ -446,12 +610,12 @@ exports.getSyntheseData = async (req, res) => {
                     journee: { $gte: yesterday, $lt: today }
                 }).lean();
 
-                // Prix projection
-                const projectionHistory = await History.findOne({
+                // Prix cible
+                const cibleHistory = await History.findOne({
                     coinId: coin.coinId,
                     journee: {
-                        $gte: projectionDate,
-                        $lt: new Date(projectionDate.getTime() + 86400000)
+                        $gte: cibleDate,
+                        $lt: new Date(cibleDate.getTime() + 86400000)
                     }
                 }).lean();
 
@@ -478,8 +642,8 @@ exports.getSyntheseData = async (req, res) => {
 
                 // Evolution %
                 let evolution = null;
-                if (todayHistory?.prix && projectionHistory?.prix) {
-                    evolution = ((todayHistory.prix - projectionHistory.prix) / projectionHistory.prix) * 100;
+                if (todayHistory?.prix && cibleHistory?.prix) {
+                    evolution = ((todayHistory.prix - cibleHistory.prix) / cibleHistory.prix) * 100;
                 }
 
                 return {
@@ -487,7 +651,7 @@ exports.getSyntheseData = async (req, res) => {
                     name: coin.name,
                     prixAuj: todayHistory?.prix || null,
                     prixHier: yesterdayHistory?.prix || null,
-                    prixProjection: projectionHistory?.prix || null,
+                    prixCible: cibleHistory?.prix || null,
                     evolution,
                     max: maxHistory ? { prix: maxHistory.prix, date: maxHistory.journee } : null,
                     min: minHistory ? { prix: minHistory.prix, date: minHistory.journee } : null,
@@ -498,7 +662,7 @@ exports.getSyntheseData = async (req, res) => {
         );
 
         res.status(200).json({
-            dateProjection: projectionDate,
+            dateCible: cibleDate,
             data: syntheseData
         });
 
@@ -508,7 +672,6 @@ exports.getSyntheseData = async (req, res) => {
         res.status(500).json({ error: err.message });
     }
 };
-
 
 
 

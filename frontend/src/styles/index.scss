@@ -1,4 +1,11 @@
-@import 'settings';
-@import 'navbar';
-@import 'leftnav';
-@import 'coins';
+// Bootstrap
+@use "bootstrap/scss/bootstrap";
+
+// Bootstrap Icons
+@use "bootstrap-icons/font/bootstrap-icons.scss";
+
+// Mes styles
+@use 'settings';
+@use 'navbar';
+@use 'leftnav';
+@use 'coins';

@@ -9,7 +9,7 @@ async function getMaxDiffValue() {
 
 exports.getMyWallet = async (req, res) => {
     try {
-        const coins = await Coin.find({ nombre: { $gt: 0 } });
+        const coins = await Coin.find();
         console.log("wallet");
         const result = await Promise.all(
             coins.map(async coin => {
@@ -25,29 +25,29 @@ exports.getMyWallet = async (req, res) => {
 
                 const prixAujourdhui = historyToday ? historyToday.prix : null;
 
-                // --- 2. Prix projection (maxDiff jours) ---
+                // --- 2. Prix cible (maxDiff jours) ---
                 const targetDate = new Date();
                 targetDate.setDate(targetDate.getDate() - maxDiff);
 
-                // 2A : prix le plus proche après projection jours
+                // 2A : prix le plus proche après cible jours
                 let historyPast = await History.findOne({
                     coinId: coin.coinId,
                     journee: { $gte: targetDate }
                 }).sort({ journee: 1 });
 
-                let projectionJours = null;
+                let cibleJours = null;
 
                 if (historyPast && prixAujourdhui) {
                     const oldPrice = historyPast.prix;
                     const evolution = ((prixAujourdhui - oldPrice) / oldPrice) ;
-                    projectionJours = prixAujourdhui + (prixAujourdhui * evolution);
+                    cibleJours = prixAujourdhui + (prixAujourdhui * evolution);
                 }
 
                 return {
                     ...coin.toObject(),
                     prixAujourdhui,
-                    prixProjectionJours: historyPast ? historyPast.prix : null,
-                    projectionJours
+                    prixCibleJours: historyPast ? historyPast.prix : null,
+                    cibleJours
                 };
 
             })

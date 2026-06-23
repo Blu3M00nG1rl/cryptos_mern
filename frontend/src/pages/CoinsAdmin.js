@@ -3,12 +3,8 @@ import axios from "axios";
 
 const CoinsAdmin = ({ search = '' }) => {
     const [coins, setCoins] = useState([]);
-    const [form, setForm] = useState({
-        no: "",
-        coinId: "",
-        symbol: "",
-        name: ""
-    });
+    const [form, setForm] = useState({ no: "", coinId: "", symbol: "", name: "" });
+    const [editedCoins, setEditedCoins] = useState({});
 
     useEffect(() => {
         loadCoins();
@@ -22,7 +18,6 @@ const CoinsAdmin = ({ search = '' }) => {
         c.name.toLowerCase().includes(normalizedSearch)
     );
 
-
     const loadCoins = async () => {
         const res = await axios.get(`${process.env.REACT_APP_API_URL}/backend/coin`);
         setCoins(res.data);
@@ -34,16 +29,30 @@ const CoinsAdmin = ({ search = '' }) => {
         loadCoins();
     };
 
-    const updateCoin = async (id, field, value) => {
-        await axios.put(`${process.env.REACT_APP_API_URL}/backend/coin/${id}`, {
-            [field]: value
-        });
-        loadCoins();
-    };
-
     const deleteCoin = async (id) => {
         await axios.delete(`${process.env.REACT_APP_API_URL}/backend/coin/${id}`);
         loadCoins();
+    };
+
+    const handleLocalChange = (id, field, value) => {
+        setEditedCoins(prev => ({
+            ...prev,
+            [id]: {
+                ...prev[id],
+                [field]: value
+            }
+        }));
+    };
+
+    const saveCoin = async (id) => {
+        if (!editedCoins[id]) return;
+
+        try {
+            await axios.put(`${process.env.REACT_APP_API_URL}/backend/coin/${id}`, editedCoins[id]);
+            alert("Modifications enregistrées !");
+        } catch (err) {
+            console.error("Erreur sauvegarde", err);
+        }
     };
 
 
@@ -74,7 +83,7 @@ const CoinsAdmin = ({ search = '' }) => {
                     <div className="col">
                         <input
                             className="form-control"
-                            placeholder="symbol"
+                            placeholder="symbole"
                             value={form.symbol}
                             onChange={(e) => setForm({ ...form, symbol: e.target.value })}
                         />
@@ -82,9 +91,17 @@ const CoinsAdmin = ({ search = '' }) => {
                     <div className="col">
                         <input
                             className="form-control"
-                            placeholder="name"
+                            placeholder="nom"
                             value={form.name}
                             onChange={(e) => setForm({ ...form, name: e.target.value })}
+                        />
+                    </div>
+                    <div className="col">
+                        <input
+                            className="form-control"
+                            placeholder="rang"
+                            value={form.rank}
+                            onChange={(e) => setForm({ ...form, rank: e.target.value })}
                         />
                     </div>
                     <div className="col-auto">
@@ -102,109 +119,133 @@ const CoinsAdmin = ({ search = '' }) => {
                 <table className="table table-striped mt-3">
                     <thead>
                         <tr>
-                            <th>No</th>
-                            <th>Id</th>
-                            <th>Symbol</th>
-                            <th>Nom</th>
-                            <th>Date achat</th>
-                            <th>Nombre</th>
-                            <th>Prix</th>
-                            <th>Stockage</th>
-                            <th>Date vérif</th>
-                            <th>Observations</th>
+                            <th>No - Rang</th>
+                            <th>Id - Stockage</th>
+                            <th>Symbole - Date d'Achat</th>
+                            <th>Nom - Observations</th>
+                            <th>Date Vérif</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         {filteredData.map((c) => (
-                            <tr key={c._id}>
-                                <td>
-                                    <input
-                                        className="form-control"
-                                        value={c.no}
-                                        onChange={(e) => updateCoin(c._id, "no", e.target.value)}
-                                    />
-                                </td>
+                            <React.Fragment key={c._id}>
+                                {/* Première ligne */}
+                                <tr>
+                                    <td>
+                                        <input
+                                            className="form-control"
+                                            value={editedCoins[c._id]?.no ?? c.no ?? ""}
+                                            onChange={(e) => handleLocalChange(c._id, "no", e.target.value)}
+                                        />
+                                    </td>
 
-                                <td>
-                                    <input
-                                        className="form-control"
-                                        value={c.coinId}
-                                        onChange={(e) => updateCoin(c._id, "coinId", e.target.value)}
-                                    />
-                                </td>
+                                    <td>
+                                        <input
+                                            className="form-control"
+                                            value={editedCoins[c._id]?.coinId ?? c.coinId ?? ""}
+                                            onChange={(e) => handleLocalChange(c._id, "coinId", e.target.value)}
+                                        />
+                                    </td>
 
-                                <td>
-                                    <input
-                                        className="form-control"
-                                        value={c.symbol}
-                                        onChange={(e) => updateCoin(c._id, "symbol", e.target.value)}
-                                    />
-                                </td>
-                                <td>
-                                    <input
-                                        className="form-control"
-                                        value={c.name}
-                                        onChange={(e) => updateCoin(c._id, "name", e.target.value)}
-                                    />
-                                </td>
-                                <td>
-                                    <input
-                                        type="date"
-                                        className="form-control"
-                                        value={c.dateAchat ? c.dateAchat.slice(0, 10) : ""}
-                                        onChange={(e) => updateCoin(c._id, "dateAchat", e.target.value)}
-                                    />
-                                </td>
-                                <td>
-                                    <input
-                                        type="number"
-                                        className="form-control"
-                                        value={c.nombre || ""}
-                                        onChange={(e) => updateCoin(c._id, "nombre", e.target.value)}
-                                    />
-                                </td>
-                                <td>
-                                    <input
-                                        type="number"
-                                        step="0.00000001"
-                                        className="form-control"
-                                        value={c.prixCoin || ""}
-                                        onChange={(e) => updateCoin(c._id, "prix", e.target.value)}
-                                    />
-                                </td>
-                                <td style={{ minWidth: "250px" }}>
-                                    <textarea
-                                        className="form-control"
-                                        rows={5}
-                                        value={c.stockage || ""}
-                                        onChange={(e) => updateCoin(c._id, "stockage", e.target.value)}
-                                    />
-                                </td>
-                                <td>
-                                    <input
-                                        type="date"
-                                        className="form-control"
-                                        value={c.dateVerif ? c.dateVerif.slice(0, 10) : ""}
-                                        onChange={(e) => updateCoin(c._id, "dateVerif", e.target.value)}
-                                    />
-                                </td>
-                                <td style={{ minWidth: "400px" }}>
-                                    <textarea
-                                        className="form-control"
-                                        rows={10}
-                                        value={c.observation || ""}
-                                        onChange={(e) => updateCoin(c._id, "observation", e.target.value)}
-                                    />
-                                </td>
-                                <td>
-                                    <button className="btn btn-danger" onClick={() => deleteCoin(c._id)}>
-                                        S
-                                    </button>
-                                </td>
-                            </tr>
+                                    <td>
+                                        <input
+                                            className="form-control"
+                                            value={editedCoins[c._id]?.symbol ?? c.symbol ?? ""}
+                                            onChange={(e) => handleLocalChange(c._id, "symbol", e.target.value)}
+                                        />
+                                    </td>
+
+                                    <td>
+                                        <input
+                                            className="form-control"
+                                            value={editedCoins[c._id]?.name ?? c.name ?? ""}
+                                            onChange={(e) => handleLocalChange(c._id, "name", e.target.value)}
+                                        />
+                                    </td>
+
+                                    <td>
+                                        <input
+                                            type="date"
+                                            className="form-control"
+                                            value={
+                                                editedCoins[c._id]?.dateVerif
+                                                    ? editedCoins[c._id].dateVerif.slice(0, 10)
+                                                    : c.dateVerif
+                                                        ? c.dateVerif.slice(0, 10)
+                                                        : ""
+                                            }
+                                            onChange={(e) => handleLocalChange(c._id, "dateVerif", e.target.value)}
+                                        />
+                                    </td>
+
+
+                                    <td>
+                                        <button
+                                            className="btn btn-light mt-2"
+                                            onClick={() => saveCoin(c._id)}
+                                        >
+                                            💾
+                                        </button>
+                                        <button
+                                            className="btn btn-light mt-2 ml-1"
+                                            onClick={() => deleteCoin(c._id)}
+                                            title="Supprimer"
+                                        >
+                                            🗑️
+                                        </button>
+                                    </td>
+                                </tr>
+
+                                {/* Deuxième ligne */}
+                                <tr>
+
+
+                                    <td>
+                                        <input
+                                            className="form-control"
+                                            value={editedCoins[c._id]?.rank ?? c.rank ?? ""}
+                                            onChange={(e) => handleLocalChange(c._id, "rank", e.target.value)}
+                                        />
+                                    </td>
+
+                                    <td style={{ minWidth: "250px" }}>
+                                        <textarea
+                                            className="form-control"
+                                            rows={5}
+                                            value={editedCoins[c._id]?.stockage ?? c.stockage ?? ""}
+                                            onChange={(e) => handleLocalChange(c._id, "stockage", e.target.value)}
+                                        />
+                                    </td>
+
+                                    <td>
+                                        <input
+                                            type="date"
+                                            className="form-control"
+                                            value={
+                                                editedCoins[c._id]?.dateAchat
+                                                    ? editedCoins[c._id].dateAchat.slice(0, 10)
+                                                    : c.dateAchat
+                                                        ? c.dateAchat.slice(0, 10)
+                                                        : ""
+                                            }
+                                            onChange={(e) => handleLocalChange(c._id, "dateAchat", e.target.value)}
+                                        />
+                                    </td>
+
+                                    <td style={{ minWidth: "400px" }}>
+                                        <textarea
+                                            className="form-control"
+                                            rows={10}
+                                            value={editedCoins[c._id]?.observation ?? c.observation ?? ""}
+                                            onChange={(e) => handleLocalChange(c._id, "observation", e.target.value)}
+                                        />
+                                    </td>
+                                </tr>
+                            </React.Fragment>
                         ))}
                     </tbody>
+
                 </table>
             </div>
         </div>

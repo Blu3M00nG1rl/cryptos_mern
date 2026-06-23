@@ -4,7 +4,7 @@ import Wallet from '../../pages/Wallet';
 import Coins from '../../pages/Coins';
 import Ventes from '../../pages/Ventes';
 import Achats from '../../pages/Achats';
-import Export from '../../pages/Export';
+import Recap from '../../pages/Recap';
 import CoinsAdmin from '../../pages/CoinsAdmin';
 import Navbar from '../Navbar';
 import LeftNav from '../LeftNav';
@@ -23,7 +23,7 @@ const RoutesLayout = () => {
                     <Route path="/coins" element={<Coins search={search} />} />
                     <Route path="/ventes" element={<Ventes search={search} />} />
                     <Route path="/achats" element={<Achats search={search} />} />
-                    <Route path="/export" element={<Export search={search} />} />
+                    <Route path="/recap" element={<Recap search={search} />} />
                     <Route path="/coins-admin" element={<CoinsAdmin search={search} />} />
                     <Route path="*" element={<Wallet search={search} />} />
                 </Routes>

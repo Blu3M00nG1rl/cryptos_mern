@@ -3,5 +3,6 @@ const coinsNonImporteController = require('../controllers/coins_non_importe.cont
 
 router.post("/create", coinsNonImporteController.createCoinNI);
 router.delete("/delete", coinsNonImporteController.deleteCoinsNI);
+router.get("/", coinsNonImporteController.getCoinsNI);
 
 module.exports = router;

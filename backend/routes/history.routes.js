@@ -6,7 +6,7 @@ router.delete("/delete", historyController.deleteHistory);
 router.get("/stats", historyController.getStats);
 router.post("/importJ", historyController.runImportJ);
 router.post("/importH", historyController.runImportH);
-router.get("/export", historyController.getExportData);
+router.get("/recap", historyController.getRecapData);
 router.get("/ventes", historyController.getVentesData);
 router.get("/achats", historyController.getAchatsData);
 router.get("/synthese", historyController.getSyntheseData);

@@ -11,9 +11,10 @@ const historyRoutes = require('./routes/history.routes');
 const walletRoutes = require('./routes/wallet.routes');
 const bitcoinRoutes = require('./routes/bitcoin.routes');
 const maintenanceRoutes = require('./routes/maintenance.routes');
+const paramsRoutes = require('./routes/param.routes');
 
 const app = express();
-app.use(express.json());
+app.use(express.json());    
 
 const corsOptions = {
     origin: process.env.CLIENT_URL,
@@ -36,7 +37,8 @@ app.use(process.env.ROUTES_PREFIX+'/coins_non_importe', coinsNonImporteRoutes);
 app.use(process.env.ROUTES_PREFIX+'/history', historyRoutes);
 app.use(process.env.ROUTES_PREFIX+'/wallet', walletRoutes);
 app.use(process.env.ROUTES_PREFIX+'/bitcoin', bitcoinRoutes);
-app.use(process.env.ROUTES_PREFIX + "/maintenance", maintenanceRoutes);
+app.use(process.env.ROUTES_PREFIX+'/maintenance', maintenanceRoutes);
+app.use(process.env.ROUTES_PREFIX+'/param', paramsRoutes);
 
 
 // server

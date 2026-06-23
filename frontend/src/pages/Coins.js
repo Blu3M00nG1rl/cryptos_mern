@@ -4,7 +4,7 @@ import axios from 'axios';
 const Coins = ({ search = '' }) => {
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [dateProjection, setDateProjection] = useState(null);
+    const [dateCible, setDateCible] = useState(null);
 
     useEffect(() => {
         fetchData();
@@ -14,7 +14,7 @@ const Coins = ({ search = '' }) => {
         try {
             const res = await axios.get(`${process.env.REACT_APP_API_URL}/backend/history/synthese`);
 
-            setDateProjection(res.data.dateProjection);
+            setDateCible(res.data.dateCible);
 
             setData(
                 [...res.data.data].sort((a, b) => a.symbol.localeCompare(b.symbol))
@@ -39,6 +39,14 @@ const Coins = ({ search = '' }) => {
     const formatNumber = (v) =>
         v === null || v === undefined ? "-" : v.toLocaleString("fr-FR", { maximumFractionDigits: 4 });
 
+    const formatCurrency12 = (n) =>
+        new Intl.NumberFormat('fr-FR', {
+            style: 'currency',
+            currency: 'EUR',
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 12
+        }).format(n);
+
     const formatDate = (d) =>
         d ? new Date(d).toLocaleDateString("fr-FR") : "-";
 
@@ -56,47 +64,56 @@ const Coins = ({ search = '' }) => {
                         <table className="table table-striped table-hover">
                             <thead className="table-dark">
                                 <tr>
-                                    <th>Symbole</th>
-                                    <th>Nom</th>
-                                    <th>Aujourd'hui</th>
-                                    <th>Hier</th>
-                                    <th>{formatDate(dateProjection)}</th>
-                                    <th>Évolution (%)</th>
-                                    <th>Maximum</th>
-                                    <th>Minimum</th>
-                                    <th>Fib. Vente</th>
-                                    <th>Fib. Achat</th>
+                                    <th></th>
+                                    <th className="text-center">Symbol</th>
+                                    <th className="text-center">Nom</th>
+                                    <th className="text-center">Prix Aujourd'hui</th>
+                                    <th className="text-center">Prix Hier</th>
+                                    <th className="text-center">{formatDate(dateCible)}</th>
+                                    <th className="text-center">Évolution (%)</th>
+                                    <th className="text-center">Prix Max</th>
+                                    <th className="text-center">Prix Min</th>
+                                    <th className="text-center">Fib. Vente</th>
+                                    <th className="text-center">Fib. Achat</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {filteredData.map((coin, i) => (
                                     <tr key={i}>
-                                        <td><strong>{coin.symbol}</strong></td>
-                                        <td>{coin.name}</td>
-                                        <td>{formatNumber(coin.prixAuj)}</td>
-                                        <td>{formatNumber(coin.prixHier)}</td>
-                                        <td>{formatNumber(coin.prixProjection)}</td>
-                                        <td>
+                                        <td className="text-center">
+                                            <img
+                                                src={`/img/coins/${coin.symbol}.png`}
+                                                alt={coin.symbol}
+                                                style={{ width: 32, height: 32 }}
+                                                onError={(e) => { e.target.src = '/img/random-coin.jpg'; }}
+                                            />
+                                        </td>
+                                        <td className="text-center"><strong>{coin.symbol}</strong></td>
+                                        <td className="text-center">{coin.name}</td>
+                                        <td className="text-center">{formatCurrency12(coin.prixAuj)}</td>
+                                        <td className="text-center">{formatCurrency12(coin.prixHier)}</td>
+                                        <td className="text-center">{formatCurrency12(coin.prixCible)}</td>
+                                        <td className="text-center">
                                             {coin.evolution !== null ? formatNumber(coin.evolution) + " %" : "-"}
                                         </td>
-                                        <td>
+                                        <td className="text-center">
                                             {coin.max ? (
                                                 <>
-                                                    {formatNumber(coin.max.prix)}<br />
+                                                    {formatCurrency12(coin.max.prix)}<br />
                                                     <small>{formatDate(coin.max.date)}</small>
                                                 </>
                                             ) : "-"}
                                         </td>
-                                        <td>
+                                        <td className="text-center">
                                             {coin.min ? (
                                                 <>
-                                                    {formatNumber(coin.min.prix)}<br />
+                                                    {formatCurrency12(coin.min.prix)}<br />
                                                     <small>{formatDate(coin.min.date)}</small>
                                                 </>
                                             ) : "-"}
                                         </td>
-                                        <td>{formatNumber(coin.fibVente)}</td>
-                                        <td>{formatNumber(coin.fibAchat)}</td>
+                                        <td className="text-center">{formatCurrency12(coin.fibVente)}</td>
+                                        <td className="text-center">{formatCurrency12(coin.fibAchat)}</td>
                                     </tr>
                                 ))}
                             </tbody>

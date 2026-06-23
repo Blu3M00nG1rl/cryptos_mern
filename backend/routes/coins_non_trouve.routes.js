@@ -3,5 +3,6 @@ const coinsNonTrouveController = require('../controllers/coins_non_trouve.contro
 
 router.post("/create", coinsNonTrouveController.createCoinNF);
 router.delete("/delete", coinsNonTrouveController.deleteCoinsNF);
+router.get("/", coinsNonTrouveController.getCoinsNF);
 
 module.exports = router;

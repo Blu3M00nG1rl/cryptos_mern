@@ -1,11 +1,11 @@
 require('dotenv').config({ path: '../config/.env' });
-const axios = require('axios');
+const mongoose = require("mongoose");
+const Coin = require("../models/coin.model");
+const History = require("../models/history.model");
+const Params = require("../models/params.model");
 
-// ===== PARAMS
-const marketCapMinEUR = process.env.MARKETCAP_MIN_EUR;
+const axios = require("axios");
 const jnee = new Date().toISOString().slice(0, 10);
-
-
 
 const getMaxDiff = async () => {
     const endpoint = process.env.API_URL + "/bitcoin/max-diff";
@@ -17,16 +17,6 @@ const getMaxDiff = async () => {
         return 0;
     }
 };
-
-const coinFind = async (symbol) => {
-    const endpoint = process.env.API_URL + "/coin/symbol/" + symbol;
-    try {
-        const response = await axios.get(endpoint);
-        return response.data;   // <-- IMPORTANT
-    } catch (error) {
-        return null;            // <-- indique que le coin n'existe pas
-    }
-}
 
 const coinNF = async (coinData) => {
     const endpoint = process.env.API_URL + "/coins_non_trouve/create";
@@ -55,11 +45,11 @@ const history = async (historyData) => {
     }
 }
 
-const deleteHistory = async (jneeProjection) => {
+const deleteHistory = async (jneeCible) => {
     const endpoint = process.env.API_URL + "/history/delete";
     try {
         const response = await axios.delete(endpoint, {
-            data: { jneeProjection }
+            data: { jneeCible }
         });
         console.log(response.data);
     } catch (error) {
@@ -77,11 +67,25 @@ const deleteCoinsNF = async () => {
     }
 }
 
+async function connectDB() {
+    try {
+        await mongoose.connect(process.env.MONGO_URI);
+        console.log("MongoDB connecté ✔");
+    } catch (err) {
+        console.error("Erreur connexion MongoDB :", err);
+        process.exit(1);
+    }
+}
+
 async function importCrypto() {
     console.log("=== DEBUT IMPORT PRIX DU JOUR ===");
     const maxDiff = await getMaxDiff();
-    const jneeProjection = new Date(Date.now() - maxDiff * 24 * 60 * 60 * 1000);
-    jneeProjection.setUTCHours(0, 0, 0, 0);
+    const jneeCible = new Date(Date.now() - maxDiff * 24 * 60 * 60 * 1000);
+    jneeCible.setUTCHours(0, 0, 0, 0);
+    // ===== PARAMS
+    // 🔥 Charger les paramètres depuis MongoDB
+    const params = await Params.findOne().lean();
+    const marketCapMinEUR = params.marketCapMin;
 
     const fxRes = await axios.get('https://api.frankfurter.app/latest?from=USD&to=EUR');
     const usdToEur = fxRes.data.rates.EUR;
@@ -89,7 +93,7 @@ async function importCrypto() {
     if (!usdToEur) throw new Error("Erreur récupération taux USD/EUR");
 
     await deleteCoinsNF();
-    await deleteHistory(jneeProjection);
+    await deleteHistory(jneeCible);
 
     let start = 0;
     const limit = 100;
@@ -116,10 +120,13 @@ async function importCrypto() {
                 break;
             }
 
-            const existingCoin = await coinFind(symbol);
             const priceEUR = coin.price_usd * usdToEur;
             const volumeEUR = coin.volume24 * usdToEur;
 
+            // 1️⃣ Récupérer le coin dans ta base
+            const existingCoin = await Coin.findOne({ symbol });
+
+            // 2️⃣ Si le coin n'existe pas → coins_non_trouve
             if (!existingCoin) {
                 await coinNF({
                     rank: coin.rank,
@@ -129,20 +136,32 @@ async function importCrypto() {
                     market_cap: marketCapEUR,
                     volume: volumeEUR
                 });
-                continue;
+                continue; // ❗ On ne crée PAS d'historique sans coinId
             }
 
-            await history({
-                coinId: existingCoin.coinId,
-                rank: existingCoin.rank,
-                journee: jnee,
-                prix: priceEUR,
-                market_cap: marketCapEUR,
-                total_volume: volumeEUR
-            });
+            // 3️⃣ Mise à jour du coin existant
+            existingCoin.rank = coin.rank;
+            existingCoin.prix = priceEUR;
+            existingCoin.market_cap = marketCapEUR;
+            existingCoin.volume = volumeEUR;
+            await existingCoin.save();
 
-            importedCount++; // 👉 compteur ici
+            // 4️⃣ Historique : toujours avec existingCoin.coinId
+            await History.updateOne(
+                { coinId: existingCoin.coinId, journee: jnee },
+                {
+                    $set: {
+                        prix: priceEUR,
+                        market_cap: marketCapEUR,
+                        total_volume: volumeEUR
+                    }
+                },
+                { upsert: true }
+            );
+
+            importedCount++;
         }
+
 
         start += limit;
     }
@@ -153,4 +172,9 @@ async function importCrypto() {
     console.log("=== FIN IMPORT PRIX DU JOUR ===");
 }
 
-importCrypto();
+(async () => {
+    await connectDB();
+    await importCrypto();
+    mongoose.connection.close();
+})();
+

@@ -78,17 +78,16 @@ $ npm i -s axios
 
 11 Installation de bootstrap
 $ npm i -s bootstrap
+$ npm i -s bootstrap-icons@1.11.1
 
 12 Installation pour export excel
 $ npm install xlsx file-saver
 
-
-2h51
+SI NOUVELLE INSTALL NPM réinstaller le conteneur
+docker compose down
+docker compose build --no-cache
+docker compose up -d
 
 MONGO
 delete une table
 db.coins.deleteMany({})
-
-création import.js dans backend upload (copier sur uploads de copa (axios vers controller pour intéragir avec mongo))
-
-

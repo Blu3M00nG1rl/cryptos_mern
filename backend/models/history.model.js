@@ -24,7 +24,7 @@ const historySchema = new mongoose.Schema(
     }
 );
 
-historySchema.index({ coinId: 1, journee: 1 });
+historySchema.index({ coinId: 1, journee: 1 }, { unique: true });
 
 const HistoryModel = mongoose.model("history", historySchema);
 

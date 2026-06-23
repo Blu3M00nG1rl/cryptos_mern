@@ -33,6 +33,19 @@ const Ventes = ({ search = '' }) => {
         return value.toLocaleString("fr-FR", { maximumFractionDigits: 2 });
     };
 
+    const formatNumber12 = (value) => {
+        if (value === null || value === undefined) return "-";
+        return value.toLocaleString("fr-FR", { maximumFractionDigits: 12 });
+    };
+
+    const formatCurrency0 = (n) =>
+        new Intl.NumberFormat('fr-FR', {
+            style: 'currency',
+            currency: 'EUR',
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0
+        }).format(n);
+
     return (
         <div>
             <div className="d-flex justify-content-between align-items-center mb-4">
@@ -47,31 +60,36 @@ const Ventes = ({ search = '' }) => {
                         <table className="table table-striped table-hover">
                             <thead className="table-dark">
                                 <tr>
-                                    <th>Symbole</th>
-                                    <th>Nom</th>
-                                    <th>Portefeuille</th>
-                                    <th>Prix Aujourd'hui</th>
-                                    <th>Prix Hier</th>
-                                    <th>Évolution 24h</th>
-                                    <th>Market Cap</th>
-                                    <th>Volume</th>
+                                    <th className='text-center'>Symbole</th>
+                                    <th className='text-center'>Nom</th>
+                                    <th className='text-center'>Portefeuille</th>
+                                    <th className='text-center'>Prix Aujourd'hui</th>
+                                    <th className='text-center'>Prix Hier</th>
+                                    <th className='text-center'>Évolution 24h</th>
+                                    <th className='text-center'>Évolution Cible</th>
+                                    <th className='text-center'>Market Cap</th>
+                                    <th className='text-center'>Volume</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {filteredData.map((coin, index) => (
                                     <tr key={index}>
-                                        <td><strong>{coin.symbol}</strong></td>
-                                        <td>{coin.name}</td>
-                                        <td>{coin.nombre}</td>
-                                        <td>{formatNumber(coin.prixAuj)}</td>
-                                        <td>{formatNumber(coin.prixHier)}</td>
-                                        <td>
-                                            {coin.evolution === null
+                                        <td className='text-center'><strong>{coin.symbol}</strong></td>
+                                        <td className='text-center'>{coin.name}</td>
+                                        <td className='text-center'>{formatNumber12(coin.nombre)}</td>
+                                        <td className='text-center'>{formatCurrency0(coin.prixAuj)}</td>
+                                        <td className='text-center'>{formatCurrency0(coin.prixHier)}</td>
+                                        <td className='text-center'>{coin.evolution24 === null ? "-" : `${formatNumber(coin.evolution24)} %`}</td>
+                                        <td
+                                            className={`text-center ${coin.evolutionCible > 0 ? "table-success" : "table-danger"
+                                                }`}
+                                        >
+                                            {coin.evolutionCible === null
                                                 ? "-"
-                                                : `${formatNumber(coin.evolution)} %`}
+                                                : `${formatNumber(coin.evolutionCible)} %`}
                                         </td>
-                                        <td>{formatNumber(coin.market_cap)}</td>
-                                        <td>{formatNumber(coin.volume)}</td>
+                                        <td className='text-center'>{formatCurrency0(coin.market_cap)}</td>
+                                        <td className='text-center'>{formatCurrency0(coin.volume)}</td>
                                     </tr>
                                 ))}
                             </tbody>

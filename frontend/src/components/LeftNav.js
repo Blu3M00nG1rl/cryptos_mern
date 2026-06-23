@@ -10,8 +10,8 @@ const LeftNav = () => {
                         <img src="/img/wallet.png" alt="wallet" />
                     </NavLink>
 
-                    <NavLink to="/export" title="Export" className={({ isActive }) => isActive ? "active-left-nav" : ""}>
-                        <img src="/img/excel.png" alt="export" />
+                    <NavLink to="/recap" title="Recap" className={({ isActive }) => isActive ? "active-left-nav" : ""}>
+                        <img src="/img/recap.png" alt="recap" />
                     </NavLink>
 
                     <NavLink to="/ventes" title="Ventes" className={({ isActive }) => isActive ? "active-left-nav" : ""}>
