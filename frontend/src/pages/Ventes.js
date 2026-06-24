@@ -6,7 +6,6 @@ const Ventes = ({ search = '' }) => {
     const [data, setData] = useState([]);
     const [dataBtc, setDataBtc] = useState([]);
     const [mode, setMode] = useState("eur"); // "eur" ou "btc"
-    const [activeTab, setActiveTab] = useState("eur");
 
     useEffect(() => {
         fetchData();
@@ -81,46 +80,19 @@ const Ventes = ({ search = '' }) => {
                     className={`btn btn-sm btn-currency mb-4 ${mode === "eur" ? "btn-primary" : "btn-outline-primary"}`}
                     onClick={() => setMode("eur")}
                 >
-                    <img src="/img/eur.png" style={{ width: 28 }} />
+                    <img src="/img/eur.png" style={{ width: 28 }} alt="eur"/>
                 </button>
 
                 <button
                     className={`btn btn-sm btn-currency mb-4 ${mode === "btc" ? "btn-warning" : "btn-outline-warning"}`}
                     onClick={() => setMode("btc")}
                 >
-                    <img src="/img/btc.png" style={{ width: 28 }} />
+                    <img src="/img/btc.png" style={{ width: 28 }} alt="btc"/>
                 </button>
             </div>
 
-            <ul className="nav nav-tabs mb-3">
-                {mode === "eur" && (
-                    <>
-                        <li className="nav-item">
-                            <button
-                                className={`nav-link ${activeTab === "eur" ? "active" : ""}`}
-                                onClick={() => setActiveTab("eur")}
-                            >
-                                Eur
-                            </button>
-                        </li>
-                    </>
-                )}
-                {mode === "btc" && (
-                    <>
-                        <li className="nav-item">
-                            <button
-                                className={`nav-link ${activeTab === "btc" ? "active" : ""}`}
-                                onClick={() => setActiveTab("btc")}
-                            >
-                                Btc
-                            </button>
-                        </li>
-                    </>
-                )}
-            </ul>
-
             <div className="card p-4">
-                {mode === "eur" && activeTab === "eur" && (
+                {mode === "eur" && (
                     <>
                         {loading ? (
                             <p>Chargement...</p>
@@ -168,7 +140,7 @@ const Ventes = ({ search = '' }) => {
                     </>
                 )}
 
-                {mode === "btc" && activeTab === "btc" && (
+                {mode === "btc" && (
                     <>
                         {loading ? (
                             <p>Chargement...</p>

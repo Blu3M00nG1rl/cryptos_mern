@@ -6,7 +6,6 @@ const Coins = ({ search = '' }) => {
     const [loading, setLoading] = useState(true);
     const [dateCible, setDateCible] = useState(null);
     const [mode, setMode] = useState("eur"); // "eur" ou "btc"
-    const [activeTab, setActiveTab] = useState("eur");
 
     useEffect(() => {
         fetchData();
@@ -39,6 +38,9 @@ const Coins = ({ search = '' }) => {
     const formatNumber = (v) =>
         v === null || v === undefined ? "-" : v.toLocaleString("fr-FR", { maximumFractionDigits: 4 });
 
+    const formatNumber0 = (v) =>
+        v === null || v === undefined ? "-" : v.toLocaleString("fr-FR", { maximumFractionDigits: 0 });
+
     const formatCurrency12 = (n) =>
         new Intl.NumberFormat('fr-FR', {
             style: 'currency',
@@ -67,46 +69,19 @@ const Coins = ({ search = '' }) => {
                     className={`btn btn-sm btn-currency mb-4 ${mode === "eur" ? "btn-primary" : "btn-outline-primary"}`}
                     onClick={() => setMode("eur")}
                 >
-                    <img src="/img/eur.png" style={{ width: 28 }} />
+                    <img src="/img/eur.png" style={{ width: 28 }} alt="eur" />
                 </button>
 
                 <button
                     className={`btn btn-sm btn-currency mb-4 ${mode === "btc" ? "btn-warning" : "btn-outline-warning"}`}
                     onClick={() => setMode("btc")}
                 >
-                    <img src="/img/btc.png" style={{ width: 28 }} />
+                    <img src="/img/btc.png" style={{ width: 28 }} alt="bnb" />
                 </button>
             </div>
 
-            <ul className="nav nav-tabs mb-3">
-                {mode === "eur" && (
-                    <>
-                        <li className="nav-item">
-                            <button
-                                className={`nav-link ${activeTab === "eur" ? "active" : ""}`}
-                                onClick={() => setActiveTab("eur")}
-                            >
-                                Eur
-                            </button>
-                        </li>
-                    </>
-                )}
-                {mode === "btc" && (
-                    <>
-                        <li className="nav-item">
-                            <button
-                                className={`nav-link ${activeTab === "btc" ? "active" : ""}`}
-                                onClick={() => setActiveTab("btc")}
-                            >
-                                Btc
-                            </button>
-                        </li>
-                    </>
-                )}
-            </ul>
-
             <div className="card p-4">
-                {mode === "eur" && activeTab === "eur" && (
+                {mode === "eur" && (
                     <>
                         {loading ? (
                             <p>Chargement...</p>
@@ -174,7 +149,7 @@ const Coins = ({ search = '' }) => {
                     </>
                 )}
 
-                {mode === "btc" && activeTab === "btc" && (
+                {mode === "btc" && (
                     <>
                         {loading ? (
                             <p>Chargement...</p>
@@ -209,16 +184,16 @@ const Coins = ({ search = '' }) => {
                                                 </td>
                                                 <td className="text-center"><strong>{coin.symbol}</strong></td>
                                                 <td className="text-center">{coin.name}</td>
-                                                <td className="text-center">{formatCurrency12B(coin.prixAuj/coin.btcToday)}</td>
-                                                <td className="text-center">{formatCurrency12B(coin.prixHier/coin.btcYesterday)}</td>
-                                                <td className="text-center">{formatCurrency12B(coin.prixCible/coin.btcCible)}</td>
+                                                <td className="text-center">{formatCurrency12B(coin.prixAuj / coin.btcToday)}</td>
+                                                <td className="text-center">{formatCurrency12B(coin.prixHier / coin.btcYesterday)}</td>
+                                                <td className="text-center">{formatCurrency12B(coin.prixCible / coin.btcCible)}</td>
                                                 <td className="text-center">
-                                                    {coin.evolution !== null ? formatNumber(coin.evolution) + " %" : "-"}
+                                                    {coin.evolution !== null ? formatNumber0(coin.evolutionBtc) + " %" : "-"}
                                                 </td>
                                                 <td className="text-center">
                                                     {coin.max ? (
                                                         <>
-                                                            {formatCurrency12B(coin.max.prix/coin.maxBTC.prix)}<br />
+                                                            {formatCurrency12B(coin.max.prix / coin.maxBTC.prix)}<br />
                                                             <small>{formatDate(coin.max.date)}</small>
                                                         </>
                                                     ) : "-"}
@@ -226,13 +201,13 @@ const Coins = ({ search = '' }) => {
                                                 <td className="text-center">
                                                     {coin.min ? (
                                                         <>
-                                                            {formatCurrency12B(coin.min.prix/coin.minBTC.prix)}<br />
+                                                            {formatCurrency12B(coin.min.prix / coin.minBTC.prix)}<br />
                                                             <small>{formatDate(coin.min.date)}</small>
                                                         </>
                                                     ) : "-"}
                                                 </td>
-                                                <td className="text-center">{formatCurrency12B(coin.fibVente/coin.btcToday)}</td>
-                                                <td className="text-center">{formatCurrency12B(coin.fibAchat/coin.btcToday)}</td>
+                                                <td className="text-center">{formatCurrency12B(coin.fibVente / coin.btcToday)}</td>
+                                                <td className="text-center">{formatCurrency12B(coin.fibAchat / coin.btcToday)}</td>
                                             </tr>
                                         ))}
                                     </tbody>

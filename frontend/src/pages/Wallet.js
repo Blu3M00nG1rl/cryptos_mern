@@ -15,7 +15,6 @@ const Wallet = ({ search = '' }) => {
     const [btcPriceToday, setBtcPriceToday] = useState(0);
     const [btcEvolution, setBtcEvolution] = useState(0);
     const [btcCapitalisation, setBtcCapitalisation] = useState(0);
-    const [btcPrixCible, setBtcPrixCible] = useState(0);
     const [stablePriceToday, setStablePriceToday] = useState(0);
     const [dominance, setDominance] = useState(0);
     const [activeTab, setActiveTab] = useState("groupe");
@@ -37,7 +36,9 @@ const Wallet = ({ search = '' }) => {
     });
     const [eurValue, setEurValue] = useState("");
     const [stableValue, setStableValue] = useState("");
+    const [btcValue, setBtcValue] = useState("");
     const [mode, setMode] = useState("eur"); // "eur" ou "btc"
+    const [note, setNote] = useState("");
 
     const normalizedSearch = (search || '').trim().toLowerCase();
     const owned = coins
@@ -62,11 +63,6 @@ const Wallet = ({ search = '' }) => {
     const totalValeurAchat = owned.reduce((sum, c) => sum + ((Number(c.nombre) || 0) * (Number(c.prixCoin) || 0)), 0);
     const totalGainPerte = totalValeur - totalValeurAchat;
     const totalPourcGP = totalValeurAchat > 0 ? (totalGainPerte / totalValeurAchat) * 100 : 0;
-    const totalNombreEnBtc = ownedEnBtc.reduce((sum, c) => sum + (Number(c.nombre) || 0), 0);
-    const totalValeurEnBtc = ownedEnBtc.reduce((sum, c) => sum + ((Number(c.nombre) || 0) * (Number(c.prixHistory) || 0)), 0);
-    const totalValeurAchatEnBtc = ownedEnBtc.reduce((sum, c) => sum + ((Number(c.nombre) || 0) * (Number(c.prixCoin) || 0)), 0);
-    const totalGainPerteEnBtc = totalValeurEnBtc - totalValeurAchatEnBtc;
-    const totalPourcGPEnBtc = totalValeurAchatEnBtc > 0 ? (totalGainPerteEnBtc / totalValeurAchatEnBtc) * 100 : 0;
     const investissement = Number(process.env.REACT_APP_INVESTISSEMENT) || 0;
     const gain = totalValeur - investissement;
     const gainPourcentage = investissement > 0 ? (gain / investissement) * 100 : 0;
@@ -123,10 +119,6 @@ const Wallet = ({ search = '' }) => {
         try {
             const res = await axios.get(`${process.env.REACT_APP_API_URL}/backend/coin/enBtc`);
             setCoinsEnBtc(res.data || []);
-            const btc = res.data.find(c => c.symbol === "btc" || c.coinId === "bitcoin");
-            const usdc = res.data.find(c => c.symbol === "usdc" || c.coinId === "usd-coin");
-            const usdt = res.data.find(c => c.symbol === "usdt" || c.coinId === "tether");
-
         } catch (err) {
             console.error('Erreur récupération coins', err);
             setCoins([]);
@@ -174,6 +166,29 @@ const Wallet = ({ search = '' }) => {
             setCoinsEnBtc([]);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const fetchNote = async () => {
+        try {
+            const res = await axios.get(
+                `${process.env.REACT_APP_API_URL}/backend/coin/note`
+            );
+            setNote(res.data.content);
+        } catch (err) {
+            console.error("Erreur récupération Note", err);
+        }
+    };
+
+    const saveNote = async () => {
+        try {
+            await axios.post(
+                `${process.env.REACT_APP_API_URL}/backend/coin/note`,
+                { content: note },
+                { headers: { "Content-Type": "application/json" } }
+            );
+        } catch (err) {
+            console.error("Erreur sauvegarde Note", err);
         }
     };
 
@@ -328,14 +343,8 @@ const Wallet = ({ search = '' }) => {
         fetchAchatCoinsEnBtc();
     };
 
-    const btc = owned.find(c =>
-        c.symbol.toLowerCase() === "btc" || c.coinId === "bitcoin"
-    );
-
     const ownedEnriched = owned.map(c => {
         const prixDuJour = Number(c.prixHistory);
-        const prixEnBtc = prixDuJour / btcPriceToday;
-        const prixEnBtcCible = c.prixCible / btcPrixCible;
         const dominanceCoin = dominanceCalculee > 0 && c.capitalisation
             ? (c.capitalisation / dominanceCalculee) * 1000000
             : 0;
@@ -371,7 +380,6 @@ const Wallet = ({ search = '' }) => {
     const ownedEnrichedEnBtc = ownedEnBtc.map(c => {
         const prixDuJour = Number(c.prixHistory);
         const prixEnBtc = prixDuJour / btcPriceToday;
-        const prixEnBtcCible = c.prixCible / btcPrixCible;
         const dominanceCoin = dominanceCalculee > 0 && c.capitalisation
             ? (c.capitalisation / dominanceCalculee) * 1000000
             : 0;
@@ -413,27 +421,38 @@ const Wallet = ({ search = '' }) => {
     };
 
     const handleEurChange = (e) => {
-        const eur = e.target.value;
+        const eur = parseFloat(e.target.value) || 0;
         setEurValue(eur);
 
-        if (!eur || isNaN(eur)) {
-            setStableValue("");
-            return;
-        }
+        // EUR → STABLE
+        setStableValue(eur / stablePriceToday);
 
-        setStableValue((eur / stablePriceToday).toFixed(4));
+        // EUR → BTC
+        setBtcValue(eur / btcPriceToday);
     };
 
     const handleStableChange = (e) => {
-        const stable = e.target.value;
+        const stable = parseFloat(e.target.value) || 0;
         setStableValue(stable);
 
-        if (!stable || isNaN(stable)) {
-            setEurValue("");
-            return;
-        }
+        // STABLE → EUR
+        const eur = stable * stablePriceToday;
+        setEurValue(eur);
 
-        setEurValue((stable * stablePriceToday).toFixed(2));
+        // STABLE → BTC
+        setBtcValue(eur / btcPriceToday);
+    };
+
+    const handleBtcChange = (e) => {
+        const btc = parseFloat(e.target.value) || 0;
+        setBtcValue(btc);
+
+        // BTC → EUR
+        const eur = btc * btcPriceToday;
+        setEurValue(eur);
+
+        // BTC → STABLE
+        setStableValue(eur / stablePriceToday);
     };
 
     useEffect(() => {
@@ -444,10 +463,21 @@ const Wallet = ({ search = '' }) => {
         fetchMaxDiff();
         fetchAchatCoins();
         fetchAchatCoinsEnBtc();
-        if (btc) {
-            setBtcPrixCible(btc.prixCible);
+    }, []);
+
+    useEffect(() => {
+        fetchNote();
+    }, []);
+
+    useEffect(() => {
+        if (mode === "eur") {
+            setActiveTab("groupe");
+        } else if (mode === "btc") {
+            setActiveTab("groupeB");
         }
-    }, [btc]);
+    }, [mode]);
+
+
 
     return (
         <div>
@@ -458,14 +488,14 @@ const Wallet = ({ search = '' }) => {
                     className={`btn btn-sm btn-currency mb-4 ${mode === "eur" ? "btn-primary" : "btn-outline-primary"}`}
                     onClick={() => setMode("eur")}
                 >
-                    <img src="/img/eur.png" style={{ width: 28 }} />
+                    <img src="/img/eur.png" style={{ width: 28 }} alt="eur" />
                 </button>
 
                 <button
                     className={`btn btn-sm btn-currency mb-4 ${mode === "btc" ? "btn-warning" : "btn-outline-warning"}`}
                     onClick={() => setMode("btc")}
                 >
-                    <img src="/img/btc.png" style={{ width: 28 }} />
+                    <img src="/img/btc.png" style={{ width: 28 }} alt="btc" />
                 </button>
             </div>
 
@@ -502,10 +532,10 @@ const Wallet = ({ search = '' }) => {
 
                 <div className="col-md-2">
                     <div className="card p-3 shadow-sm">
-                        {/* 🔥 Convertisseur EUR - STABLE */}
 
                         <h6 className="mt-2">Convertisseur</h6>
 
+                        {/* EUR */}
                         <div className="mb-2">
                             <small className="text-muted">Somme en Euros</small>
                             <input
@@ -513,10 +543,11 @@ const Wallet = ({ search = '' }) => {
                                 className="form-control"
                                 value={eurValue}
                                 onChange={handleEurChange}
-                                placeholder="EUR → Stable"
+                                placeholder="EUR → Stable / BTC"
                             />
                         </div>
 
+                        {/* STABLE */}
                         <div className="mb-2">
                             <small className="text-muted">Somme en Stable</small>
                             <input
@@ -524,9 +555,22 @@ const Wallet = ({ search = '' }) => {
                                 className="form-control"
                                 value={stableValue}
                                 onChange={handleStableChange}
-                                placeholder="Stable → EUR"
+                                placeholder="Stable → EUR / BTC"
                             />
                         </div>
+
+                        {/* BTC */}
+                        <div className="mb-2">
+                            <small className="text-muted">Somme en BTC</small>
+                            <input
+                                type="number"
+                                className="form-control"
+                                value={btcValue}
+                                onChange={handleBtcChange}
+                                placeholder="BTC → EUR / Stable"
+                            />
+                        </div>
+
                     </div>
                 </div>
 
@@ -597,9 +641,18 @@ const Wallet = ({ search = '' }) => {
 
                 <div className="col-md-2">
                     <div className="card p-3 shadow-sm">
-                        <div className="d-flex justify-content-between align-items-start">
-                            <div>
+                        <div >
+                            <div className="d-flex justify-content-between align-items-start">
                                 <h5>Notes</h5>
+                                <button className="btn btn-light mt-2" onClick={saveNote}>💾</button>
+                            </div>
+                            <div>
+                                <textarea
+                                    className="form-control"
+                                    rows="4"
+                                    value={note}
+                                    onChange={(e) => setNote(e.target.value)}
+                                />
                             </div>
                         </div>
                     </div>
@@ -695,7 +748,7 @@ const Wallet = ({ search = '' }) => {
                                             </th>
 
                                             <th className="text-center">
-                                                Evolution
+                                                Evol. Cible
                                             </th>
 
                                             <th className="text-center">
@@ -714,13 +767,6 @@ const Wallet = ({ search = '' }) => {
                                     <tbody>
                                         {sortData(ownedEnriched)
                                             .map((c) => {
-
-                                                const btc = ownedEnriched.find(x => x.symbol.toLowerCase() === "btc");
-                                                const evolutionBTC = btc ? btc.evolution : 0;
-                                                const rowClass =
-                                                    c.symbol.toLowerCase() === "btc"
-                                                        ? (c.evolution > evolutionBTC ? "table-success" : "table-danger")
-                                                        : (c.evolution > 0 ? "table-success" : "table-danger");
 
                                                 return (
                                                     <tr

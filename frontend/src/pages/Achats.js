@@ -9,15 +9,33 @@ const Achats = ({ search = '' }) => {
     const [stables, setStables] = useState(0);
     const [prixStable, setPrixStable] = useState(0);
     const [dominance, setDominance] = useState(0);
+    const [btcPriceToday, setBtcPriceToday] = useState(0);
     const [btcCapitalisation, setBtcCapitalisation] = useState(0);
+    const [btcNombre, setBtcNombre] = useState(0);
+    const [btcEvolution, setBtcEvolution] = useState(0);
+    const [btcEcart, setBtcEcart] = useState(0);
     const [mode, setMode] = useState("eur"); // "eur" ou "btc"
-    const [activeTab, setActiveTab] = useState("eur");
 
     useEffect(() => {
         fetchDominance();
         fetchRecapData();
         fetchData();
     }, []);
+
+    useEffect(() => {
+        const dominanceCalculee = dominance > 0 ? (btcCapitalisation / dominance) * 100 : 0;
+        const dominanceCoin = dominance > 0 ? (btcCapitalisation / dominanceCalculee) * 1000000 : 0;
+        const estimationWalletBtc = (btcPriceToday / dominance) * 100;
+        const hodlBtc = btcPriceToday > 0
+            ? ((estimationWalletBtc * dominanceCoin) / btcPriceToday) / 1000000
+            : 0;
+        const valeurBtc = btcNombre * btcPriceToday;
+        const investMin = (btcEvolution > 0) ? hodlBtc * btcPriceToday : 0;
+        const ecart = valeurBtc - investMin;
+        setBtcEcart(ecart);
+    }, [dominance, btcCapitalisation, btcPriceToday, btcNombre, btcEvolution]);
+
+    console.log(btcEcart);
 
     const fetchData = async () => {
         try {
@@ -30,6 +48,9 @@ const Achats = ({ search = '' }) => {
             );
             setStables(res.data.stables || 0);
             setPrixStable(res.data.prixStable || 0);
+            setBtcNombre(res.data.btcNombre || 0);
+            setBtcEvolution(res.data.btcEvolution || 0);
+            setBtcPriceToday(res.data.btcPrice);
         } catch (err) {
             console.error(err);
         } finally {
@@ -105,7 +126,7 @@ const Achats = ({ search = '' }) => {
             maximumFractionDigits: 0
         }).format(n);
 
-    const formatCurrencyD0 = (n) =>
+    const formatCurrency0D = (n) =>
         new Intl.NumberFormat('fr-FR', {
             style: 'currency',
             currency: 'USD',
@@ -113,7 +134,13 @@ const Achats = ({ search = '' }) => {
             maximumFractionDigits: 0
         }).format(n);
 
-    const dominanceCalculee = dominance > 0 ? (btcCapitalisation / dominance) * 100 : 0;
+    const formatCurrency12B = (n) =>
+        new Intl.NumberFormat('fr-FR', {
+            style: 'currency',
+            currency: 'BTC',
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 12
+        }).format(n);
 
     return (
         <div>
@@ -138,39 +165,20 @@ const Achats = ({ search = '' }) => {
                     </button>
                 </div>
 
-                {/* Bloc droite */}
-                <h5 className="mb-0">Disponible : {formatCurrencyD0((stables / 10)/prixStable)}</h5>
-            </div>
-
-            <ul className="nav nav-tabs mb-3">
                 {mode === "eur" && (
                     <>
-                        <li className="nav-item">
-                            <button
-                                className={`nav-link ${activeTab === "eur" ? "active" : ""}`}
-                                onClick={() => setActiveTab("eur")}
-                            >
-                                Eur
-                            </button>
-                        </li>
+                        <h5 className="mb-0">Disponible : {formatCurrency0D((stables / 10) / prixStable)}{ }</h5>
                     </>
                 )}
                 {mode === "btc" && (
                     <>
-                        <li className="nav-item">
-                            <button
-                                className={`nav-link ${activeTab === "btc" ? "active" : ""}`}
-                                onClick={() => setActiveTab("btc")}
-                            >
-                                Btc
-                            </button>
-                        </li>
+                        <h5 className="mb-0">Disponible : {btcEcart / btcPriceToday > (prixStable * 10) / btcPriceToday ? formatCurrency12B((btcEcart / btcPriceToday) / 10) : 0}</h5>
                     </>
                 )}
-            </ul>
+            </div>
 
             <div className="card p-4">
-                {mode === "eur" && activeTab === "eur" && (
+                {mode === "eur" && (
                     <>
                         {loading ? (
                             <p>Chargement...</p>
@@ -183,7 +191,7 @@ const Achats = ({ search = '' }) => {
                                             <th className='text-center'>Nom</th>
                                             <th className='text-center'>Prix Aujourd'hui</th>
                                             <th className='text-center'>Prix Hier</th>
-                                            <th className='text-center'>Évolution %</th>
+                                            <th className='text-center'>Évol. Cible %</th>
                                             <th className='text-center'>Market Cap</th>
                                             <th className='text-center'>Volume</th>
                                             <th className='text-center'>InvMax</th>
@@ -195,49 +203,61 @@ const Achats = ({ search = '' }) => {
                                     </thead>
                                     <tbody>
                                         {filteredData.map((coin, index) => {
+
+                                            const dominanceCalculee = dominance > 0
+                                                ? (btcCapitalisation / dominance) * 100
+                                                : 0;
+
                                             const prixDuJour = Number(coin.prixAuj);
                                             const tranche = stables / 10;
                                             const eurConvertit = coin.prixAuj / prixStable;
-                                            const dominanceCoin = dominance > 0 ? (coin.market_cap / dominanceCalculee) * 1000000 : 0;
+
+                                            const dominanceCoin = dominance > 0
+                                                ? (coin.market_cap / dominanceCalculee) * 1000000
+                                                : 0;
+
                                             const nombre = Number(coin.nombre) || 0;
                                             const valeurAchat = nombre * (Number(coin.prixCoin) || 0);
                                             const valeur = nombre * prixDuJour;
+
                                             const invBase = valeurAchat > valeur ? valeurAchat : valeur;
                                             const invCalcul = dominanceCoin - invBase;
                                             const invReel = invCalcul > tranche ? tranche : invCalcul;
                                             const invReelFinal = invReel > 0 ? invReel : 0;
-                                            const evolution24h = ((coin.prixAuj - coin.prixHier) / coin.prixHier) * 100;
-                                            console.log(evolution24h);
-                                            console.log(coin.symbol + ' : (' +coin.prixAuj+' - '+coin.prixHier+') / '+coin.prixHier+') * 100 = ' +evolution24h);
+
                                             return (
                                                 <tr key={index}>
                                                     <td className={`text-center ${valeurAchat < dominanceCoin && valeur < dominanceCoin
                                                         ? "table-success"
-                                                        : ""}`
-                                                    }><strong>{coin.symbol}</strong></td>
+                                                        : ""
+                                                        }`}>
+                                                        <strong>{coin.symbol}</strong>
+                                                    </td>
+
                                                     <td className='text-center'>{coin.name}</td>
                                                     <td className='text-center'>{formatCurrency6(coin.prixAuj)}</td>
                                                     <td className='text-center'>{formatCurrency6(coin.prixHier)}</td>
-                                                    <td className='text-center'>{coin.evolution === null ? "-" : `${formatNumber0(coin.evolution)} %`}</td>
+                                                    <td className='text-center'>
+                                                        {coin.evolution === null ? "-" : `${formatNumber0(coin.evolution)} %`}
+                                                    </td>
                                                     <td className='text-center'>{formatCurrency0(coin.market_cap)}</td>
                                                     <td className='text-center'>{formatCurrency0(coin.total_volume)}</td>
                                                     <td className='text-center'>{formatCurrency0(dominanceCoin)}</td>
                                                     <td className='text-center'>{formatCurrency0(valeurAchat)}</td>
                                                     <td className='text-center'>{formatCurrency0(valeur)}</td>
-                                                    <td className='text-center'>{formatCurrencyD0(invReelFinal / prixStable)}</td>
+                                                    <td className='text-center'>{formatCurrency0D(invReelFinal / prixStable)}</td>
                                                     <td className='text-center'>{formatNumber6((invReelFinal / prixStable) / eurConvertit)}</td>
                                                 </tr>
                                             );
                                         })}
                                     </tbody>
-
                                 </table>
                             </div>
                         )}
                     </>
                 )}
 
-                {mode === "btc" && activeTab === "btc" && (
+                {mode === "btc" && (
                     <>                {loading ? (
                         <p>Chargement...</p>
                     ) : (
@@ -249,9 +269,8 @@ const Achats = ({ search = '' }) => {
                                         <th className='text-center'>Nom</th>
                                         <th className='text-center'>Prix Aujourd'hui</th>
                                         <th className='text-center'>Prix Hier</th>
-                                        <th className='text-center'>Évolution %</th>
-                                        <th className='text-center'>Market Cap</th>
-                                        <th className='text-center'>Volume</th>
+                                        <th className='text-center'>Prix Cible</th>
+                                        <th className='text-center'>Évol. Cible %</th>
                                         <th className='text-center'>InvMax</th>
                                         <th className='text-center'>Valeur Achat</th>
                                         <th className='text-center'>Valeur Réelle</th>
@@ -261,15 +280,26 @@ const Achats = ({ search = '' }) => {
                                 </thead>
                                 <tbody>
                                     {filteredDataBtc.map((coin, index) => {
+
+                                        // 🔥 AJOUT OBLIGATOIRE
+                                        const dominanceCalculee = dominance > 0
+                                            ? (btcCapitalisation / dominance) * 100
+                                            : 0;
+
                                         const prixDuJour = Number(coin.prixAujBtc);
-                                        const tranche = stables / 10;
+                                        const tranche = (btcEcart / btcPriceToday) / 10;
                                         const eurConvertit = coin.prixAuj / prixStable;
-                                        const dominanceCoin = dominance > 0 ? (coin.market_cap / dominanceCalculee) * 1000000 : 0;
-                                        const nombre = Number(coin.nombreEnBtc) || 0;
-                                        const valeurAchat = nombre * (Number(coin.prixCoinEnBtc) || 0);
+
+                                        const dominanceCoin = dominance > 0
+                                            ? (coin.market_cap / dominanceCalculee) * 1000000
+                                            : 0;
+
+                                        const nombre = Number(coin.nombre) || 0;
+                                        const valeurAchat = nombre * (Number(coin.prixCoin) || 0);
                                         const valeur = nombre * prixDuJour;
-                                        const invBase = valeurAchat > valeur ? valeurAchat : valeur;
-                                        const invCalcul = dominanceCoin - invBase;
+
+                                        const invBase = valeurAchat > valeur ? valeurAchat / btcPriceToday : valeur / btcPriceToday;
+                                        const invCalcul = (dominanceCoin/btcPriceToday) - invBase;
                                         const invReel = invCalcul > tranche ? tranche : invCalcul;
                                         const invReelFinal = invReel > 0 ? invReel : 0;
 
@@ -277,24 +307,27 @@ const Achats = ({ search = '' }) => {
                                             <tr key={index}>
                                                 <td className={`text-center ${valeurAchat < dominanceCoin && valeur < dominanceCoin
                                                     ? "table-success"
-                                                    : ""}`
-                                                }><strong>{coin.symbol}</strong></td>
+                                                    : ""
+                                                    }`}>
+                                                    <strong>{coin.symbol}</strong>
+                                                </td>
+
                                                 <td className='text-center'>{coin.name}</td>
-                                                <td className='text-center'>{formatCurrency6(coin.prixAujBtc)}</td>
-                                                <td className='text-center'>{formatCurrency6(coin.prixHierBtc)}</td>
-                                                <td className='text-center'>{coin.evolutionBtc === null ? "-" : `${formatNumber0(coin.evolutionBtc)} %`}</td>
-                                                <td className='text-center'>{formatCurrency0(coin.market_cap)}</td>
-                                                <td className='text-center'>{formatCurrency0(coin.total_volume)}</td>
-                                                <td className='text-center'>{formatCurrency0(dominanceCoin)}</td>
-                                                <td className='text-center'>{formatCurrency0(valeurAchat)}</td>
-                                                <td className='text-center'>{formatCurrency0(valeur)}</td>
-                                                <td className='text-center'>{formatCurrencyD0(invReelFinal / prixStable)}</td>
-                                                <td className='text-center'>{formatNumber6((invReelFinal / prixStable) / eurConvertit)}</td>
+                                                <td className='text-center'>{formatCurrency12B(coin.prixAujBtc)}</td>
+                                                <td className='text-center'>{formatCurrency12B(coin.prixHierBtc)}</td>
+                                                <td className='text-center'>{formatCurrency12B(coin.prixCibleBtc)}</td>
+                                                <td className='text-center'>
+                                                    {coin.evolutionBtc === null ? "-" : `${formatNumber0(coin.evolutionBtc)} %`}
+                                                </td>
+                                                <td className='text-center'>{formatCurrency12B(dominanceCoin / btcPriceToday)}</td>
+                                                <td className='text-center'>{formatCurrency12B(valeurAchat / btcPriceToday)}</td>
+                                                <td className='text-center'>{formatCurrency12B(valeur)}</td>
+                                                <td className='text-center'>{formatCurrency12B(invReelFinal)}</td>
+                                                <td className='text-center'>{formatNumber6(invReelFinal / coin.prixAujBtc)}</td>
                                             </tr>
                                         );
                                     })}
                                 </tbody>
-
                             </table>
                         </div>
                     )}

@@ -77,6 +77,13 @@ const Recap = ({ search = '' }) => {
         fetchNonImportes();
     }, []);
 
+    useEffect(() => {
+        if (mode === "eur") {
+            setActiveTab("tous");
+        } else if (mode === "btc") {
+            setActiveTab("tousB");
+        }
+    }, [mode]);
 
     const normalizedSearch = (search || '').trim().toLowerCase();
 

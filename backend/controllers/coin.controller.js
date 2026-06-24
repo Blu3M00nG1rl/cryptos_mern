@@ -3,6 +3,7 @@ const AchatCoin = require("../models/achatCoin.model");
 const AchatCoinEnBtc = require("../models/achatCoinEnBtc.model");
 const History = require("../models/history.model");
 const Bitcoin = require("../models/bitcoin.model");
+const Note = require("../models/note.model");
 
 async function getMaxDiffValue() {
     const row = await Bitcoin.findOne().sort({ diff: -1 }).lean();
@@ -145,6 +146,11 @@ exports.getAllCoinsEnBtc = async (req, res) => {
 
         const coinIds = coins.map(c => c.coinId);
 
+        const btcToday = await History.findOne({
+            coinId: "bitcoin",
+            journee: { $gte: today, $lt: tomorrow }
+        }).lean();
+
         // Prix du jour
         const histories = await History.find({
             coinId: { $in: coinIds },
@@ -205,7 +211,7 @@ exports.getAllCoinsEnBtc = async (req, res) => {
                     }
                 }).lean();
 
-                let evolution = null;   
+                let evolution = null;
                 if (todayHistory?.prix && cibleHistory?.prix) {
                     evolution = ((todayHistory.prix - cibleHistory.prix) / cibleHistory.prix) * 100;
                 }
@@ -215,6 +221,7 @@ exports.getAllCoinsEnBtc = async (req, res) => {
                     prixCoin: achatBTC ? achatBTC.prixAchatMoyen : 0,
                     prixHistory: mapHistory.get(c.coinId) || null,
                     dateCible: cibleDate.toLocaleDateString("fr-FR"),
+                    btcToday,
                     evolution,
                     capitalisation: todayHistory?.market_cap || null,
                 };
@@ -406,4 +413,21 @@ exports.getCoinBySymbol = async (req, res) => {
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
+};
+
+exports.getNote = async (req, res) => {
+    const note = await Note.findOne({ walletId: "main" });
+    res.json(note || { content: "" });
+};
+
+exports.saveNote = async (req, res) => {
+    const { content } = req.body;
+
+    const note = await Note.findOneAndUpdate(
+        { walletId: "main" },
+        { content, updatedAt: new Date() },
+        { upsert: true, new: true }
+    );
+
+    res.json(note);
 };

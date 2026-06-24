@@ -8,7 +8,6 @@ const coinRoutes = require('./routes/coin.routes');
 const coinsNonTrouveRoutes = require('./routes/coins_non_trouve.routes');
 const coinsNonImporteRoutes = require('./routes/coins_non_importe.routes');
 const historyRoutes = require('./routes/history.routes');
-const walletRoutes = require('./routes/wallet.routes');
 const bitcoinRoutes = require('./routes/bitcoin.routes');
 const maintenanceRoutes = require('./routes/maintenance.routes');
 const paramsRoutes = require('./routes/param.routes');
@@ -35,10 +34,10 @@ app.use(process.env.ROUTES_PREFIX+'/coin', coinRoutes);
 app.use(process.env.ROUTES_PREFIX+'/coins_non_trouve', coinsNonTrouveRoutes);
 app.use(process.env.ROUTES_PREFIX+'/coins_non_importe', coinsNonImporteRoutes);
 app.use(process.env.ROUTES_PREFIX+'/history', historyRoutes);
-app.use(process.env.ROUTES_PREFIX+'/wallet', walletRoutes);
 app.use(process.env.ROUTES_PREFIX+'/bitcoin', bitcoinRoutes);
 app.use(process.env.ROUTES_PREFIX+'/maintenance', maintenanceRoutes);
 app.use(process.env.ROUTES_PREFIX+'/param', paramsRoutes);
+app.use(process.env.ROUTES_PREFIX+'/note', paramsRoutes);
 
 
 // server

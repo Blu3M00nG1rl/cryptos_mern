@@ -3,6 +3,8 @@ const coinController = require('../controllers/coin.controller.js');
 
 router.post("/create", coinController.createCoin);
 router.get("/", coinController.getAllCoins);
+router.get("/note", coinController.getNote);
+router.post("/note", coinController.saveNote);
 router.get("/enBtc", coinController.getAllCoinsEnBtc);
 router.get("/detail", coinController.getDetailAchatCoins);
 router.post("/detail", coinController.createDetailAchat);
