@@ -38,10 +38,10 @@ const Recap = ({ search = '' }) => {
                 );
 
                 if (btc) {
+                    setBtcPrixCible(btc.prixCible);
                     setBtcPrix(btc.prixDuJour); // 🔥 prix du jour du BTC
                     setBtcCapitalisation(btc.capitalisation);
                     setBtcEvolution(btc.evolution);
-                    setBtcPrixCible(btc.prixCible);
                 }
             }
         } catch (err) {
@@ -141,16 +141,15 @@ const Recap = ({ search = '' }) => {
                     className={`btn btn-sm btn-currency mb-4 ${mode === "eur" ? "btn-primary" : "btn-outline-primary"}`}
                     onClick={() => setMode("eur")}
                 >
-                    <img src="/img/eur.png" style={{ width: 28 }} />
+                    <img src="/img/eur.png" alt="EUR" style={{ width: 28 }} />
                 </button>
 
                 <button
                     className={`btn btn-sm btn-currency mb-4 ${mode === "btc" ? "btn-warning" : "btn-outline-warning"}`}
                     onClick={() => setMode("btc")}
                 >
-                    <img src="/img/btc.png" style={{ width: 28 }} />
+                    <img src="/img/btc.png" alt="BTC" style={{ width: 28 }} />
                 </button>
-
 
             </div>
 
@@ -390,11 +389,6 @@ const Recap = ({ search = '' }) => {
                                     <tbody>
                                         {filteredData.map((coin, index) => {
 
-                                            const dominanceCoin =
-                                                dominance > 0 ? (coin.capitalisation / dominanceCalculee) * 1000000 : 0;
-
-                                            const hodl = ((estimationWallet * dominanceCoin) / coin.prixDuJour) / 1000000;
-                                            const investMin = (coin.evolution > 0 && coin.evolution >= btcEvolution) ? hodl * coin.prixDuJour : 0;
                                             const prixBtc = coin.prixDuJour / btcPrix;
                                             const prixBtcCible = coin.prixCible / btcPrixCible;
                                             const evolutionEnBtc = (prixBtc - prixBtcCible) / prixBtc;

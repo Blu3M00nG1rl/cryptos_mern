@@ -2,6 +2,7 @@ const History = require("../models/history.model");
 const Coin = require("../models/coin.model");
 const Bitcoin = require("../models/bitcoin.model");
 const AchatCoin = require("../models/achatCoin.model");
+const AchatCoinEnBtc = require("../models/achatCoinEnBtc.model");
 const { exec } = require("child_process");
 const fs = require("fs");
 const path = require("path");
@@ -267,6 +268,38 @@ exports.getVentesData = async (req, res) => {
             ])
         );
 
+        // Agrégation achats
+        const achatsEnBtc = await AchatCoinEnBtc.aggregate([
+            {
+                $group: {
+                    _id: { $toLower: "$symbol" },
+                    totalNombre: { $sum: "$nombre" },
+                    totalInvesti: { $sum: { $multiply: ["$nombre", "$prixAchat"] } }
+                }
+            },
+            {
+                $addFields: {
+                    prixAchatMoyen: {
+                        $cond: [
+                            { $eq: ["$totalNombre", 0] },
+                            0,
+                            { $divide: ["$totalInvesti", "$totalNombre"] }
+                        ]
+                    }
+                }
+            }
+        ]);
+
+        const mapAchatsEnBtc = new Map(
+            achatsEnBtc.map(a => [
+                a._id,
+                {
+                    totalNombre: a.totalNombre,
+                    prixAchatMoyen: a.prixAchatMoyen
+                }
+            ])
+        );
+
         const ventesDataRaw = await Promise.all(
             coins.map(async (coin) => {
 
@@ -280,12 +313,37 @@ exports.getVentesData = async (req, res) => {
                     journee: { $gte: yesterday, $lt: today }
                 }).lean();
 
+                // --- PRIX BTC ---
+                const btcToday = await History.findOne({
+                    coinId: "bitcoin",
+                    journee: { $gte: today, $lt: tomorrow }
+                }).lean();
+
+                const btcYesterday = await Bitcoin.findOne({
+                    dateCours: { $gte: yesterday, $lt: today }
+                }).lean();
+
+                const btcCible = await Bitcoin.findOne({
+                    dateCours: {
+                        $gte: cibleDate,
+                        $lt: new Date(cibleDate.getTime() + 86400000)
+                    }
+                }).lean();
+
                 const prixAuj = todayHistory?.prix ?? null;
+                const prixAujBtc = todayHistory?.prix / btcToday.prix ?? null;
                 const prixHier = yesterdayHistory?.prix ?? null;
+                const prixHierBtc = yesterdayHistory?.prix / btcYesterday.prix ?? null;
+                const prixCibleBtc = btcCible?.prix / btcCible.prix ?? null;
 
                 let evolution24 = null;
                 if (prixAuj !== null && prixHier !== null) {
                     evolution24 = ((prixAuj - prixHier) / prixHier) * 100;
+                }
+
+                let evolution24Btc = null;
+                if (prixAujBtc !== null && prixHierBtc !== null) {
+                    evolution24Btc = ((prixAujBtc - prixHierBtc) / prixHierBtc) * 100;
                 }
 
                 const minHistory = await History.findOne({ coinId: coin.coinId })
@@ -301,6 +359,7 @@ exports.getVentesData = async (req, res) => {
                     const min = minHistory.prix;
                     const max = maxHistory.prix;
                     fibVente = (max - min) * 0.618 + min;
+                    fibVenteBtc = fibVente / prixAujBtc;
                 }
 
                 const key = coin.symbol.toLowerCase();
@@ -314,28 +373,35 @@ exports.getVentesData = async (req, res) => {
                     }
                 }).lean();
 
+                // Evolution USD
                 let evolutionCible = null;
-
-                if (
-                    todayHistory?.prix !== null &&
-                    todayHistory?.prix !== undefined &&
-                    cibleHistory?.prix !== null &&
-                    cibleHistory?.prix !== undefined
-                ) {
+                if (todayHistory?.prix != null && cibleHistory?.prix != null) {
                     evolutionCible = ((todayHistory.prix - cibleHistory.prix) / cibleHistory.prix) * 100;
                 }
 
+                // Evolution BTC
+                let evolutionCibleBtc = null;
+                if (prixAujBtc != null && prixCibleBtc != null) {
+                    evolutionCibleBtc = ((prixAujBtc - prixCibleBtc) / prixCibleBtc) * 100;
+                }
 
                 return {
                     symbol: coin.symbol,
                     name: coin.name,
                     nombre: achat ? achat.totalNombre : 0,
                     prixCoin: achat ? achat.prixAchatMoyen : 0,
+                    nombreEnBtc: achatsEnBtc ? achatsEnBtc.totalNombre : 0,
+                    prixCoinEnBtc: achatsEnBtc ? achatsEnBtc.prixAchatMoyen : 0,
                     prixAuj,
+                    prixAujBtc,
                     prixHier,
+                    prixHierBtc,
                     evolution24,
+                    evolution24Btc,
                     evolutionCible,
+                    evolutionCibleBtc,
                     fibVente,
+                    fibVenteBtc,
                     market_cap: todayHistory?.market_cap ?? null,
                     volume: todayHistory?.total_volume ?? null
                 };
@@ -353,7 +419,21 @@ exports.getVentesData = async (req, res) => {
                 item.nombre > 0
         );
 
-        res.status(200).json(ventesData);
+        // 🔥 Filtre final corrigé
+        const ventesDataBtc = ventesDataRaw.filter(
+            item =>
+                item.evolution24Btc !== null &&
+                item.evolution24Btc < 0 &&
+                item.prixAujBtc !== null &&
+                item.fibVenteBtc !== null &&
+                item.prixAujBtc > item.fibVenteBtc &&
+                item.nombre > 0
+        );
+
+        res.status(200).json({
+            ventesData,
+            ventesDataBtc
+        });
 
     } catch (err) {
         console.error("Erreur getVentesData:", err);
@@ -394,6 +474,11 @@ exports.getAchatsData = async (req, res) => {
             coinId: "bitcoin",
             journee: { $gte: today, $lt: tomorrow }
         }).lean();
+
+        const btcYesterday = await Bitcoin.findOne({
+            dateCours: { $gte: yesterday, $lt: today }
+        }).lean();
+
 
         const btcCible = await History.findOne({
             coinId: "bitcoin",
@@ -441,7 +526,7 @@ exports.getAchatsData = async (req, res) => {
 
         const prixUSDC = usdcHistory?.prix || 0;
         const prixUSDT = usdtHistory?.prix || 0;
-        const prixStable = (prixUSDC + prixUSDT)/2;
+        const prixStable = (prixUSDC + prixUSDT) / 2;
 
         // 🔥 Valeur totale stable
         const stableUSDC = totalUSDC * prixUSDC;
@@ -480,6 +565,38 @@ exports.getAchatsData = async (req, res) => {
             ])
         );
 
+        // Agrégation achats
+        const achatsEnBtc = await AchatCoinEnBtc.aggregate([
+            {
+                $group: {
+                    _id: { $toLower: "$symbol" },
+                    totalNombre: { $sum: "$nombre" },
+                    totalInvesti: { $sum: { $multiply: ["$nombre", "$prixAchat"] } }
+                }
+            },
+            {
+                $addFields: {
+                    prixAchatMoyen: {
+                        $cond: [
+                            { $eq: ["$totalNombre", 0] },
+                            0,
+                            { $divide: ["$totalInvesti", "$totalNombre"] }
+                        ]
+                    }
+                }
+            }
+        ]);
+
+        const mapAchatsEnBtc = new Map(
+            achatsEnBtc.map(a => [
+                a._id,
+                {
+                    totalNombre: a.totalNombre,
+                    prixAchatMoyen: a.prixAchatMoyen
+                }
+            ])
+        );
+
         const achatsDataRaw = await Promise.all(
             coins.map(async (coin) => {
                 const key = coin.symbol.toLowerCase();
@@ -506,15 +623,28 @@ exports.getAchatsData = async (req, res) => {
                 const prixAuj = todayHistory?.prix ?? null;
                 const prixHier = yesterdayHistory?.prix ?? null;
                 const prixCible = cibleHistory?.prix ?? null;
+                const prixAujBtc = todayHistory?.prix / btcToday.prix ?? null;
+                const prixHierBtc = yesterdayHistory?.prix / btcYesterday.prix ?? null;
+                const prixCibleBtc = cibleHistory?.prix / btcCible.prix ?? null;
 
                 let evolution = null;
                 if (prixAuj !== null && prixCible !== null) {
                     evolution = ((prixAuj - prixCible) / prixCible) * 100;
                 }
 
+                let evolutionBtc = null;
+                if (prixAujBtc !== null && prixCibleBtc !== null) {
+                    evolutionBtc = ((prixAujBtc - prixCibleBtc) / prixCibleBtc) * 100;
+                }
+
                 let evolution24h = null;
                 if (prixAuj !== null && prixHier !== null) {
                     evolution24h = ((prixAuj - prixHier) / prixHier) * 100;
+                }
+
+                let evolution24hBtc = null;
+                if (prixAujBtc !== null && prixHierBtc !== null) {
+                    evolution24hBtc = ((prixAujBtc - prixHierBtc) / prixHierBtc) * 100;
                 }
 
                 const minHistory = await History.findOne({ coinId: coin.coinId })
@@ -526,24 +656,33 @@ exports.getAchatsData = async (req, res) => {
                     .lean();
 
                 let fibAchat = null;
+                let fibAchatBtc = null;
                 if (minHistory?.prix != null && maxHistory?.prix != null) {
                     const min = minHistory.prix;
                     const max = maxHistory.prix;
                     fibAchat = (max - min) * 0.382 + min;
+                    fibAchatBtc = fibAchat / prixAujBtc;
                 }
 
                 return {
                     symbol: coin.symbol,
                     name: coin.name,
                     prixAuj,
+                    prixAujBtc,
                     prixHier,
+                    prixHierBtc,
                     evolution,
+                    evolutionBtc,
                     evolution24h,
+                    evolution24hBtc,
                     fibAchat,
+                    fibAchatBtc,
                     market_cap: todayHistory?.market_cap ?? null,
                     total_volume: todayHistory?.total_volume ?? null,
                     nombre: achat ? achat.totalNombre : 0,
                     prixCoin: achat ? achat.prixAchatMoyen : 0,
+                    nombreEnBtc: achatsEnBtc ? achatsEnBtc.totalNombre : 0,
+                    prixCoinEnBtc: achatsEnBtc ? achatsEnBtc.prixAchatMoyen : 0,
                 };
             })
         );
@@ -563,8 +702,22 @@ exports.getAchatsData = async (req, res) => {
             item.evolution > evolutionBitcoin
         );
 
+        // 🔥 Filtre Btc
+        const achatsDataBtc = achatsDataRaw.filter(item =>
+            item.evolutionBtc !== null &&
+            item.evolutionBtc > 0 &&
+            item.evolution24hBtc !== null &&
+            item.evolution24hBtc > 0 &&
+            item.prixAujBtc !== null &&
+            item.fibAchatBtc !== null &&
+            item.prixAujBtc < item.fibAchatBtc &&
+            prixTetherAuj !== null &&
+            item.evolutionBtc > (prixTetherAuj * 0.10)
+        );
+
         res.status(200).json({
             achatsData,
+            achatsDataBtc,
             stables: stables,
             prixStable: prixStable
         });
@@ -578,7 +731,6 @@ exports.getAchatsData = async (req, res) => {
 
 exports.getSyntheseData = async (req, res) => {
     try {
-        // 🔥 Récupérer maxDiff depuis Bitcoin
         const maxDiff = await getMaxDiffValue();
 
         const today = new Date();
@@ -589,7 +741,7 @@ exports.getSyntheseData = async (req, res) => {
 
         const cibleDate = new Date(today);
         cibleDate.setDate(cibleDate.getDate() - maxDiff);
-        console.log(cibleDate);
+
         const tomorrow = new Date(today);
         tomorrow.setDate(tomorrow.getDate() + 1);
 
@@ -598,19 +750,17 @@ exports.getSyntheseData = async (req, res) => {
         const syntheseData = await Promise.all(
             coins.map(async (coin) => {
 
-                // Prix aujourd’hui
+                // --- PRIX USD ---
                 const todayHistory = await History.findOne({
                     coinId: coin.coinId,
                     journee: { $gte: today, $lt: tomorrow }
                 }).lean();
 
-                // Prix hier
                 const yesterdayHistory = await History.findOne({
                     coinId: coin.coinId,
                     journee: { $gte: yesterday, $lt: today }
                 }).lean();
 
-                // Prix cible
                 const cibleHistory = await History.findOne({
                     coinId: coin.coinId,
                     journee: {
@@ -619,7 +769,6 @@ exports.getSyntheseData = async (req, res) => {
                     }
                 }).lean();
 
-                // Min & Max
                 const minHistory = await History.findOne({ coinId: coin.coinId })
                     .sort({ prix: 1 })
                     .lean();
@@ -627,6 +776,52 @@ exports.getSyntheseData = async (req, res) => {
                 const maxHistory = await History.findOne({ coinId: coin.coinId })
                     .sort({ prix: -1 })
                     .lean();
+
+
+                // --- PRIX BTC ---
+                const btcToday = await History.findOne({
+                    coinId: "bitcoin",
+                    journee: { $gte: today, $lt: tomorrow }
+                }).lean();
+
+                const btcYesterday = await Bitcoin.findOne({
+                    dateCours: { $gte: yesterday, $lt: today }
+                }).lean();
+
+                const btcCible = await Bitcoin.findOne({
+                    dateCours: {
+                        $gte: cibleDate,
+                        $lt: new Date(cibleDate.getTime() + 86400000)
+                    }
+                }).lean();
+
+                // --- Prix BTC au moment du max USD ---
+                let btcAtMax = null;
+                if (maxHistory?.journee) {
+                    btcAtMax = await Bitcoin.findOne({
+                        dateCours: {
+                            $gte: maxHistory.journee,
+                            $lt: new Date(maxHistory.journee.getTime() + 86400000)
+                        }
+                    }).lean();
+                }
+
+                // --- Prix BTC au moment du min USD ---
+                let btcAtMin = null;
+                if (minHistory?.journee) {
+                    btcAtMin = await Bitcoin.findOne({
+                        dateCours: {
+                            $gte: minHistory.journee,
+                            $lt: new Date(minHistory.journee.getTime() + 86400000)
+                        }
+                    }).lean();
+                }
+
+                // --- EVOLUTION ---
+                let evolution = null;
+                if (todayHistory?.prix && cibleHistory?.prix) {
+                    evolution = ((todayHistory.prix - cibleHistory.prix) / cibleHistory.prix) * 100;
+                }
 
                 // Fibonnaci
                 let fibVente = null;
@@ -640,24 +835,31 @@ exports.getSyntheseData = async (req, res) => {
                     fibAchat = (max - min) * 0.382 + min;
                 }
 
-                // Evolution %
-                let evolution = null;
-                if (todayHistory?.prix && cibleHistory?.prix) {
-                    evolution = ((todayHistory.prix - cibleHistory.prix) / cibleHistory.prix) * 100;
-                }
-
                 return {
                     symbol: coin.symbol,
                     name: coin.name,
+
+                    // USD
                     prixAuj: todayHistory?.prix || null,
                     prixHier: yesterdayHistory?.prix || null,
                     prixCible: cibleHistory?.prix || null,
-                    evolution,
+                    btcToday: btcToday.prix,
+                    btcYesterday: btcYesterday.prix,
+                    btcCible: btcCible.prix,
+
+                    // Min / Max USD
                     max: maxHistory ? { prix: maxHistory.prix, date: maxHistory.journee } : null,
                     min: minHistory ? { prix: minHistory.prix, date: minHistory.journee } : null,
-                    fibVente,
-                    fibAchat
+
+                    // Min / Max BTC (prix BTC à la date du max/min USD)
+                    maxBTC: btcAtMax ? { prix: btcAtMax.prix } : null,
+                    minBTC: btcAtMin ? { prix: btcAtMin.prix } : null,
+
+                    evolution,
+                    fibAchat,
+                    fibVente
                 };
+
             })
         );
 
@@ -666,12 +868,12 @@ exports.getSyntheseData = async (req, res) => {
             data: syntheseData
         });
 
-
     } catch (err) {
         console.error("Erreur getSyntheseData:", err);
         res.status(500).json({ error: err.message });
     }
 };
+
 
 
 

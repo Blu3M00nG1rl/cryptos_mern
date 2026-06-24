@@ -714,13 +714,24 @@ const Wallet = ({ search = '' }) => {
                                     <tbody>
                                         {sortData(ownedEnriched)
                                             .map((c) => {
+
+                                                const btc = ownedEnriched.find(x => x.symbol.toLowerCase() === "btc");
+                                                const evolutionBTC = btc ? btc.evolution : 0;
+                                                const rowClass =
+                                                    c.symbol.toLowerCase() === "btc"
+                                                        ? (c.evolution > evolutionBTC ? "table-success" : "table-danger")
+                                                        : (c.evolution > 0 ? "table-success" : "table-danger");
+
                                                 return (
                                                     <tr
                                                         key={c.symbol}
                                                         className={
-                                                            c.venteI === "oui"
-                                                                ? "table-success"
-                                                                : "table-danger"
+                                                            c.symbol === "btc"
+                                                                ? "table-warning"
+                                                                :
+                                                                c.evolution > 0
+                                                                    ? "table-success"
+                                                                    : "table-danger"
                                                         }>
                                                         <td className="text-center">
                                                             <img
@@ -738,13 +749,14 @@ const Wallet = ({ search = '' }) => {
                                                         <td className="text-center">{formatCurrency0(c.valeur)}</td>
                                                         <td className="text-center">{formatCurrency2(c.gainPerte)}</td>
                                                         <td className="text-center">{formatNumber2(c.pourcGP)} %</td>
-                                                        <td className={`text-center ${c.evolution > 0
-                                                            ? "table-success"
-                                                            : "table-danger"
-                                                            }`}
-                                                        >{formatNumber2(c.evolution)} %</td>
+                                                        <td className="text-center">{formatNumber2(c.evolution)} %</td>
                                                         <td className="text-center">{formatCurrency0(c.ecart)}</td>
-                                                        <td className="text-center">{c.venteI}</td>
+                                                        <td
+                                                            className={`text-center ${c.venteI === "oui" ? "bg-success text-white" : "bg-danger text-white"
+                                                                }`}
+                                                        >
+                                                            {c.venteI}
+                                                        </td>
                                                         <td className="text-center">{formatDate(c.dateVerif)}</td>
                                                     </tr>
                                                 );
