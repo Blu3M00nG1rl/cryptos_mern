@@ -7,10 +7,6 @@ const Ventes = ({ search = '' }) => {
     const [dataBtc, setDataBtc] = useState([]);
     const [mode, setMode] = useState("eur"); // "eur" ou "btc"
 
-    useEffect(() => {
-        fetchData();
-    }, []);
-
     const fetchData = async () => {
         try {
             const res = await axios.get(`${process.env.REACT_APP_API_URL}/backend/history/ventes`);
@@ -58,7 +54,7 @@ const Ventes = ({ search = '' }) => {
     const formatCurrency12 = (n) =>
         new Intl.NumberFormat('fr-FR', {
             style: 'currency',
-            currency: 'BTC',
+            currency: 'EUR',
             minimumFractionDigits: 0,
             maximumFractionDigits: 12
         }).format(n);
@@ -71,6 +67,10 @@ const Ventes = ({ search = '' }) => {
             maximumFractionDigits: 12
         }).format(n);
 
+    useEffect(() => {
+        fetchData();
+    }, []);
+
     return (
         <div>
             <div className="d-flex">
@@ -80,14 +80,14 @@ const Ventes = ({ search = '' }) => {
                     className={`btn btn-sm btn-currency mb-4 ${mode === "eur" ? "btn-primary" : "btn-outline-primary"}`}
                     onClick={() => setMode("eur")}
                 >
-                    <img src="/img/eur.png" style={{ width: 28 }} alt="eur"/>
+                    <img src="/img/eur.png" style={{ width: 28 }} alt="eur" />
                 </button>
 
                 <button
                     className={`btn btn-sm btn-currency mb-4 ${mode === "btc" ? "btn-warning" : "btn-outline-warning"}`}
                     onClick={() => setMode("btc")}
                 >
-                    <img src="/img/btc.png" style={{ width: 28 }} alt="btc"/>
+                    <img src="/img/btc.png" style={{ width: 28 }} alt="btc" />
                 </button>
             </div>
 

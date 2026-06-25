@@ -9,60 +9,54 @@ const csv = require("csv-parser");
 
 const Bitcoin = require("../models/bitcoin.model");
 
-const bitcoinPath = path.join(__dirname, "../storage/bitcoin");
+const bitcoinPath = path.join(__dirname, "../storage/historique/btc-usd-max.csv");
 
 async function runImport() {
-    const files = fs.readdirSync(bitcoinPath).filter(f => f.endsWith(".csv"));
-
-    if (files.length === 0) {
-        console.log("Aucun fichier CSV trouvé.");
+    if (!fs.existsSync(bitcoinPath)) {
+        console.log("Fichier CSV introuvable.");
         return;
     }
 
     let importedCount = 0;
+    const results = [];
 
-    for (const file of files) {
-        console.log("Import du fichier :", file);
+    await new Promise((resolve, reject) => {
+        fs.createReadStream(bitcoinPath)
+            .pipe(csv())
+            .on("data", (row) => {
+                results.push({
+                    dateCours: row.snapped_at ? new Date(row.snapped_at) : null,
+                    prix: row.price ? Number(row.price) : null
+                });
+            })
+            .on("end", async () => {
+                try {
+                    const bulkOps = results.map(r => ({
+                        updateOne: {
+                            filter: { dateCours: r.dateCours },
+                            update: { $set: r },
+                            upsert: true
+                        }
+                    }));
 
-        const results = [];
+                    await Bitcoin.bulkWrite(bulkOps, { ordered: false });
 
-        await new Promise((resolve, reject) => {
-            fs.createReadStream(path.join(bitcoinPath, file))
-                .pipe(csv())
-                .on("data", (row) => {
-                    results.push({
-                        dateCours: row.snapped_at ? new Date(row.snapped_at) : null,
-                        prix: row.price ? Number(row.price) : null
-                    });
-                })
-                .on("end", async () => {
-                    try {
-                        const bulkOps = results.map(r => ({
-                            updateOne: {
-                                filter: { dateCours: r.dateCours },
-                                update: { $set: r },
-                                upsert: true
-                            }
-                        }));
+                    importedCount = results.length;
 
-                        await Bitcoin.bulkWrite(bulkOps, { ordered: false });
-
-                        importedCount += results.length;
-
-                        console.log(`→ ${results.length} lignes importées/mises à jour`);
-                        resolve();
-                    } catch (err) {
-                        console.error("Erreur bulkWrite :", err.message);
-                        resolve();
-                    }
-                })
-                .on("error", reject);
-        });
-    }
+                    console.log(`→ ${results.length} lignes importées/mises à jour`);
+                    resolve();
+                } catch (err) {
+                    console.error("Erreur bulkWrite :", err.message);
+                    resolve();
+                }
+            })
+            .on("error", reject);
+    });
 
     console.log("Import terminé");
     console.log(`IMPORTED_COUNT=${importedCount}`);
 }
+
 
 async function calculerDiff() {
     console.log("Calcul des diff…");

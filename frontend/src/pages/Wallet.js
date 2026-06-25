@@ -39,6 +39,8 @@ const Wallet = ({ search = '' }) => {
     const [btcValue, setBtcValue] = useState("");
     const [mode, setMode] = useState("eur"); // "eur" ou "btc"
     const [note, setNote] = useState("");
+    const [editBuffer, setEditBuffer] = useState({});
+    const [editBufferBtc, setEditBufferBtc] = useState({});
 
     const normalizedSearch = (search || '').trim().toLowerCase();
     const owned = coins
@@ -48,7 +50,6 @@ const Wallet = ({ search = '' }) => {
             c.symbol.toLowerCase().includes(normalizedSearch) ||
             c.name.toLowerCase().includes(normalizedSearch)
         );
-
 
     const ownedEnBtc = coinsEnBtc
         .filter(c => c.nombre && Number(c.nombre) > 0)
@@ -305,7 +306,7 @@ const Wallet = ({ search = '' }) => {
     );
 
     const sortedDetail = sortData(filteredDetail);
-    const sortedDetailEnBtc = sortData(filteredDetailEnBtc);
+    const sortedDetailEnBtc = sortDataEnBtc(filteredDetailEnBtc);
 
     const createDetailAchat = async () => {
         await axios.post(`${process.env.REACT_APP_API_URL}/backend/coin/detail`, form);
@@ -453,6 +454,78 @@ const Wallet = ({ search = '' }) => {
 
         // BTC → STABLE
         setStableValue(eur / stablePriceToday);
+    };
+
+    const handleEditChange = (id, field, value) => {
+        setEditBuffer(prev => ({
+            ...prev,
+            [id]: {
+                ...prev[id],
+                [field]: value
+            }
+        }));
+    };
+
+    const handleSaveRow = (item) => {
+        const buffer = editBuffer[item._id] || {};
+
+        // on prend la valeur du buffer si présente, sinon la valeur originale
+        const payload = {
+            symbol: buffer.symbol ?? item.symbol ?? "",
+            dateAchat: buffer.dateAchat ?? (item.dateAchat ? item.dateAchat.slice(0, 10) : ""),
+            stockage: buffer.stockage ?? item.stockage ?? "",
+            nombre: buffer.nombre ?? item.nombre ?? "",
+            prixAchat: buffer.prixAchat ?? item.prixAchat ?? "",
+            observation: buffer.observation ?? item.observation ?? "",
+        };
+
+        // si ton updateDetailAchat est de la forme (id, field, value)
+        Object.entries(payload).forEach(([field, value]) => {
+            updateDetailAchat(item._id, field, value);
+        });
+
+        // optionnel : vider le buffer de cette ligne
+        setEditBuffer(prev => {
+            const copy = { ...prev };
+            delete copy[item._id];
+            return copy;
+        });
+    };
+
+    const handleEditChangeEnBtc = (id, field, value) => {
+        setEditBufferBtc(prev => ({
+            ...prev,
+            [id]: {
+                ...prev[id],
+                [field]: value
+            }
+        }));
+    };
+
+    const handleSaveRowEnBtc = (item) => {
+        const bufferBtc = editBufferBtc[item._id] || {};
+
+        // on prend la valeur du buffer si présente, sinon la valeur originale
+        const payload = {
+            symbol: bufferBtc.symbol ?? item.symbol ?? "",
+            dateAchat: bufferBtc.dateAchat ?? (item.dateAchat ? item.dateAchat.slice(0, 10) : ""),
+            stockage: bufferBtc.stockage ?? item.stockage ?? "",
+            nombre: bufferBtc.nombre ?? item.nombre ?? "",
+            prixAchat: bufferBtc.prixAchat ?? item.prixAchat ?? "",
+            observation: bufferBtc.observation ?? item.observation ?? "",
+        };
+
+        // si ton updateDetailAchat est de la forme (id, field, value)
+        Object.entries(payload).forEach(([field, value]) => {
+            updateDetailAchatEnBtc(item._id, field, value);
+        });
+
+        // optionnel : vider le buffer de cette ligne
+        setEditBufferBtc(prev => {
+            const copy = { ...prev };
+            delete copy[item._id];
+            return copy;
+        });
     };
 
     useEffect(() => {
@@ -924,312 +997,355 @@ const Wallet = ({ search = '' }) => {
                                             <th>Actions</th>
                                         </tr>
                                     </thead>
-
                                     <tbody>
-                                        {sortedDetail.map((item, index) => (
-                                            <tr key={index}>
-                                                <td>
-                                                    <input
-                                                        className="form-control"
-                                                        value={item.symbol}
-                                                        onChange={(e) => updateDetailAchat(item._id, "symbol", e.target.value)}
-                                                    />
-                                                </td>
-                                                <td>
-                                                    <input
-                                                        type="date"
-                                                        className="form-control"
-                                                        value={item.dateAchat ? item.dateAchat.slice(0, 10) : ""}
-                                                        onChange={(e) => updateDetailAchat(item._id, "dateAchat", e.target.value)}
-                                                    />
-                                                </td>
-                                                <td>
-                                                    <input
-                                                        className="form-control"
-                                                        value={item.stockage}
-                                                        onChange={(e) => updateDetailAchat(item._id, "stockage", e.target.value)}
-                                                    />
-                                                </td>
-                                                <td>
-                                                    <input
-                                                        className="form-control"
-                                                        value={item.nombre
-                                                        }
-                                                        onChange={(e) => updateDetailAchat(item._id, "nombre", e.target.value)}
-                                                    />
-                                                </td>
-                                                <td>
-                                                    <input
-                                                        className="form-control"
-                                                        value={item.prixAchat
-                                                        }
-                                                        onChange={(e) => updateDetailAchat(item._id, "prixAchat", e.target.value)}
-                                                    />
-                                                </td>
-                                                <td>
-                                                    <textarea
-                                                        className="form-control"
-                                                        rows={3}
-                                                        value={item.observation || ""}
-                                                        onChange={(e) => updateDetailAchat(item._id, "observation", e.target.value)}
-                                                    />
-                                                </td>
-                                                <td className="text-center">
+                                        {sortedDetail.map((item, index) => {
+                                            const buffer = editBuffer[item._id] || {};
+
+                                            const symbol = buffer.symbol ?? item.symbol ?? "";
+                                            const dateAchat = buffer.dateAchat ?? (item.dateAchat ? item.dateAchat.slice(0, 10) : "");
+                                            const stockage = buffer.stockage ?? item.stockage ?? "";
+                                            const nombre = buffer.nombre ?? item.nombre ?? "";
+                                            const prixAchat = buffer.prixAchat ?? item.prixAchat ?? "";
+                                            const observation = buffer.observation ?? item.observation ?? "";
+
+                                            return (
+                                                <tr key={index}>
+                                                    <td>
+                                                        <input
+                                                            className="form-control"
+                                                            value={symbol}
+                                                            onChange={(e) => handleEditChange(item._id, "symbol", e.target.value)}
+                                                        />
+                                                    </td>
+
+                                                    <td>
+                                                        <input
+                                                            type="date"
+                                                            className="form-control"
+                                                            value={dateAchat}
+                                                            onChange={(e) => handleEditChange(item._id, "dateAchat", e.target.value)}
+                                                        />
+                                                    </td>
+
+                                                    <td>
+                                                        <input
+                                                            className="form-control"
+                                                            value={stockage}
+                                                            onChange={(e) => handleEditChange(item._id, "stockage", e.target.value)}
+                                                        />
+                                                    </td>
+
+                                                    <td>
+                                                        <input
+                                                            className="form-control"
+                                                            value={nombre}
+                                                            onChange={(e) => handleEditChange(item._id, "nombre", e.target.value)}
+                                                        />
+                                                    </td>
+
+                                                    <td>
+                                                        <input
+                                                            className="form-control"
+                                                            value={prixAchat}
+                                                            onChange={(e) => handleEditChange(item._id, "prixAchat", e.target.value)}
+                                                        />
+                                                    </td>
+
+                                                    <td>
+                                                        <textarea
+                                                            className="form-control"
+                                                            rows={3}
+                                                            value={observation}
+                                                            onChange={(e) => handleEditChange(item._id, "observation", e.target.value)}
+                                                        />
+                                                    </td>
+
+                                                    <td className="text-center">
+                                                        <button
+                                                            className="btn btn-light mt-2 ml-1"
+                                                        onClick={() => handleSaveRow(item)}
+                                                        title="Sauvegarder"
+                                                        >
+                                                        💾
+                                                    </button>
+
                                                     <button
-                                                        className="btn btn-light mt-2 ml-1 text-center"
+                                                        className="btn btn-light mt-2 ml-1"
                                                         onClick={() => deleteDetailAchat(item._id)}
                                                         title="Supprimer"
                                                     >
                                                         🗑️
                                                     </button>
                                                 </td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
+                                                </tr>
+                                    );
+                                        })}
+                                </tbody>
+                            </table>
                             </div>
                         )}
-                    </>
+            </>
                 )}
 
-                {mode === "btc" && activeTab === "groupeB" && (
-                    <>
-                        {loading ? (
-                            <div>Chargement...</div>
-                        ) : (
-                            <div className="table-responsive">
-                                <table className="table table-sm">
-                                    <thead>
-                                        <tr>
-                                            <th></th>
+            {mode === "btc" && activeTab === "groupeB" && (
+                <>
+                    {loading ? (
+                        <div>Chargement...</div>
+                    ) : (
+                        <div className="table-responsive">
+                            <table className="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th></th>
 
-                                            <th className="text-center" onClick={() => requestSortEnBtc("symbol")} style={{ cursor: "pointer" }}>
-                                                Symbole {getSortIconEnBtc("symbol")}
-                                            </th>
+                                        <th className="text-center" onClick={() => requestSortEnBtc("symbol")} style={{ cursor: "pointer" }}>
+                                            Symbole {getSortIconEnBtc("symbol")}
+                                        </th>
 
-                                            <th className="text-center" onClick={() => requestSortEnBtc("name")} style={{ cursor: "pointer" }}>
-                                                Nom {getSortIconEnBtc("name")}
-                                            </th>
+                                        <th className="text-center" onClick={() => requestSortEnBtc("name")} style={{ cursor: "pointer" }}>
+                                            Nom {getSortIconEnBtc("name")}
+                                        </th>
 
-                                            <th className="text-center" onClick={() => requestSortEnBtc("nombre")} style={{ cursor: "pointer" }}>
-                                                Nombre {getSortIconEnBtc("nombre")}
-                                            </th>
+                                        <th className="text-center" onClick={() => requestSortEnBtc("nombre")} style={{ cursor: "pointer" }}>
+                                            Nombre {getSortIconEnBtc("nombre")}
+                                        </th>
 
-                                            <th className="text-center" onClick={() => requestSortEnBtc("valeurAchat")} style={{ cursor: "pointer" }}>
-                                                Valeur d'Achat {getSortIconEnBtc("valeurAchat")}
-                                            </th>
+                                        <th className="text-center" onClick={() => requestSortEnBtc("valeurAchat")} style={{ cursor: "pointer" }}>
+                                            Valeur d'Achat {getSortIconEnBtc("valeurAchat")}
+                                        </th>
 
-                                            <th className="text-center">
-                                                Prix Achat Moyen
-                                            </th>
+                                        <th className="text-center">
+                                            Prix Achat Moyen
+                                        </th>
 
-                                            <th className="text-center" onClick={() => requestSortEnBtc("valeur")} style={{ cursor: "pointer" }}>
-                                                Valeur {getSortIconEnBtc("valeur")}
-                                            </th>
+                                        <th className="text-center" onClick={() => requestSortEnBtc("valeur")} style={{ cursor: "pointer" }}>
+                                            Valeur {getSortIconEnBtc("valeur")}
+                                        </th>
 
-                                            <th className="text-center">
-                                                Gain/Perte
-                                            </th>
+                                        <th className="text-center">
+                                            Gain/Perte
+                                        </th>
 
-                                            <th className="text-center">
-                                                %
-                                            </th>
+                                        <th className="text-center">
+                                            %
+                                        </th>
 
-                                            <th className="text-center" onClick={() => requestSortEnBtc("venteI")} style={{ cursor: "pointer" }}>
-                                                Vente ? {getSortIconEnBtc("venteI")}
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {sortDataEnBtc(ownedEnrichedEnBtc)
-                                            .map((c) => {
+                                        <th className="text-center" onClick={() => requestSortEnBtc("venteI")} style={{ cursor: "pointer" }}>
+                                            Vente ? {getSortIconEnBtc("venteI")}
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {sortDataEnBtc(ownedEnrichedEnBtc)
+                                        .map((c) => {
 
-                                                return (
-                                                    <tr
-                                                        key={c.symbol}
-                                                        className={
-                                                            c.venteI === "oui"
-                                                                ? "table-success"
-                                                                : "table-danger"
-                                                        }>
-                                                        <td className="text-center">
-                                                            <img
-                                                                src={`/img/coins/${c.symbol}.png`}
-                                                                alt={c.symbol}
-                                                                style={{ width: 32, height: 32 }}
-                                                                onError={(e) => { e.target.src = '/img/random-coin.jpg'; }}
-                                                            />
-                                                        </td>
-                                                        <td className="text-center">{c.symbol}</td>
-                                                        <td className="text-center">{c.name}</td>
-                                                        <td className="text-center">{formatNumber8(c.nombre)}</td>
-                                                        <td className="text-center">{formatCurrency12B(c.valeurAchat)}</td>
-                                                        <td className="text-center">{formatCurrency12B(c.prixCoin)}</td>
-                                                        <td className="text-center">{formatCurrency12B(c.valeur)}</td>
-                                                        <td className="text-center">{formatCurrency12B(c.gainPerte)}</td>
-                                                        <td className="text-center">{formatNumber2(c.pourcGP)} %</td>
-                                                        <td className="text-center">{c.venteI}</td>
-                                                    </tr>
-                                                );
-                                            })}
-                                    </tbody>
-                                </table>
-                                {owned.length === 0 && <div className="text-muted">Aucune crypto possédée (nombre &gt; 0).</div>}
+                                            return (
+                                                <tr
+                                                    key={c.symbol}
+                                                    className={
+                                                        c.venteI === "oui"
+                                                            ? "table-success"
+                                                            : "table-danger"
+                                                    }>
+                                                    <td className="text-center">
+                                                        <img
+                                                            src={`/img/coins/${c.symbol}.png`}
+                                                            alt={c.symbol}
+                                                            style={{ width: 32, height: 32 }}
+                                                            onError={(e) => { e.target.src = '/img/random-coin.jpg'; }}
+                                                        />
+                                                    </td>
+                                                    <td className="text-center">{c.symbol}</td>
+                                                    <td className="text-center">{c.name}</td>
+                                                    <td className="text-center">{formatNumber8(c.nombre)}</td>
+                                                    <td className="text-center">{formatCurrency12B(c.valeurAchat)}</td>
+                                                    <td className="text-center">{formatCurrency12B(c.prixCoin)}</td>
+                                                    <td className="text-center">{formatCurrency12B(c.valeur)}</td>
+                                                    <td className="text-center">{formatCurrency12B(c.gainPerte)}</td>
+                                                    <td className="text-center">{formatNumber2(c.pourcGP)} %</td>
+                                                    <td className="text-center">{c.venteI}</td>
+                                                </tr>
+                                            );
+                                        })}
+                                </tbody>
+                            </table>
+                            {owned.length === 0 && <div className="text-muted">Aucune crypto possédée (nombre &gt; 0).</div>}
+                        </div>
+                    )}
+                </>
+            )}
+
+            {mode === "btc" && activeTab === "detailB" && (
+                <>
+
+                    {/* CREATE */}
+                    <div className="card p-3 mb-4">
+                        <h4>Ajouter un achat</h4>
+                        <div className="row g-2">
+                            <div className="col">
+                                <input
+                                    className="form-control"
+                                    placeholder="symbole"
+                                    value={formEnBtc.symbol}
+                                    onChange={(e) => setFormEnBtc({ ...formEnBtc, symbol: e.target.value })}
+                                />
                             </div>
-                        )}
-                    </>
-                )}
-
-                {mode === "btc" && activeTab === "detailB" && (
-                    <>
-
-                        {/* CREATE */}
-                        <div className="card p-3 mb-4">
-                            <h4>Ajouter un achat</h4>
-                            <div className="row g-2">
-                                <div className="col">
-                                    <input
-                                        className="form-control"
-                                        placeholder="symbole"
-                                        value={formEnBtc.symbol}
-                                        onChange={(e) => setFormEnBtc({ ...formEnBtc, symbol: e.target.value })}
-                                    />
-                                </div>
-                                <div className="col">
-                                    <input
-                                        type="date"
-                                        className="form-control"
-                                        placeholder="date d'achat"
-                                        value={formEnBtc.dateAchat}
-                                        onChange={(e) => setFormEnBtc({ ...formEnBtc, dateAchat: e.target.value })}
-                                    />
-                                </div>
-                                <div className="col">
-                                    <input
-                                        className="form-control"
-                                        placeholder="stockage"
-                                        value={formEnBtc.stockage}
-                                        onChange={(e) => setFormEnBtc({ ...formEnBtc, stockage: e.target.value })}
-                                    />
-                                </div>
-                                <div className="col">
-                                    <input
-                                        className="form-control"
-                                        placeholder="nombre"
-                                        value={formEnBtc.nombre}
-                                        onChange={(e) => setFormEnBtc({ ...formEnBtc, nombre: e.target.value })}
-                                    />
-                                </div>
-                                <div className="col">
-                                    <input
-                                        className="form-control"
-                                        placeholder="prix d'achat"
-                                        value={formEnBtc.prixAchat}
-                                        onChange={(e) => setFormEnBtc({ ...formEnBtc, prixAchat: e.target.value })}
-                                    />
-                                </div>
-                                <div className="col">
-                                    <input
-                                        className="form-control"
-                                        placeholder="observation"
-                                        value={formEnBtc.observation}
-                                        onChange={(e) => setFormEnBtc({ ...formEnBtc, observation: e.target.value })}
-                                    />
-                                </div>
-                                <div className="col-auto">
-                                    <button className="btn btn-primary" onClick={createDetailAchatEnBtc}>
-                                        Ajouter
-                                    </button>
-                                </div>
+                            <div className="col">
+                                <input
+                                    type="date"
+                                    className="form-control"
+                                    placeholder="date d'achat"
+                                    value={formEnBtc.dateAchat}
+                                    onChange={(e) => setFormEnBtc({ ...formEnBtc, dateAchat: e.target.value })}
+                                />
+                            </div>
+                            <div className="col">
+                                <input
+                                    className="form-control"
+                                    placeholder="stockage"
+                                    value={formEnBtc.stockage}
+                                    onChange={(e) => setFormEnBtc({ ...formEnBtc, stockage: e.target.value })}
+                                />
+                            </div>
+                            <div className="col">
+                                <input
+                                    className="form-control"
+                                    placeholder="nombre"
+                                    value={formEnBtc.nombre}
+                                    onChange={(e) => setFormEnBtc({ ...formEnBtc, nombre: e.target.value })}
+                                />
+                            </div>
+                            <div className="col">
+                                <input
+                                    className="form-control"
+                                    placeholder="prix d'achat"
+                                    value={formEnBtc.prixAchat}
+                                    onChange={(e) => setFormEnBtc({ ...formEnBtc, prixAchat: e.target.value })}
+                                />
+                            </div>
+                            <div className="col">
+                                <input
+                                    className="form-control"
+                                    placeholder="observation"
+                                    value={formEnBtc.observation}
+                                    onChange={(e) => setFormEnBtc({ ...formEnBtc, observation: e.target.value })}
+                                />
+                            </div>
+                            <div className="col-auto">
+                                <button className="btn btn-primary" onClick={createDetailAchatEnBtc}>
+                                    Ajouter
+                                </button>
                             </div>
                         </div>
-                        {/* LIST + UPDATE + DELETE */}
-                        {loading ? (
-                            <div>Chargement...</div>
-                        ) : (
-                            <div className="table-responsive">
-                                <table className="table table-sm">
-                                    <thead>
-                                        <tr>
-                                            <th onClick={() => requestSortEnBtc("symbol")} style={{ cursor: "pointer" }}>
-                                                Coin
-                                            </th>
+                    </div>
+                    {/* LIST + UPDATE + DELETE */}
+                    {loading ? (
+                        <div>Chargement...</div>
+                    ) : (
+                        <div className="table-responsive">
+                            <table className="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th onClick={() => requestSortEnBtc("symbol")} style={{ cursor: "pointer" }}>
+                                            Coin
+                                        </th>
 
-                                            <th onClick={() => requestSortEnBtc("dateAchat")} style={{ cursor: "pointer" }}>
-                                                Date Achat
-                                            </th>
+                                        <th onClick={() => requestSortEnBtc("dateAchat")} style={{ cursor: "pointer" }}>
+                                            Date Achat
+                                        </th>
 
-                                            <th onClick={() => requestSortEnBtc("stockage")} style={{ cursor: "pointer" }}>
-                                                Stockage
-                                            </th>
+                                        <th onClick={() => requestSortEnBtc("stockage")} style={{ cursor: "pointer" }}>
+                                            Stockage
+                                        </th>
 
-                                            <th onClick={() => requestSortEnBtc("nombre")} style={{ cursor: "pointer" }}>
-                                                Nombre
-                                            </th>
+                                        <th onClick={() => requestSortEnBtc("nombre")} style={{ cursor: "pointer" }}>
+                                            Nombre
+                                        </th>
 
-                                            <th onClick={() => requestSortEnBtc("prixAchat")} style={{ cursor: "pointer" }}>
-                                                Prix Achat
-                                            </th>
+                                        <th onClick={() => requestSortEnBtc("prixAchat")} style={{ cursor: "pointer" }}>
+                                            Prix Achat
+                                        </th>
 
-                                            <th onClick={() => requestSortEnBtc("observation")} style={{ cursor: "pointer" }}>
-                                                Observation
-                                            </th>
-                                            <th>Actions</th>
-                                        </tr>
-                                    </thead>
+                                        <th onClick={() => requestSortEnBtc("observation")} style={{ cursor: "pointer" }}>
+                                            Observation
+                                        </th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {sortedDetailEnBtc.map((item, index) => {
+                                        const bufferBtc = editBufferBtc[item._id] || {};
 
-                                    <tbody>
-                                        {sortedDetailEnBtc.map((item, index) => (
+                                        const symbol = bufferBtc.symbol ?? item.symbol ?? "";
+                                        const dateAchat = bufferBtc.dateAchat ?? (item.dateAchat ? item.dateAchat.slice(0, 10) : "");
+                                        const stockage = bufferBtc.stockage ?? item.stockage ?? "";
+                                        const nombre = bufferBtc.nombre ?? item.nombre ?? "";
+                                        const prixAchat = bufferBtc.prixAchat ?? item.prixAchat ?? "";
+                                        const observation = bufferBtc.observation ?? item.observation ?? "";
+
+                                        return (
                                             <tr key={index}>
                                                 <td>
                                                     <input
                                                         className="form-control"
-                                                        value={item.symbol}
-                                                        onChange={(e) => updateDetailAchatEnBtc(item._id, "symbol", e.target.value)}
+                                                        value={symbol}
+                                                        onChange={(e) => handleEditChangeEnBtc(item._id, "symbol", e.target.value)}
                                                     />
                                                 </td>
+
                                                 <td>
                                                     <input
                                                         type="date"
                                                         className="form-control"
-                                                        value={item.dateAchat ? item.dateAchat.slice(0, 10) : ""}
-                                                        onChange={(e) => updateDetailAchatEnBtc(item._id, "dateAchat", e.target.value)}
+                                                        value={dateAchat}
+                                                        onChange={(e) => handleEditChangeEnBtc(item._id, "dateAchat", e.target.value)}
                                                     />
                                                 </td>
+
                                                 <td>
                                                     <input
                                                         className="form-control"
-                                                        value={item.stockage}
-                                                        onChange={(e) => updateDetailAchatEnBtc(item._id, "stockage", e.target.value)}
+                                                        value={stockage}
+                                                        onChange={(e) => handleEditChangeEnBtc(item._id, "stockage", e.target.value)}
                                                     />
                                                 </td>
+
                                                 <td>
                                                     <input
                                                         className="form-control"
-                                                        value={item.nombre
-                                                        }
-                                                        onChange={(e) => updateDetailAchatEnBtc(item._id, "nombre", e.target.value)}
+                                                        value={nombre}
+                                                        onChange={(e) => handleEditChangeEnBtc(item._id, "nombre", e.target.value)}
                                                     />
                                                 </td>
+
                                                 <td>
                                                     <input
                                                         className="form-control"
-                                                        value={item.prixAchat
-                                                        }
-                                                        onChange={(e) => updateDetailAchatEnBtc(item._id, "prixAchat", e.target.value)}
+                                                        value={prixAchat}
+                                                        onChange={(e) => handleEditChangeEnBtc(item._id, "prixAchat", e.target.value)}
                                                     />
                                                 </td>
+
                                                 <td>
                                                     <textarea
                                                         className="form-control"
                                                         rows={3}
-                                                        value={item.observation || ""}
-                                                        onChange={(e) => updateDetailAchatEnBtc(item._id, "observation", e.target.value)}
+                                                        value={observation}
+                                                        onChange={(e) => handleEditChangeEnBtc(item._id, "observation", e.target.value)}
                                                     />
                                                 </td>
+
                                                 <td className="text-center">
                                                     <button
-                                                        className="btn btn-light mt-2 ml-1 text-center"
+                                                        className="btn btn-light mt-2 mr-1"
+                                                        onClick={() => handleSaveRowEnBtc(item)}
+                                                        title="Sauvegarder"
+                                                    >
+                                                        💾
+                                                    </button>
+
+                                                    <button
+                                                        className="btn btn-light mt-2 ml-1"
                                                         onClick={() => deleteDetailAchatEnBtc(item._id)}
                                                         title="Supprimer"
                                                     >
@@ -1237,15 +1353,16 @@ const Wallet = ({ search = '' }) => {
                                                     </button>
                                                 </td>
                                             </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
-                        )}
-                    </>
-                )}
-            </div>
+                                        );
+                                    })}
+                                </tbody>
+                            </table>
+                        </div>
+                    )}
+                </>
+            )}
         </div>
+        </div >
     );
 };
 

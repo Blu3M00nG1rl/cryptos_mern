@@ -14,6 +14,8 @@ const Recap = ({ search = '' }) => {
     const [nonTrouves, setNonTrouves] = useState([]);
     const [nonImportes, setNonImportes] = useState([]);
     const [mode, setMode] = useState("eur"); // "eur" ou "btc"
+    const [superformantesPct, setSuperformantesPct] = useState(0);
+
 
     const fetchDominance = async () => {
         try {
@@ -69,22 +71,6 @@ const Recap = ({ search = '' }) => {
         }
     };
 
-
-    useEffect(() => {
-        fetchDominance();
-        fetchRecapData();
-        fetchNonTrouves();
-        fetchNonImportes();
-    }, []);
-
-    useEffect(() => {
-        if (mode === "eur") {
-            setActiveTab("tous");
-        } else if (mode === "btc") {
-            setActiveTab("tousB");
-        }
-    }, [mode]);
-
     const normalizedSearch = (search || '').trim().toLowerCase();
 
     const filteredData = data.filter(c =>
@@ -139,25 +125,58 @@ const Recap = ({ search = '' }) => {
     const totalNombre = filteredData.reduce((sum, c) => sum + (Number(c.nombre) || 0), 0);
     const totalDominanceCoin = filteredData.reduce((sum, c) => sum + ((c.capitalisation / dominanceCalculee) * 1000000), 0);
 
+    useEffect(() => {
+        fetchDominance();
+        fetchRecapData();
+        fetchNonTrouves();
+        fetchNonImportes();
+    }, []);
+
+    useEffect(() => {
+        if (mode === "eur") {
+            setActiveTab("tous");
+        } else if (mode === "btc") {
+            setActiveTab("tousB");
+        }
+    }, [mode]);
+
+    useEffect(() => {
+        if (!data || data.length === 0) return;
+
+        // On filtre les cryptos qui ont une évolution supérieure à celle du BTC
+        const superformantes = data.filter(c =>
+            c.evolution > 0 && c.evolution > btcEvolution
+        );
+
+        // Calcul du pourcentage
+        const pct = (superformantes.length / data.length) * 100;
+        setSuperformantesPct(pct);
+    }, [data, btcEvolution]);
+
     return (
         <div>
-            <div className="d-flex">
-                <h1>Recap</h1>
+            <div className="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1>Recap</h1>
 
-                <button
-                    className={`btn btn-sm btn-currency mb-4 ${mode === "eur" ? "btn-primary" : "btn-outline-primary"}`}
-                    onClick={() => setMode("eur")}
-                >
-                    <img src="/img/eur.png" alt="EUR" style={{ width: 28 }} />
-                </button>
+                    <button
+                        className={`btn btn-sm btn-currency mb-4 ${mode === "eur" ? "btn-primary" : "btn-outline-primary"}`}
+                        onClick={() => setMode("eur")}
+                    >
+                        <img src="/img/eur.png" alt="EUR" style={{ width: 28 }} />
+                    </button>
 
-                <button
-                    className={`btn btn-sm btn-currency mb-4 ${mode === "btc" ? "btn-warning" : "btn-outline-warning"}`}
-                    onClick={() => setMode("btc")}
-                >
-                    <img src="/img/btc.png" alt="BTC" style={{ width: 28 }} />
-                </button>
-
+                    <button
+                        className={`btn btn-sm btn-currency mb-4 ${mode === "btc" ? "btn-warning" : "btn-outline-warning"}`}
+                        onClick={() => setMode("btc")}
+                    >
+                        <img src="/img/btc.png" alt="BTC" style={{ width: 28 }} />
+                    </button>
+                </div>
+                <div>
+                    <h6>Crypto superformantes :</h6>
+                    <h5 className="text-end">{formatNumberE(superformantesPct)} %</h5>
+                </div>
             </div>
 
             <ul className="nav nav-tabs mb-3">

@@ -3,64 +3,31 @@ import axios from 'axios';
 import { NavLink } from "react-router-dom";
 
 const Navbar = ({ search = '', onSearch = () => { } }) => {
-    const [loadingJ, setLoadingJ] = useState(false);
-    const [loadingH, setLoadingH] = useState(false);
+    const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState('');
     const [dominance, setDominance] = useState("");
     const [saving, setSaving] = useState(false);
 
-    const handleImportJ = async () => {
-        setLoadingJ(true);
-        setMessage('');
-        console.log(process.env.REACT_APP_API_URL);
-        try {
-            const res = await axios.post(`${process.env.REACT_APP_API_URL}/backend/history/importJ`);
-            setMessage(`✅ Import terminé: ${res.data.importedCount} lignes importées`);
-        } catch (err) {
-            setMessage('❌ Erreur lors de l\'import');
-            console.error(err);
-        } finally {
-            setLoadingJ(false);
-        }
-    };
-
-    const handleImportH = async () => {
-        setLoadingH(true);
-        setMessage('');
-        console.log(process.env.REACT_APP_API_URL);
-        try {
-            const res = await axios.post(`${process.env.REACT_APP_API_URL}/backend/history/importH`);
-            setMessage(`✅ Import terminé: ${res.data.importedCount} lignes importées`);
-        } catch (err) {
-            setMessage('❌ Erreur lors de l\'import');
-            console.error(err);
-        } finally {
-            setLoadingH(false);
-        }
-    };
-
     const handleMaj = async () => {
-        setLoadingJ(true);
+        setLoading(true);
         setMessage('');
-
         try {
-            const res = await axios.post(`${process.env.REACT_APP_API_URL}/backend/maintenance/maj`);
+            await axios.post(`${process.env.REACT_APP_API_URL}/backend/maintenance/maj`);
             setMessage(`✅ Mise à jour complète terminée`);
         } catch (err) {
             setMessage('❌ Erreur lors de la mise à jour');
             console.error(err);
         } finally {
-            setLoadingJ(false);
+            setLoading(false);
         }
     };
 
     const handleSaveParams = async () => {
         setSaving(true);
         try {
-            const res = await axios.post(`${process.env.REACT_APP_API_URL}/backend/param`, {
+            await axios.post(`${process.env.REACT_APP_API_URL}/backend/param`, {
                 dominance: Number(dominance)
             });
-
             setMessage("✅ Paramètres mis à jour");
 
         } catch (err) {
@@ -97,7 +64,7 @@ const Navbar = ({ search = '', onSearch = () => { } }) => {
 
                 {/* --- LOGO CENTRÉ --- */}
                 <NavLink to="/" className="logo">
-                    <h3>Gestion Cryptomonnaies</h3>
+                    <h3>Cryptos Manager</h3>
                 </NavLink>
 
                 {/* --- BOUTONS IMPORT / MAJ --- */}
@@ -105,8 +72,8 @@ const Navbar = ({ search = '', onSearch = () => { } }) => {
 
                     <div>1-Historique Bitcoin</div>
 
-                    <button className="btn btn-info btn-sm" disabled={loadingJ} onClick={handleMaj}>
-                        {loadingJ && <span className="spinner-border spinner-border-sm me-2"></span>}
+                    <button className="btn btn-info btn-sm" disabled={loading} onClick={handleMaj}>
+                        {loading && <span className="spinner-border spinner-border-sm me-2"></span>}
                         2-Maj
                     </button>
 
