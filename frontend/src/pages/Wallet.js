@@ -1063,305 +1063,315 @@ const Wallet = ({ search = '' }) => {
                                                     <td className="text-center">
                                                         <button
                                                             className="btn btn-light mt-2 ml-1"
-                                                        onClick={() => handleSaveRow(item)}
-                                                        title="Sauvegarder"
+                                                            onClick={() => handleSaveRow(item)}
+                                                            title="Sauvegarder"
                                                         >
-                                                        💾
-                                                    </button>
+                                                            💾
+                                                        </button>
 
-                                                    <button
-                                                        className="btn btn-light mt-2 ml-1"
-                                                        onClick={() => deleteDetailAchat(item._id)}
-                                                        title="Supprimer"
-                                                    >
-                                                        🗑️
-                                                    </button>
-                                                </td>
-                                                </tr>
-                                    );
-                                        })}
-                                </tbody>
-                            </table>
-                            </div>
-                        )}
-            </>
-                )}
-
-            {mode === "btc" && activeTab === "groupeB" && (
-                <>
-                    {loading ? (
-                        <div>Chargement...</div>
-                    ) : (
-                        <div className="table-responsive">
-                            <table className="table table-sm">
-                                <thead>
-                                    <tr>
-                                        <th></th>
-
-                                        <th className="text-center" onClick={() => requestSortEnBtc("symbol")} style={{ cursor: "pointer" }}>
-                                            Symbole {getSortIconEnBtc("symbol")}
-                                        </th>
-
-                                        <th className="text-center" onClick={() => requestSortEnBtc("name")} style={{ cursor: "pointer" }}>
-                                            Nom {getSortIconEnBtc("name")}
-                                        </th>
-
-                                        <th className="text-center" onClick={() => requestSortEnBtc("nombre")} style={{ cursor: "pointer" }}>
-                                            Nombre {getSortIconEnBtc("nombre")}
-                                        </th>
-
-                                        <th className="text-center" onClick={() => requestSortEnBtc("valeurAchat")} style={{ cursor: "pointer" }}>
-                                            Valeur d'Achat {getSortIconEnBtc("valeurAchat")}
-                                        </th>
-
-                                        <th className="text-center">
-                                            Prix Achat Moyen
-                                        </th>
-
-                                        <th className="text-center" onClick={() => requestSortEnBtc("valeur")} style={{ cursor: "pointer" }}>
-                                            Valeur {getSortIconEnBtc("valeur")}
-                                        </th>
-
-                                        <th className="text-center">
-                                            Gain/Perte
-                                        </th>
-
-                                        <th className="text-center">
-                                            %
-                                        </th>
-
-                                        <th className="text-center" onClick={() => requestSortEnBtc("venteI")} style={{ cursor: "pointer" }}>
-                                            Vente ? {getSortIconEnBtc("venteI")}
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {sortDataEnBtc(ownedEnrichedEnBtc)
-                                        .map((c) => {
-
-                                            return (
-                                                <tr
-                                                    key={c.symbol}
-                                                    className={
-                                                        c.venteI === "oui"
-                                                            ? "table-success"
-                                                            : "table-danger"
-                                                    }>
-                                                    <td className="text-center">
-                                                        <img
-                                                            src={`/img/coins/${c.symbol}.png`}
-                                                            alt={c.symbol}
-                                                            style={{ width: 32, height: 32 }}
-                                                            onError={(e) => { e.target.src = '/img/random-coin.jpg'; }}
-                                                        />
+                                                        <button
+                                                            className="btn btn-light mt-2 ml-1"
+                                                            onClick={() => deleteDetailAchat(item._id)}
+                                                            title="Supprimer"
+                                                        >
+                                                            🗑️
+                                                        </button>
                                                     </td>
-                                                    <td className="text-center">{c.symbol}</td>
-                                                    <td className="text-center">{c.name}</td>
-                                                    <td className="text-center">{formatNumber8(c.nombre)}</td>
-                                                    <td className="text-center">{formatCurrency12B(c.valeurAchat)}</td>
-                                                    <td className="text-center">{formatCurrency12B(c.prixCoin)}</td>
-                                                    <td className="text-center">{formatCurrency12B(c.valeur)}</td>
-                                                    <td className="text-center">{formatCurrency12B(c.gainPerte)}</td>
-                                                    <td className="text-center">{formatNumber2(c.pourcGP)} %</td>
-                                                    <td className="text-center">{c.venteI}</td>
                                                 </tr>
                                             );
                                         })}
-                                </tbody>
-                            </table>
-                            {owned.length === 0 && <div className="text-muted">Aucune crypto possédée (nombre &gt; 0).</div>}
+                                    </tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <th></th>
+                                            <th></th>
+                                            <th className="text-center">Total</th>
+
+                                            <th className="ps-3">{formatNumber0(totalNombre)}</th>
+                                            <th className="ps-3">{formatCurrency0(totalValeurAchat)}</th>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        )}
+                    </>
+                )}
+
+                {mode === "btc" && activeTab === "groupeB" && (
+                    <>
+                        {loading ? (
+                            <div>Chargement...</div>
+                        ) : (
+                            <div className="table-responsive">
+                                <table className="table table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th></th>
+
+                                            <th className="text-center" onClick={() => requestSortEnBtc("symbol")} style={{ cursor: "pointer" }}>
+                                                Symbole {getSortIconEnBtc("symbol")}
+                                            </th>
+
+                                            <th className="text-center" onClick={() => requestSortEnBtc("name")} style={{ cursor: "pointer" }}>
+                                                Nom {getSortIconEnBtc("name")}
+                                            </th>
+
+                                            <th className="text-center" onClick={() => requestSortEnBtc("nombre")} style={{ cursor: "pointer" }}>
+                                                Nombre {getSortIconEnBtc("nombre")}
+                                            </th>
+
+                                            <th className="text-center" onClick={() => requestSortEnBtc("valeurAchat")} style={{ cursor: "pointer" }}>
+                                                Valeur d'Achat {getSortIconEnBtc("valeurAchat")}
+                                            </th>
+
+                                            <th className="text-center">
+                                                Prix Achat Moyen
+                                            </th>
+
+                                            <th className="text-center" onClick={() => requestSortEnBtc("valeur")} style={{ cursor: "pointer" }}>
+                                                Valeur {getSortIconEnBtc("valeur")}
+                                            </th>
+
+                                            <th className="text-center">
+                                                Gain/Perte
+                                            </th>
+
+                                            <th className="text-center">
+                                                %
+                                            </th>
+
+                                            <th className="text-center" onClick={() => requestSortEnBtc("venteI")} style={{ cursor: "pointer" }}>
+                                                Vente ? {getSortIconEnBtc("venteI")}
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {sortDataEnBtc(ownedEnrichedEnBtc)
+                                            .map((c) => {
+
+                                                return (
+                                                    <tr
+                                                        key={c.symbol}
+                                                        className={
+                                                            c.venteI === "oui"
+                                                                ? "table-success"
+                                                                : "table-danger"
+                                                        }>
+                                                        <td className="text-center">
+                                                            <img
+                                                                src={`/img/coins/${c.symbol}.png`}
+                                                                alt={c.symbol}
+                                                                style={{ width: 32, height: 32 }}
+                                                                onError={(e) => { e.target.src = '/img/random-coin.jpg'; }}
+                                                            />
+                                                        </td>
+                                                        <td className="text-center">{c.symbol}</td>
+                                                        <td className="text-center">{c.name}</td>
+                                                        <td className="text-center">{formatNumber8(c.nombre)}</td>
+                                                        <td className="text-center">{formatCurrency12B(c.valeurAchat)}</td>
+                                                        <td className="text-center">{formatCurrency12B(c.prixCoin)}</td>
+                                                        <td className="text-center">{formatCurrency12B(c.valeur)}</td>
+                                                        <td className="text-center">{formatCurrency12B(c.gainPerte)}</td>
+                                                        <td className="text-center">{formatNumber2(c.pourcGP)} %</td>
+                                                        <td className="text-center">{c.venteI}</td>
+                                                    </tr>
+                                                );
+                                            })}
+                                    </tbody>
+                                </table>
+                                {owned.length === 0 && <div className="text-muted">Aucune crypto possédée (nombre &gt; 0).</div>}
+                            </div>
+                        )}
+                    </>
+                )}
+
+                {mode === "btc" && activeTab === "detailB" && (
+                    <>
+
+                        {/* CREATE */}
+                        <div className="card p-3 mb-4">
+                            <h4>Ajouter un achat</h4>
+                            <div className="row g-2">
+                                <div className="col">
+                                    <input
+                                        className="form-control"
+                                        placeholder="symbole"
+                                        value={formEnBtc.symbol}
+                                        onChange={(e) => setFormEnBtc({ ...formEnBtc, symbol: e.target.value })}
+                                    />
+                                </div>
+                                <div className="col">
+                                    <input
+                                        type="date"
+                                        className="form-control"
+                                        placeholder="date d'achat"
+                                        value={formEnBtc.dateAchat}
+                                        onChange={(e) => setFormEnBtc({ ...formEnBtc, dateAchat: e.target.value })}
+                                    />
+                                </div>
+                                <div className="col">
+                                    <input
+                                        className="form-control"
+                                        placeholder="stockage"
+                                        value={formEnBtc.stockage}
+                                        onChange={(e) => setFormEnBtc({ ...formEnBtc, stockage: e.target.value })}
+                                    />
+                                </div>
+                                <div className="col">
+                                    <input
+                                        className="form-control"
+                                        placeholder="nombre"
+                                        value={formEnBtc.nombre}
+                                        onChange={(e) => setFormEnBtc({ ...formEnBtc, nombre: e.target.value })}
+                                    />
+                                </div>
+                                <div className="col">
+                                    <input
+                                        className="form-control"
+                                        placeholder="prix d'achat"
+                                        value={formEnBtc.prixAchat}
+                                        onChange={(e) => setFormEnBtc({ ...formEnBtc, prixAchat: e.target.value })}
+                                    />
+                                </div>
+                                <div className="col">
+                                    <input
+                                        className="form-control"
+                                        placeholder="observation"
+                                        value={formEnBtc.observation}
+                                        onChange={(e) => setFormEnBtc({ ...formEnBtc, observation: e.target.value })}
+                                    />
+                                </div>
+                                <div className="col-auto">
+                                    <button className="btn btn-primary" onClick={createDetailAchatEnBtc}>
+                                        Ajouter
+                                    </button>
+                                </div>
+                            </div>
                         </div>
-                    )}
-                </>
-            )}
+                        {/* LIST + UPDATE + DELETE */}
+                        {loading ? (
+                            <div>Chargement...</div>
+                        ) : (
+                            <div className="table-responsive">
+                                <table className="table table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th onClick={() => requestSortEnBtc("symbol")} style={{ cursor: "pointer" }}>
+                                                Coin
+                                            </th>
 
-            {mode === "btc" && activeTab === "detailB" && (
-                <>
+                                            <th onClick={() => requestSortEnBtc("dateAchat")} style={{ cursor: "pointer" }}>
+                                                Date Achat
+                                            </th>
 
-                    {/* CREATE */}
-                    <div className="card p-3 mb-4">
-                        <h4>Ajouter un achat</h4>
-                        <div className="row g-2">
-                            <div className="col">
-                                <input
-                                    className="form-control"
-                                    placeholder="symbole"
-                                    value={formEnBtc.symbol}
-                                    onChange={(e) => setFormEnBtc({ ...formEnBtc, symbol: e.target.value })}
-                                />
+                                            <th onClick={() => requestSortEnBtc("stockage")} style={{ cursor: "pointer" }}>
+                                                Stockage
+                                            </th>
+
+                                            <th onClick={() => requestSortEnBtc("nombre")} style={{ cursor: "pointer" }}>
+                                                Nombre
+                                            </th>
+
+                                            <th onClick={() => requestSortEnBtc("prixAchat")} style={{ cursor: "pointer" }}>
+                                                Prix Achat
+                                            </th>
+
+                                            <th onClick={() => requestSortEnBtc("observation")} style={{ cursor: "pointer" }}>
+                                                Observation
+                                            </th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {sortedDetailEnBtc.map((item, index) => {
+                                            const bufferBtc = editBufferBtc[item._id] || {};
+
+                                            const symbol = bufferBtc.symbol ?? item.symbol ?? "";
+                                            const dateAchat = bufferBtc.dateAchat ?? (item.dateAchat ? item.dateAchat.slice(0, 10) : "");
+                                            const stockage = bufferBtc.stockage ?? item.stockage ?? "";
+                                            const nombre = bufferBtc.nombre ?? item.nombre ?? "";
+                                            const prixAchat = bufferBtc.prixAchat ?? item.prixAchat ?? "";
+                                            const observation = bufferBtc.observation ?? item.observation ?? "";
+
+                                            return (
+                                                <tr key={index}>
+                                                    <td>
+                                                        <input
+                                                            className="form-control"
+                                                            value={symbol}
+                                                            onChange={(e) => handleEditChangeEnBtc(item._id, "symbol", e.target.value)}
+                                                        />
+                                                    </td>
+
+                                                    <td>
+                                                        <input
+                                                            type="date"
+                                                            className="form-control"
+                                                            value={dateAchat}
+                                                            onChange={(e) => handleEditChangeEnBtc(item._id, "dateAchat", e.target.value)}
+                                                        />
+                                                    </td>
+
+                                                    <td>
+                                                        <input
+                                                            className="form-control"
+                                                            value={stockage}
+                                                            onChange={(e) => handleEditChangeEnBtc(item._id, "stockage", e.target.value)}
+                                                        />
+                                                    </td>
+
+                                                    <td>
+                                                        <input
+                                                            className="form-control"
+                                                            value={nombre}
+                                                            onChange={(e) => handleEditChangeEnBtc(item._id, "nombre", e.target.value)}
+                                                        />
+                                                    </td>
+
+                                                    <td>
+                                                        <input
+                                                            className="form-control"
+                                                            value={prixAchat}
+                                                            onChange={(e) => handleEditChangeEnBtc(item._id, "prixAchat", e.target.value)}
+                                                        />
+                                                    </td>
+
+                                                    <td>
+                                                        <textarea
+                                                            className="form-control"
+                                                            rows={3}
+                                                            value={observation}
+                                                            onChange={(e) => handleEditChangeEnBtc(item._id, "observation", e.target.value)}
+                                                        />
+                                                    </td>
+
+                                                    <td className="text-center">
+                                                        <button
+                                                            className="btn btn-light mt-2 mr-1"
+                                                            onClick={() => handleSaveRowEnBtc(item)}
+                                                            title="Sauvegarder"
+                                                        >
+                                                            💾
+                                                        </button>
+
+                                                        <button
+                                                            className="btn btn-light mt-2 ml-1"
+                                                            onClick={() => deleteDetailAchatEnBtc(item._id)}
+                                                            title="Supprimer"
+                                                        >
+                                                            🗑️
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            );
+                                        })}
+                                    </tbody>
+                                </table>
                             </div>
-                            <div className="col">
-                                <input
-                                    type="date"
-                                    className="form-control"
-                                    placeholder="date d'achat"
-                                    value={formEnBtc.dateAchat}
-                                    onChange={(e) => setFormEnBtc({ ...formEnBtc, dateAchat: e.target.value })}
-                                />
-                            </div>
-                            <div className="col">
-                                <input
-                                    className="form-control"
-                                    placeholder="stockage"
-                                    value={formEnBtc.stockage}
-                                    onChange={(e) => setFormEnBtc({ ...formEnBtc, stockage: e.target.value })}
-                                />
-                            </div>
-                            <div className="col">
-                                <input
-                                    className="form-control"
-                                    placeholder="nombre"
-                                    value={formEnBtc.nombre}
-                                    onChange={(e) => setFormEnBtc({ ...formEnBtc, nombre: e.target.value })}
-                                />
-                            </div>
-                            <div className="col">
-                                <input
-                                    className="form-control"
-                                    placeholder="prix d'achat"
-                                    value={formEnBtc.prixAchat}
-                                    onChange={(e) => setFormEnBtc({ ...formEnBtc, prixAchat: e.target.value })}
-                                />
-                            </div>
-                            <div className="col">
-                                <input
-                                    className="form-control"
-                                    placeholder="observation"
-                                    value={formEnBtc.observation}
-                                    onChange={(e) => setFormEnBtc({ ...formEnBtc, observation: e.target.value })}
-                                />
-                            </div>
-                            <div className="col-auto">
-                                <button className="btn btn-primary" onClick={createDetailAchatEnBtc}>
-                                    Ajouter
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                    {/* LIST + UPDATE + DELETE */}
-                    {loading ? (
-                        <div>Chargement...</div>
-                    ) : (
-                        <div className="table-responsive">
-                            <table className="table table-sm">
-                                <thead>
-                                    <tr>
-                                        <th onClick={() => requestSortEnBtc("symbol")} style={{ cursor: "pointer" }}>
-                                            Coin
-                                        </th>
-
-                                        <th onClick={() => requestSortEnBtc("dateAchat")} style={{ cursor: "pointer" }}>
-                                            Date Achat
-                                        </th>
-
-                                        <th onClick={() => requestSortEnBtc("stockage")} style={{ cursor: "pointer" }}>
-                                            Stockage
-                                        </th>
-
-                                        <th onClick={() => requestSortEnBtc("nombre")} style={{ cursor: "pointer" }}>
-                                            Nombre
-                                        </th>
-
-                                        <th onClick={() => requestSortEnBtc("prixAchat")} style={{ cursor: "pointer" }}>
-                                            Prix Achat
-                                        </th>
-
-                                        <th onClick={() => requestSortEnBtc("observation")} style={{ cursor: "pointer" }}>
-                                            Observation
-                                        </th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {sortedDetailEnBtc.map((item, index) => {
-                                        const bufferBtc = editBufferBtc[item._id] || {};
-
-                                        const symbol = bufferBtc.symbol ?? item.symbol ?? "";
-                                        const dateAchat = bufferBtc.dateAchat ?? (item.dateAchat ? item.dateAchat.slice(0, 10) : "");
-                                        const stockage = bufferBtc.stockage ?? item.stockage ?? "";
-                                        const nombre = bufferBtc.nombre ?? item.nombre ?? "";
-                                        const prixAchat = bufferBtc.prixAchat ?? item.prixAchat ?? "";
-                                        const observation = bufferBtc.observation ?? item.observation ?? "";
-
-                                        return (
-                                            <tr key={index}>
-                                                <td>
-                                                    <input
-                                                        className="form-control"
-                                                        value={symbol}
-                                                        onChange={(e) => handleEditChangeEnBtc(item._id, "symbol", e.target.value)}
-                                                    />
-                                                </td>
-
-                                                <td>
-                                                    <input
-                                                        type="date"
-                                                        className="form-control"
-                                                        value={dateAchat}
-                                                        onChange={(e) => handleEditChangeEnBtc(item._id, "dateAchat", e.target.value)}
-                                                    />
-                                                </td>
-
-                                                <td>
-                                                    <input
-                                                        className="form-control"
-                                                        value={stockage}
-                                                        onChange={(e) => handleEditChangeEnBtc(item._id, "stockage", e.target.value)}
-                                                    />
-                                                </td>
-
-                                                <td>
-                                                    <input
-                                                        className="form-control"
-                                                        value={nombre}
-                                                        onChange={(e) => handleEditChangeEnBtc(item._id, "nombre", e.target.value)}
-                                                    />
-                                                </td>
-
-                                                <td>
-                                                    <input
-                                                        className="form-control"
-                                                        value={prixAchat}
-                                                        onChange={(e) => handleEditChangeEnBtc(item._id, "prixAchat", e.target.value)}
-                                                    />
-                                                </td>
-
-                                                <td>
-                                                    <textarea
-                                                        className="form-control"
-                                                        rows={3}
-                                                        value={observation}
-                                                        onChange={(e) => handleEditChangeEnBtc(item._id, "observation", e.target.value)}
-                                                    />
-                                                </td>
-
-                                                <td className="text-center">
-                                                    <button
-                                                        className="btn btn-light mt-2 mr-1"
-                                                        onClick={() => handleSaveRowEnBtc(item)}
-                                                        title="Sauvegarder"
-                                                    >
-                                                        💾
-                                                    </button>
-
-                                                    <button
-                                                        className="btn btn-light mt-2 ml-1"
-                                                        onClick={() => deleteDetailAchatEnBtc(item._id)}
-                                                        title="Supprimer"
-                                                    >
-                                                        🗑️
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                        );
-                                    })}
-                                </tbody>
-                            </table>
-                        </div>
-                    )}
-                </>
-            )}
-        </div>
+                        )}
+                    </>
+                )}
+            </div>
         </div >
     );
 };
