@@ -207,7 +207,11 @@ const CoinsAdmin = ({ search = '' }) => {
 
                                         <button
                                             className="btn btn-light mt-2 ml-1"
-                                            onClick={() => deleteCoin(c._id)}
+                                            onClick={() => {
+                                                if (window.confirm("Voulez-vous vraiment supprimer ce coin ?")) {
+                                                    deleteCoin(c._id);
+                                                }
+                                            }}
                                             title="Supprimer"
                                         >
                                             🗑️
