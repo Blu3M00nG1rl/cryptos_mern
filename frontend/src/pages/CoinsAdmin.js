@@ -5,10 +5,7 @@ const CoinsAdmin = ({ search = '' }) => {
     const [coins, setCoins] = useState([]);
     const [form, setForm] = useState({ no: "", coinId: "", symbol: "", name: "" });
     const [editedCoins, setEditedCoins] = useState({});
-
-    useEffect(() => {
-        loadCoins();
-    }, []);
+    const [saveStatus, setSaveStatus] = useState({});
 
     const normalizedSearch = (search || '').trim().toLowerCase();
 
@@ -48,13 +45,27 @@ const CoinsAdmin = ({ search = '' }) => {
         if (!editedCoins[id]) return;
 
         try {
-            await axios.put(`${process.env.REACT_APP_API_URL}/backend/coin/${id}`, editedCoins[id]);
-            alert("Modifications enregistrées !");
+            await axios.put(
+                `${process.env.REACT_APP_API_URL}/backend/coin/${id}`,
+                editedCoins[id]
+            );
+
+            // Active la coche verte
+            setSaveStatus(prev => ({ ...prev, [id]: true }));
+
+            // Désactive la coche après 2 secondes
+            setTimeout(() => {
+                setSaveStatus(prev => ({ ...prev, [id]: false }));
+            }, 2000);
+
         } catch (err) {
             console.error("Erreur sauvegarde", err);
         }
     };
 
+    useEffect(() => {
+        loadCoins();
+    }, []);
 
     return (
         <div>
@@ -187,6 +198,13 @@ const CoinsAdmin = ({ search = '' }) => {
                                         >
                                             💾
                                         </button>
+
+                                        {saveStatus[c._id] && (
+                                            <span style={{ color: "green", marginLeft: "6px", fontSize: "1.2rem" }}>
+                                                ✔️
+                                            </span>
+                                        )}
+
                                         <button
                                             className="btn btn-light mt-2 ml-1"
                                             onClick={() => deleteCoin(c._id)}

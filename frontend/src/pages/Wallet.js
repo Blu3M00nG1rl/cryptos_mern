@@ -41,6 +41,8 @@ const Wallet = ({ search = '' }) => {
     const [note, setNote] = useState("");
     const [editBuffer, setEditBuffer] = useState({});
     const [editBufferBtc, setEditBufferBtc] = useState({});
+    const [saveStatus, setSaveStatus] = useState({});
+    const [saveStatusBtc, setSaveStatusBtc] = useState({});
 
     const normalizedSearch = (search || '').trim().toLowerCase();
     const owned = coins
@@ -490,6 +492,12 @@ const Wallet = ({ search = '' }) => {
             delete copy[item._id];
             return copy;
         });
+
+        setSaveStatus(prev => ({ ...prev, [item._id]: true }));
+
+        setTimeout(() => {
+            setSaveStatus(prev => ({ ...prev, [item._id]: false }));
+        }, 2000); // coche visible 2 secondes
     };
 
     const handleEditChangeEnBtc = (id, field, value) => {
@@ -526,6 +534,12 @@ const Wallet = ({ search = '' }) => {
             delete copy[item._id];
             return copy;
         });
+
+        setSaveStatusBtc(prev => ({ ...prev, [item._id]: true }));
+
+        setTimeout(() => {
+            setSaveStatusBtc(prev => ({ ...prev, [item._id]: false }));
+        }, 2000); // coche visible 2 secondes
     };
 
     useEffect(() => {
@@ -1069,9 +1083,19 @@ const Wallet = ({ search = '' }) => {
                                                             💾
                                                         </button>
 
+                                                        {saveStatus[item._id] && (
+                                                            <span style={{ color: "green", marginLeft: "6px", fontSize: "1.2rem" }}>
+                                                                ✔️
+                                                            </span>
+                                                        )}
+
                                                         <button
                                                             className="btn btn-light mt-2 ml-1"
-                                                            onClick={() => deleteDetailAchat(item._id)}
+                                                            onClick={() => {
+                                                                if (window.confirm("Voulez-vous vraiment supprimer cet achat ?")) {
+                                                                    deleteDetailAchat(item._id);
+                                                                }
+                                                            }}
                                                             title="Supprimer"
                                                         >
                                                             🗑️
@@ -1347,16 +1371,26 @@ const Wallet = ({ search = '' }) => {
 
                                                     <td className="text-center">
                                                         <button
-                                                            className="btn btn-light mt-2 mr-1"
+                                                            className="btn btn-light mt-2 ml-1"
                                                             onClick={() => handleSaveRowEnBtc(item)}
                                                             title="Sauvegarder"
                                                         >
                                                             💾
                                                         </button>
 
+                                                        {saveStatusBtc[item._id] && (
+                                                            <span style={{ color: "green", marginLeft: "6px", fontSize: "1.2rem" }}>
+                                                                ✔️
+                                                            </span>
+                                                        )}
+
                                                         <button
                                                             className="btn btn-light mt-2 ml-1"
-                                                            onClick={() => deleteDetailAchatEnBtc(item._id)}
+                                                            onClick={() => {
+                                                                if (window.confirm("Voulez-vous vraiment supprimer cet achat ?")) {
+                                                                    deleteDetailAchatEnBtc(item._id);
+                                                                }
+                                                            }}
                                                             title="Supprimer"
                                                         >
                                                             🗑️
