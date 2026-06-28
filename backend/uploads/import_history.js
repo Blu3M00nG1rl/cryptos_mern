@@ -7,7 +7,7 @@ const fs = require("fs");
 const path = require("path");
 const csv = require("csv-parser");
 const History = require("../models/history.model");
-const Coin = require("../models/coin.model"); 
+const Coin = require("../models/coin.model");
 const CoinsNonImporte = require("../models/coins_non_importe.model");
 
 const historiquePath = path.join(__dirname, "../storage/historique");
@@ -42,16 +42,18 @@ const runImport = async () => {
     const files = fs.readdirSync(historiquePath).filter(f => f.endsWith("-usd-max.csv"));
     // 🔍 Liste des symbols présents dans les fichiers CSV
     const symbolsInFiles = files.map(f => f.replace("-usd-max.csv", ""));
+    const symbolsInFilesLower = symbolsInFiles.map(s => s.toLowerCase());
 
     // 🔍 Liste des symbols présents dans la collection coins
     const allCoins = await Coin.find().select("symbol").lean();
     const symbolsInDB = allCoins.map(c => c.symbol);
 
-    // 🔥 Symbols présents dans coins mais absents des fichiers CSV
-    const missingSymbols = symbolsInDB.filter(sym => !symbolsInFiles.includes(sym));
+    // 🔥 Comparaison insensible à la casse
+    const missingSymbols = symbolsInDB.filter(
+        sym => !symbolsInFilesLower.includes(sym.toLowerCase())
+    );
 
     console.log("Coins sans historique :", missingSymbols);
-    
 
     // 📝 Ajout dans coins_non_importes
     for (const symbol of missingSymbols) {
@@ -123,3 +125,6 @@ runImport().catch(err => {
     console.error("Erreur:", err);
     mongoose.connection.close();
 });
+
+
+

@@ -1110,9 +1110,7 @@ const Wallet = ({ search = '' }) => {
                                             <th></th>
                                             <th></th>
                                             <th className="text-center">Total</th>
-
-                                            <th className="ps-3">{formatNumber0(totalNombre)}</th>
-                                            <th className="ps-3">{formatCurrency0(totalValeurAchat)}</th>
+                                            <th className="ps-3">{formatNumber8(totalNombre)}</th>
                                         </tr>
                                     </tfoot>
                                 </table>

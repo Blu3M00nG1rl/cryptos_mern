@@ -211,7 +211,7 @@ const Achats = ({ search = '' }) => {
                                             const prixDuJour = Number(coin.prixAuj);
                                             const tranche = stables / 10;
                                             const eurConvertit = coin.prixAuj / prixStable;
-
+                                            
                                             const dominanceCoin = dominance > 0
                                                 ? (coin.market_cap / dominanceCalculee) * 1000000
                                                 : 0;
@@ -288,7 +288,6 @@ const Achats = ({ search = '' }) => {
 
                                         const prixDuJour = Number(coin.prixAujBtc);
                                         const tranche = (btcEcart / btcPriceToday) / 10;
-                                        const eurConvertit = coin.prixAuj / prixStable;
 
                                         const dominanceCoin = dominance > 0
                                             ? (coin.market_cap / dominanceCalculee) * 1000000
