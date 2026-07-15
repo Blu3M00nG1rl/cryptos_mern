@@ -718,7 +718,7 @@ exports.getAchatsData = async (req, res) => {
             prixTetherAuj !== null &&
             item.evolution > (prixTetherAuj * 0.10) &&
             evolutionBitcoin !== null &&
-            item.evolution > evolutionBitcoin
+            item.evolution >= evolutionBitcoin
         );
 
         // 🔥 Filtre Btc

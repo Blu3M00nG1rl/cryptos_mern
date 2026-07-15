@@ -1,3 +1,24 @@
+# Présentation
+
+Application MERN (MongoDB, Express, React, Node.js) de gestion de portefeuille de cryptomonnaies, en français, dockerisée.
+
+  Architecture
+
+  - backend/ — API Express + MongoDB (mongoose), organisée en routes/controllers/models/services classiques
+  - frontend/ — React (create-react-app), avec Bootstrap, routing via react-router-dom
+  - docker-compose.yml + Dockerfiles pour chaque service
+
+  Fonctionnalités principales
+
+  Suivi de portefeuille crypto :
+  - Wallet (page d'accueil) — vue du portefeuille détenu
+  - Coins / CoinsAdmin — liste des cryptomonnaies (données probablement synchronisées via CoinGecko, vu le commentaire dans le Readme sur les images
+  assets.coingecko.com/coins/.../coinId.png)
+  - Achats / Ventes — historique des achats et ventes de coins, avec prix, quantité, date, lieu de stockage (stockage)
+  - Recap — récapitulatif/synthèse
+  - history.controller.js (912 lignes, le plus gros fichier) — logique d'historique des opérations, apparemment le cœur métier de l'app
+
+
 # Partie backend
 
 1 Création du package.json

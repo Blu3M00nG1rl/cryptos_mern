@@ -39,6 +39,7 @@ const Wallet = ({ search = '' }) => {
     const [btcValue, setBtcValue] = useState("");
     const [mode, setMode] = useState("eur"); // "eur" ou "btc"
     const [note, setNote] = useState("");
+    const [isNoteSaved, setIsNoteSaved] = useState(false);
     const [editBuffer, setEditBuffer] = useState({});
     const [editBufferBtc, setEditBufferBtc] = useState({});
     const [saveStatus, setSaveStatus] = useState({});
@@ -190,6 +191,10 @@ const Wallet = ({ search = '' }) => {
                 { content: note },
                 { headers: { "Content-Type": "application/json" } }
             );
+            setIsNoteSaved(true);
+            setTimeout(() => {
+                setIsNoteSaved(false);
+            }, 2000); // Coche visible pendant 2 secondes
         } catch (err) {
             console.error("Erreur sauvegarde Note", err);
         }
@@ -309,6 +314,22 @@ const Wallet = ({ search = '' }) => {
 
     const sortedDetail = sortData(filteredDetail);
     const sortedDetailEnBtc = sortDataEnBtc(filteredDetailEnBtc);
+    const totalNombreDetail = sortedDetail.reduce((sum, item) => {
+        const buffer = editBuffer[item._id] || {};
+        const nombre = parseFloat(buffer.nombre ?? item.nombre ?? 0);
+        return sum + (isNaN(nombre) ? 0 : nombre);
+    }, 0);
+
+    const totalMontant = sortedDetail.reduce((sum, item) => {
+        const buffer = editBuffer[item._id] || {};
+        const nombre = parseFloat(buffer.nombre ?? item.nombre ?? 0);
+        const prix = parseFloat(buffer.prixAchat ?? item.prixAchat ?? 0);
+        const montant = nombre * prix;
+        return sum + (isNaN(montant) ? 0 : montant);
+    }, 0);
+
+    const moyennePrix = totalNombreDetail > 0 ? totalMontant / totalNombreDetail : 0;
+
 
     const createDetailAchat = async () => {
         await axios.post(`${process.env.REACT_APP_API_URL}/backend/coin/detail`, form);
@@ -728,9 +749,14 @@ const Wallet = ({ search = '' }) => {
 
                 <div className="col-md-2">
                     <div className="card p-3 shadow-sm">
-                        <div >
+                        <div>
                             <div className="d-flex justify-content-between align-items-start">
                                 <h5>Notes</h5>
+                                {isNoteSaved && (
+                                    <span className="mt-3" style={{ color: "green", ontSize: "1rem" }}>
+                                        ✔️
+                                    </span>
+                                )}
                                 <button className="btn btn-light mt-2" onClick={saveNote}>💾</button>
                             </div>
                             <div>
@@ -1105,6 +1131,16 @@ const Wallet = ({ search = '' }) => {
                                             );
                                         })}
                                     </tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <th></th>
+                                            <th></th>
+                                            <th className="text-center">Total</th>
+
+                                            <th className="ps-3">{formatNumber8(totalNombreDetail)}</th>
+                                            <th className="ps-3">{formatCurrency12(moyennePrix)}</th>
+                                        </tr>
+                                    </tfoot>
                                 </table>
                             </div>
                         )}
