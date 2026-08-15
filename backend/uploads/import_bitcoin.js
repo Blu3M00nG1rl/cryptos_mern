@@ -1,22 +1,19 @@
 require('dotenv').config({ path: '../config/.env' });
-const axios = require('axios');
-
 const connectDB = require("../config/db");
 const mongoose = require("mongoose");
 const fs = require("fs");
 const path = require("path");
 const csv = require("csv-parser");
-
+const writeLog = require("../utils/logger");
 const Bitcoin = require("../models/bitcoin.model");
 
 const bitcoinPath = path.join(__dirname, "../storage/historique/btc-usd-max.csv");
 
-async function runImport() {
-    if (!fs.existsSync(bitcoinPath)) {
-        console.log("Fichier CSV introuvable.");
-        return;
-    }
+//
+// 🔥 IMPORT CSV
+//
 
+async function runImport() {
     let importedCount = 0;
     const results = [];
 
@@ -24,46 +21,64 @@ async function runImport() {
         fs.createReadStream(bitcoinPath)
             .pipe(csv())
             .on("data", (row) => {
+                // event_date, close_price_usd, market_cap_usd, volume_usd
+
+                if (!row.close_price_usd || row.close_price_usd.trim() === "") {
+                    // Ligne sans prix → on l'ignore
+                    return;
+                }
+
+                const date = new Date(row.event_date.replace(" UTC", "Z"));
+                if (isNaN(date.getTime())) {
+                    writeLog("Date invalide :", row.event_date);
+                    return;
+                }
+
+                const prix = Number(row.close_price_usd);
+
                 results.push({
-                    dateCours: row.snapped_at ? new Date(row.snapped_at) : null,
-                    prix: row.price ? Number(row.price) : null
+                    dateCours: date,
+                    prix,
+                    market_cap: row.market_cap_usd ? Number(row.market_cap_usd) : null,
+                    volume: row.volume_usd ? Number(row.volume_usd) : null
                 });
             })
+
             .on("end", async () => {
                 try {
-                    const bulkOps = results.map(r => ({
-                        updateOne: {
-                            filter: { dateCours: r.dateCours },
-                            update: { $set: r },
-                            upsert: true
-                        }
-                    }));
-
-                    await Bitcoin.bulkWrite(bulkOps, { ordered: false });
+                    await Bitcoin.insertMany(results, { ordered: false });
 
                     importedCount = results.length;
+                    writeLog(`→ ${results.length} lignes insérées`);
 
-                    console.log(`→ ${results.length} lignes importées/mises à jour`);
                     resolve();
                 } catch (err) {
-                    console.error("Erreur bulkWrite :", err.message);
+                    console.error("Erreur insertMany :", err.message);
                     resolve();
                 }
             })
             .on("error", reject);
     });
 
-    console.log("Import terminé");
-    console.log(`IMPORTED_COUNT=${importedCount}`);
+    writeLog("Import terminé");
+    writeLog(`IMPORTED_COUNT=${importedCount}`);
+    return importedCount;   // <-- IMPORTANT
 }
 
 
+//
+// 🔥 CALCUL DIFF
+//
 async function calculerDiff() {
-    console.log("Calcul des diff…");
+    writeLog("Calcul des diff…");
 
-    const rows = await Bitcoin.find().sort({ dateCours: 1 }).lean();
+    // On ne garde que les lignes avec prix et date valides
+    const rows = await Bitcoin.find({
+        prix: { $ne: null },
+        dateCours: { $ne: null }
+    }).sort({ dateCours: 1 }).lean();
 
-    console.log(`→ ${rows.length} lignes chargées`);
+    writeLog(`→ ${rows.length} lignes chargées`);
 
     const updates = [];
 
@@ -72,20 +87,20 @@ async function calculerDiff() {
         const dateCourante = rows[i].dateCours;
 
         let diffMax = 0;
+        let dateDepassement = null;
 
         for (let j = i + 1; j < rows.length; j++) {
             if (rows[j].prix < prixCourant) {
                 const jours = Math.floor(
                     (rows[j].dateCours - dateCourante) / (1000 * 60 * 60 * 24)
                 );
-                if (jours > diffMax) diffMax = jours;
+
+                if (jours > diffMax) {
+                    diffMax = jours;
+                    dateDepassement = rows[j].dateCours; // date réelle du dépassement
+                }
             }
         }
-
-        const dateDepassement =
-            diffMax > 0
-                ? new Date(dateCourante.getTime() + diffMax * 86400000)
-                : null;
 
         updates.push({
             updateOne: {
@@ -102,29 +117,47 @@ async function calculerDiff() {
 
     await Bitcoin.bulkWrite(updates, { ordered: false });
 
-    console.log("Calcul diff terminé !");
+    writeLog("Calcul diff terminé !");
 }
 
 //
-// 🔥 Fonction principale : exécute les deux étapes dans l’ordre
+// 🔥 MAIN
 //
-async function main() {
-    console.log("=== DEBUT IMPORT BITCOIN ===");
+async function runImportBitcoin() {
+    writeLog("=== DEBUT IMPORT BITCOIN ===");
+    writeLog("BITCOIN PATH: " + bitcoinPath);
+
     try {
         await connectDB();
-        console.log("=== Étape 1 : Import CSV ===");
-        await runImport();
 
-        console.log("=== Étape 2 : Calcul diff ===");
+        writeLog("=== Suppression ancienne data ===");
+        await Bitcoin.deleteMany({});
+        writeLog("→ Collection Bitcoin vidée");
+
+        writeLog("=== Étape 1 : Import CSV ===");
+        const importedCount = await runImport();   // <-- récupéré ici
+
+        writeLog("=== Étape 2 : Calcul diff ===");
         await calculerDiff();
 
-        console.log("=== Terminé ===");
+        writeLog("=== Terminé ===");
+
+        return {
+            success: true,
+            importedCount
+        };
+
     } catch (err) {
         console.error("Erreur:", err);
+        return {
+            success: false,
+            error: err.message
+        };
     } finally {
-        mongoose.connection.close();
+        // ❌ NE PAS fermer la connexion ici
+        writeLog("=== FIN IMPORT BITCOIN ===");
     }
-    console.log("=== FIN IMPORT BITCOIN ===");
 }
 
-main();
+module.exports = runImportBitcoin;
+

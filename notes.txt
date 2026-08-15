@@ -1,0 +1,1 @@
+Utiliser React Query pour le data fetching et TypeScript strict 

@@ -15,7 +15,8 @@ const Recap = ({ search = '' }) => {
     const [nonImportes, setNonImportes] = useState([]);
     const [mode, setMode] = useState("eur"); // "eur" ou "btc"
     const [superformantesPct, setSuperformantesPct] = useState(0);
-
+    let totalInvestMin = 0;
+    let totalRestant = 0;
 
     const fetchDominance = async () => {
         try {
@@ -123,6 +124,8 @@ const Recap = ({ search = '' }) => {
     // Estimation Wallet
     const estimationWallet = (btcPrix / dominance) * 100;
     const totalNombre = filteredData.reduce((sum, c) => sum + (Number(c.nombre) || 0), 0);
+    const totalInvMin = filteredData.reduce((sum, c) => sum + (Number(c.investissement) || 0), 0);
+    const totalEcart = filteredData.reduce((sum, c) => sum + (Number(c.evolution) || 0), 0);
     const totalDominanceCoin = filteredData.reduce((sum, c) => sum + ((c.capitalisation / dominanceCalculee) * 1000000), 0);
 
     useEffect(() => {
@@ -263,6 +266,8 @@ const Recap = ({ search = '' }) => {
 
                                             const hodl = ((estimationWallet * dominanceCoin) / coin.prixDuJour) / 1000000;
                                             const investMin = (coin.evolution > 0 && coin.evolution >= btcEvolution) ? hodl * coin.prixDuJour : 0;
+                                            totalInvestMin += investMin;
+                                            totalRestant += (coin.nombre * coin.prixDuJour) - investMin;
 
                                             return (
                                                 <tr
@@ -314,11 +319,14 @@ const Recap = ({ search = '' }) => {
                                             <th></th>
                                             <th></th>
                                             <th></th>
-                                            <th></th>
-                                            <th></th>
+                                            {/* 👉 Total InvestMin */}
+                                            <th className="text-center">{formatCurrency0(totalInvestMin)}</th>
+                                            {/* 👉 Total Restant */}
+                                            <th className="text-center">{formatCurrency0(totalRestant)}</th>
                                             <th className="text-center">{formatCurrency0(totalDominanceCoin)}</th>
                                         </tr>
                                     </tfoot>
+
                                 </table>
                             </div>
                         )}

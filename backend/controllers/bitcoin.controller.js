@@ -7,18 +7,39 @@ const { execSync } = require("child_process");
 
 exports.getMaxDiff = async (req, res) => {
     try {
+        // 1️⃣ Récupérer la ligne avec le diff max
         const row = await Bitcoin.findOne()
-            .sort({ diff: -1 }) // diff décroissant
+            .sort({ diff: -1 })
             .lean();
 
         if (!row) {
-            return res.json({ diff: 0, dateCours: null, dateDepassement: null });
+            return res.json({
+                diff: 0,
+                dateCours: null,
+                prixCours: null,
+                dateDepassement: null,
+                prixDepassement: null
+            });
         }
 
+        // 2️⃣ Récupérer le prix à dateCours
+        const coursRow = await Bitcoin.findOne({ dateCours: row.dateCours }).lean();
+        const prixCours = coursRow ? coursRow.prix : null;
+
+        // 3️⃣ Récupérer le prix à dateDepassement
+        let prixDepassement = null;
+        if (row.dateDepassement) {
+            const depRow = await Bitcoin.findOne({ dateCours: row.dateDepassement }).lean();
+            prixDepassement = depRow ? depRow.prix : null;
+        }
+
+        // 4️⃣ Réponse complète
         res.json({
             diff: row.diff,
             dateCours: row.dateCours,
-            dateDepassement: row.dateDepassement
+            prixCours,
+            dateDepassement: row.dateDepassement,
+            prixDepassement
         });
 
     } catch (err) {
@@ -27,27 +48,16 @@ exports.getMaxDiff = async (req, res) => {
     }
 };
 
+
+const runImportBitcoin = require("../uploads/import_bitcoin");
+
 exports.runImportB = async (req, res) => {
     try {
-        const importPath = path.join(__dirname, "../uploads/import_bitcoin.js");
-
-        if (!fs.existsSync(importPath)) {
-            return res.status(400).json({ error: "Fichier import_bitcoin.js non trouvé" });
-        }
-
-        const stdout = execSync(`node ${importPath}`, { env: process.env }).toString();
-
-        const match = stdout.match(/IMPORTED_COUNT=(\d+)/);
-        const importedCount = match ? parseInt(match[1], 10) : 0;
-
-        res.status(200).json({
-            message: "Import terminé",
-            importedCount,
-            output: stdout
-        });
-
+        const result = await runImportBitcoin();
+        res.json(result);
     } catch (err) {
         console.error("Erreur import:", err);
         res.status(500).json({ error: err.message });
     }
 };
+

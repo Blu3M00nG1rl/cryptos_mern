@@ -63,59 +63,19 @@ exports.getStats = async (req, res) => {
     }
 };
 
+const runImportPrix = require("../uploads/import");
+
 exports.runImportJ = async (req, res) => {
-    try {
-        const importPath = path.join(__dirname, "../uploads/import.js");
-
-        if (!fs.existsSync(importPath)) {
-            return res.status(400).json({ error: "Fichier import.js non trouvé" });
-        }
-
-        exec(`node ${importPath}`, { env: process.env }, (error, stdout, stderr) => {
-            if (error) {
-                console.error("Erreur import:", error);
-                return res.status(500).json({ error: error.message });
-            }
-
-            // Extraction du compteur
-            const match = stdout.match(/IMPORTED_COUNT=(\d+)/);
-            const importedCount = match ? parseInt(match[1], 10) : 0;
-
-            res.status(200).json({
-                message: "Import terminé",
-                importedCount,
-                output: stdout
-            });
-        });
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
+    const result = await runImportPrix();
+    res.json(result);
 };
+
+const runImportHistory = require("../uploads/import_history");
 
 exports.runImportH = async (req, res) => {
     try {
-        const importPath = path.join(__dirname, "../uploads/import_history.js");
-
-        if (!fs.existsSync(importPath)) {
-            return res.status(400).json({ error: "Fichier import_history.js non trouvé" });
-        }
-
-        exec(`node ${importPath}`, { env: process.env }, (error, stdout, stderr) => {
-            if (error) {
-                console.error("Erreur import:", error);
-                return res.status(500).json({ error: error.message });
-            }
-
-            // Extraction du compteur
-            const match = stdout.match(/IMPORTED_COUNT=(\d+)/);
-            const importedCount = match ? parseInt(match[1], 10) : 0;
-
-            res.status(200).json({
-                message: "Import terminé",
-                importedCount,
-                output: stdout
-            });
-        });
+        const result = await runImportHistory();
+        res.json(result);
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
@@ -236,7 +196,7 @@ exports.getVentesData = async (req, res) => {
 
         const coins = await Coin.find().lean();
 
-        // Agrégation achats
+        // --- Agrégation achats USD ---
         const achats = await AchatCoin.aggregate([
             {
                 $group: {
@@ -268,7 +228,7 @@ exports.getVentesData = async (req, res) => {
             ])
         );
 
-        // Agrégation achats
+        // --- Agrégation achats BTC ---
         const achatsEnBtc = await AchatCoinEnBtc.aggregate([
             {
                 $group: {
@@ -300,6 +260,9 @@ exports.getVentesData = async (req, res) => {
             ])
         );
 
+        // --- Fonction safe division ---
+        const safeDiv = (a, b) => (a != null && b != null ? a / b : null);
+
         const ventesDataRaw = await Promise.all(
             coins.map(async (coin) => {
 
@@ -313,7 +276,7 @@ exports.getVentesData = async (req, res) => {
                     journee: { $gte: yesterday, $lt: today }
                 }).lean();
 
-                // --- PRIX BTC ---
+                // --- BTC ---
                 const btcToday = await History.findOne({
                     coinId: "bitcoin",
                     journee: { $gte: today, $lt: tomorrow }
@@ -330,22 +293,27 @@ exports.getVentesData = async (req, res) => {
                     }
                 }).lean();
 
+                // --- Prix ---
                 const prixAuj = todayHistory?.prix ?? null;
-                const prixAujBtc = todayHistory?.prix / btcToday.prix ?? null;
                 const prixHier = yesterdayHistory?.prix ?? null;
-                const prixHierBtc = yesterdayHistory?.prix / btcYesterday.prix ?? null;
-                const prixCibleBtc = btcCible?.prix / btcCible.prix ?? null;
 
+                const prixAujBtc = safeDiv(todayHistory?.prix, btcToday?.prix);
+                const prixHierBtc = safeDiv(yesterdayHistory?.prix, btcYesterday?.prix);
+                const prixCibleBtc = safeDiv(btcCible?.prix, btcCible?.prix);
+
+                // --- Evolution 24h USD ---
                 let evolution24 = null;
-                if (prixAuj !== null && prixHier !== null) {
+                if (prixAuj != null && prixHier != null) {
                     evolution24 = ((prixAuj - prixHier) / prixHier) * 100;
                 }
 
+                // --- Evolution 24h BTC ---
                 let evolution24Btc = null;
-                if (prixAujBtc !== null && prixHierBtc !== null) {
+                if (prixAujBtc != null && prixHierBtc != null) {
                     evolution24Btc = ((prixAujBtc - prixHierBtc) / prixHierBtc) * 100;
                 }
 
+                // --- Min / Max ---
                 const minHistory = await History.findOne({ coinId: coin.coinId })
                     .sort({ prix: 1 })
                     .lean();
@@ -355,15 +323,21 @@ exports.getVentesData = async (req, res) => {
                     .lean();
 
                 let fibVente = null;
+                let fibVenteBtc = null;
+
                 if (minHistory?.prix != null && maxHistory?.prix != null) {
                     const min = minHistory.prix;
                     const max = maxHistory.prix;
                     fibVente = (max - min) * 0.618 + min;
-                    fibVenteBtc = fibVente / prixAujBtc;
+
+                    if (prixAujBtc != null) {
+                        fibVenteBtc = fibVente / prixAujBtc;
+                    }
                 }
 
                 const key = coin.symbol.toLowerCase();
                 const achat = mapAchats.get(key);
+                const achatEnBtc = mapAchatsEnBtc.get(key);
 
                 const cibleHistory = await History.findOne({
                     coinId: coin.coinId,
@@ -373,13 +347,13 @@ exports.getVentesData = async (req, res) => {
                     }
                 }).lean();
 
-                // Evolution USD
+                // --- Evolution USD ---
                 let evolutionCible = null;
                 if (todayHistory?.prix != null && cibleHistory?.prix != null) {
                     evolutionCible = ((todayHistory.prix - cibleHistory.prix) / cibleHistory.prix) * 100;
                 }
 
-                // Evolution BTC
+                // --- Evolution BTC ---
                 let evolutionCibleBtc = null;
                 if (prixAujBtc != null && prixCibleBtc != null) {
                     evolutionCibleBtc = ((prixAujBtc - prixCibleBtc) / prixCibleBtc) * 100;
@@ -388,27 +362,35 @@ exports.getVentesData = async (req, res) => {
                 return {
                     symbol: coin.symbol,
                     name: coin.name,
+
+                    // Achats USD
                     nombre: achat ? achat.totalNombre : 0,
                     prixCoin: achat ? achat.prixAchatMoyen : 0,
-                    nombreEnBtc: achatsEnBtc ? achatsEnBtc.totalNombre : 0,
-                    prixCoinEnBtc: achatsEnBtc ? achatsEnBtc.prixAchatMoyen : 0,
+
+                    // Achats BTC
+                    nombreEnBtc: achatEnBtc ? achatEnBtc.totalNombre : 0,
+                    prixCoinEnBtc: achatEnBtc ? achatEnBtc.prixAchatMoyen : 0,
+
                     prixAuj,
                     prixAujBtc,
                     prixHier,
                     prixHierBtc,
+
                     evolution24,
                     evolution24Btc,
                     evolutionCible,
                     evolutionCibleBtc,
+
                     fibVente,
                     fibVenteBtc,
+
                     market_cap: todayHistory?.market_cap ?? null,
                     volume: todayHistory?.total_volume ?? null
                 };
             })
         );
 
-        // 🔥 Filtre final corrigé
+        // --- Filtre final USD ---
         const ventesData = ventesDataRaw.filter(
             item =>
                 item.evolution24 !== null &&
@@ -419,7 +401,7 @@ exports.getVentesData = async (req, res) => {
                 item.nombre > 0
         );
 
-        // 🔥 Filtre final corrigé
+        // --- Filtre final BTC ---
         const ventesDataBtc = ventesDataRaw.filter(
             item =>
                 item.evolution24Btc !== null &&
@@ -427,7 +409,7 @@ exports.getVentesData = async (req, res) => {
                 item.prixAujBtc !== null &&
                 item.fibVenteBtc !== null &&
                 item.prixAujBtc > item.fibVenteBtc &&
-                item.nombre > 0
+                item.nombreEnBtc > 0
         );
 
         res.status(200).json({
@@ -906,6 +888,8 @@ exports.getSyntheseData = async (req, res) => {
         res.status(500).json({ error: err.message });
     }
 };
+
+
 
 
 

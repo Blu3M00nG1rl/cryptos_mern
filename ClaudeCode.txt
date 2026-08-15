@@ -1,0 +1,43 @@
+Commandes :
+
+claude
+pour lancer claude
+
+claude -p "coucou"
+lance claude directement avec un prompt
+
+cat .\package.json | claude -p "stylé ?"
+lance claude en prompt direct sur l'analyse d'un fichier
+
+claude -p "frontend/src/components/LeftNav.js"
+demande à claude d'ouvrir un fichier spécifique à modifier
+
+/init
+Claude analyse le projet et crée un fichier à la racine
+
+/context
+Etat de la fenêtre de contexte (nombre de token consommés par categorie)
+
+/compact
+Gestion de contexte (résume la conversation quand elle devient longue)
+
+/clear (ou Ctrl+L)
+reset de la conversation qui repart de zero (mais claude continue à se baser sur le fichier CLAUDE.md)
+
+/model
+change de modèle entre sonnet (meilleur rapport qualité/prix pour le quotidien) et fable
+
+/bug
+si problème rencontré avec ClaudeCode
+
+/doctor
+diagnostique l'installation (vérifie la config et le type d'install et signale les problèmes potentiels)
+
+/permissions
+commandes que Claude peut utiliser sans demander la permission 
+
+claude --dangerously-skip-permissions
+exécute tout sans demander aucune permission
+
+Ctrl+C
+2x pour sortir

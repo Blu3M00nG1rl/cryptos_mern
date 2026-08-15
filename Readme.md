@@ -101,9 +101,6 @@ $ npm i -s axios
 $ npm i -s bootstrap
 $ npm i -s bootstrap-icons@1.11.1
 
-12 Installation pour export excel
-$ npm install xlsx file-saver
-
 SI NOUVELLE INSTALL NPM réinstaller le conteneur
 docker compose down
 docker compose build --no-cache

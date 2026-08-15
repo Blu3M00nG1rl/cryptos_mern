@@ -62,6 +62,13 @@ const Wallet = ({ search = '' }) => {
             c.name.toLowerCase().includes(normalizedSearch)
         );
 
+    const minDateAchat = coinsDetail.reduce((oldest, item) => {
+        if (!item.dateAchat) return oldest;
+        const date = new Date(item.dateAchat);
+        if (!oldest || date < new Date(oldest.dateAchat)) return item;
+        return oldest;
+    }, null);
+
     const totalNombre = owned.reduce((sum, c) => sum + (Number(c.nombre) || 0), 0);
     const totalValeur = owned.reduce((sum, c) => sum + ((Number(c.nombre) || 0) * (Number(c.prixHistory) || 0)), 0);
     const totalValeurAchat = owned.reduce((sum, c) => sum + ((Number(c.nombre) || 0) * (Number(c.prixCoin) || 0)), 0);
@@ -203,6 +210,7 @@ const Wallet = ({ search = '' }) => {
     const formatNumber0 = (n) => new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 0 }).format(n);
     const formatNumber2 = (n) => new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 2 }).format(n);
     const formatNumber8 = (n) => new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 8 }).format(n);
+    const formatNumber12 = (n) => new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 12 }).format(n);
 
     const formatCurrency0 = (n) =>
         new Intl.NumberFormat('fr-FR', {
@@ -216,6 +224,14 @@ const Wallet = ({ search = '' }) => {
         new Intl.NumberFormat('fr-FR', {
             style: 'currency',
             currency: 'EUR',
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        }).format(n);
+
+    const formatCurrencyD2 = (n) =>
+        new Intl.NumberFormat('fr-FR', {
+            style: 'currency',
+            currency: 'USD',
             minimumFractionDigits: 2,
             maximumFractionDigits: 2
         }).format(n);
@@ -237,7 +253,7 @@ const Wallet = ({ search = '' }) => {
         }).format(n);
 
     const formatDate = (date) => {
-        if (!date) return 'N/A';
+        if (!date) return 'Aucune date';
         return new Intl.DateTimeFormat('fr-FR', { year: 'numeric', month: 'long', day: 'numeric' }).format(new Date(date));
     };
 
@@ -329,6 +345,43 @@ const Wallet = ({ search = '' }) => {
     }, 0);
 
     const moyennePrix = totalNombreDetail > 0 ? totalMontant / totalNombreDetail : 0;
+
+    const detailGroupsByStockage = (() => {
+        const sorted = [...filteredDetail].sort((a, b) => {
+            const stockageA = (a.stockage || "").toLowerCase();
+            const stockageB = (b.stockage || "").toLowerCase();
+            if (stockageA !== stockageB) return stockageA.localeCompare(stockageB);
+            return new Date(b.dateAchat || 0) - new Date(a.dateAchat || 0);
+        });
+
+        const groups = [];
+        sorted.forEach((item) => {
+            const stockage = item.stockage || "";
+            let group = groups[groups.length - 1];
+            if (!group || group.stockage !== stockage) {
+                group = { stockage, items: [] };
+                groups.push(group);
+            }
+            group.items.push(item);
+        });
+
+        return groups.map((group) => {
+            const totalNombre = group.items.reduce((sum, item) => {
+                const buffer = editBuffer[item._id] || {};
+                const nombre = parseFloat(buffer.nombre ?? item.nombre ?? 0);
+                return sum + (isNaN(nombre) ? 0 : nombre);
+            }, 0);
+            const totalMontantGroupe = group.items.reduce((sum, item) => {
+                const buffer = editBuffer[item._id] || {};
+                const nombre = parseFloat(buffer.nombre ?? item.nombre ?? 0);
+                const prix = parseFloat(buffer.prixAchat ?? item.prixAchat ?? 0);
+                const montant = nombre * prix;
+                return sum + (isNaN(montant) ? 0 : montant);
+            }, 0);
+            const moyennePrixGroupe = totalNombre > 0 ? totalMontantGroupe / totalNombre : 0;
+            return { ...group, totalNombre, moyennePrixGroupe };
+        });
+    })();
 
 
     const createDetailAchat = async () => {
@@ -563,6 +616,17 @@ const Wallet = ({ search = '' }) => {
         }, 2000); // coche visible 2 secondes
     };
 
+    function diffToYMD(days) {
+        const years = Math.floor(days / 365);
+        const remainingDays = days % 365;
+
+        const months = Math.floor(remainingDays / 30);
+        const finalDays = remainingDays % 30;
+
+        return { years, months, days: finalDays };
+    }
+
+
     useEffect(() => {
         fetchDominance();
         fetchCoins();
@@ -585,7 +649,7 @@ const Wallet = ({ search = '' }) => {
         }
     }, [mode]);
 
-
+    const ymd = maxDiff ? diffToYMD(maxDiff.diff) : null;
 
     return (
         <div>
@@ -613,21 +677,33 @@ const Wallet = ({ search = '' }) => {
                         <div className="d-flex justify-content-between align-items-start">
                             <div>
                                 <h5>Algorithme</h5>
-                                <p className="mb-0">
+                                <p className="mb-2">
                                     <small className="text-muted">Date Cible</small><br />
-                                    <strong>{dateCible || "N/A"}</strong>
+                                    <strong>{formatDate(dateCible) || "Aucune date"}</strong>
+                                </p>
+                                <p>
+                                    <small className="text-muted">Min. Date Achat</small><br />
+                                    <strong>
+                                        {minDateAchat
+                                            ? `${formatDate(minDateAchat.dateAchat)} (${minDateAchat.symbol})`
+                                            : "Aucun achat"}
+                                    </strong>
                                 </p>
                             </div>
 
-                            <div className="mb-1">
-                                <small className="text-muted">Diff maximale</small><br />
+                            <div>
                                 {maxDiff ? (
                                     <>
-                                        <h3 className="text-primary"><strong>{maxDiff.diff} jours</strong></h3><br />
+                                        <small className="text-muted">Diff maximale ({ymd.years}a,{ymd.months}m,{ymd.days}j)</small><br />
+                                        <h3 className="text-primary">
+                                            <strong>{maxDiff.diff} jours</strong>
+                                        </h3>
+
                                         <small>
-                                            Début : {formatDate(maxDiff.dateCours)}
+                                            Du {formatDate(maxDiff.dateCours)} ({formatCurrencyD2(maxDiff.prixCours)})
                                             <br />
-                                            Fin : {formatDate(maxDiff.dateDepassement)}
+                                            Au {formatDate(maxDiff.dateDepassement)} ({formatCurrencyD2(maxDiff.prixDepassement)})
+                                            <br /><br />
                                         </small>
                                     </>
                                 ) : (
@@ -905,7 +981,7 @@ const Wallet = ({ search = '' }) => {
                                                         <td className="text-center">{formatNumber8(c.nombre)}</td>
                                                         <td className="text-center">{formatCurrency0(c.valeurAchat)}</td>
                                                         <td className="text-center">{formatCurrency12(c.prixCoin)}</td>
-                                                        <td className="text-center">{formatCurrency0(c.valeur)}</td>
+                                                        <td className="text-center"><strong>{formatCurrency0(c.valeur)}</strong></td>
                                                         <td className="text-center">{formatCurrency2(c.gainPerte)}</td>
                                                         <td className="text-center">{formatNumber2(c.pourcGP)} %</td>
                                                         <td className="text-center">{formatNumber2(c.evolution)} %</td>
@@ -922,7 +998,7 @@ const Wallet = ({ search = '' }) => {
                                             })}
                                     </tbody>
                                     <tfoot>
-                                        <tr>
+                                        <tr className="table-success">
                                             <th></th>
                                             <th></th>
                                             <th className="text-center">Total</th>
@@ -932,6 +1008,10 @@ const Wallet = ({ search = '' }) => {
                                             <th className="text-center">{formatCurrency0(totalValeur)}</th>
                                             <th className="text-center">{formatNumber2(totalGainPerte)}</th>
                                             <th className="text-center">{formatNumber2(totalPourcGP)} %</th>
+                                            <th></th>
+                                            <th></th>
+                                            <th></th>
+                                            <th></th>
                                         </tr>
                                     </tfoot>
                                 </table>
@@ -1011,134 +1091,131 @@ const Wallet = ({ search = '' }) => {
                                 <table className="table table-sm">
                                     <thead>
                                         <tr>
-                                            <th onClick={() => requestSort("symbol")} style={{ cursor: "pointer" }}>
-                                                Coin
-                                            </th>
-
-                                            <th onClick={() => requestSort("dateAchat")} style={{ cursor: "pointer" }}>
-                                                Date Achat
-                                            </th>
-
-                                            <th onClick={() => requestSort("stockage")} style={{ cursor: "pointer" }}>
-                                                Stockage
-                                            </th>
-
-                                            <th onClick={() => requestSort("nombre")} style={{ cursor: "pointer" }}>
-                                                Nombre
-                                            </th>
-
-                                            <th onClick={() => requestSort("prixAchat")} style={{ cursor: "pointer" }}>
-                                                Prix Achat
-                                            </th>
-
-                                            <th onClick={() => requestSort("observation")} style={{ cursor: "pointer" }}>
-                                                Observation
-                                            </th>
+                                            <th>Coin</th>
+                                            <th>Date Achat</th>
+                                            <th>Stockage</th>
+                                            <th>Nombre</th>
+                                            <th>Prix Achat</th>
+                                            <th>Observation</th>
                                             <th>Actions</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {sortedDetail.map((item, index) => {
-                                            const buffer = editBuffer[item._id] || {};
+                                        {detailGroupsByStockage.map((group) => (
+                                            <React.Fragment key={group.stockage || "sans-stockage"}>
+                                                {group.items.map((item, index) => {
+                                                    const buffer = editBuffer[item._id] || {};
 
-                                            const symbol = buffer.symbol ?? item.symbol ?? "";
-                                            const dateAchat = buffer.dateAchat ?? (item.dateAchat ? item.dateAchat.slice(0, 10) : "");
-                                            const stockage = buffer.stockage ?? item.stockage ?? "";
-                                            const nombre = buffer.nombre ?? item.nombre ?? "";
-                                            const prixAchat = buffer.prixAchat ?? item.prixAchat ?? "";
-                                            const observation = buffer.observation ?? item.observation ?? "";
+                                                    const symbol = buffer.symbol ?? item.symbol ?? "";
+                                                    const dateAchat = buffer.dateAchat ?? (item.dateAchat ? item.dateAchat.slice(0, 10) : "");
+                                                    const stockage = buffer.stockage ?? item.stockage ?? "";
+                                                    const nombre = buffer.nombre ?? item.nombre ?? "";
+                                                    const prixAchat = buffer.prixAchat ?? item.prixAchat ?? "";
+                                                    const observation = buffer.observation ?? item.observation ?? "";
 
-                                            return (
-                                                <tr key={index}>
-                                                    <td>
-                                                        <input
-                                                            className="form-control"
-                                                            value={symbol}
-                                                            onChange={(e) => handleEditChange(item._id, "symbol", e.target.value)}
-                                                        />
-                                                    </td>
+                                                    return (
+                                                        <tr key={item._id}>
+                                                            <td>
+                                                                <input
+                                                                    className="form-control"
+                                                                    value={symbol}
+                                                                    onChange={(e) => handleEditChange(item._id, "symbol", e.target.value)}
+                                                                />
+                                                            </td>
 
-                                                    <td>
-                                                        <input
-                                                            type="date"
-                                                            className="form-control"
-                                                            value={dateAchat}
-                                                            onChange={(e) => handleEditChange(item._id, "dateAchat", e.target.value)}
-                                                        />
-                                                    </td>
+                                                            <td>
+                                                                <input
+                                                                    type="date"
+                                                                    className="form-control"
+                                                                    value={dateAchat}
+                                                                    onChange={(e) => handleEditChange(item._id, "dateAchat", e.target.value)}
+                                                                />
+                                                            </td>
 
-                                                    <td>
-                                                        <input
-                                                            className="form-control"
-                                                            value={stockage}
-                                                            onChange={(e) => handleEditChange(item._id, "stockage", e.target.value)}
-                                                        />
-                                                    </td>
+                                                            <td>
+                                                                <input
+                                                                    className="form-control"
+                                                                    value={stockage}
+                                                                    onChange={(e) => handleEditChange(item._id, "stockage", e.target.value)}
+                                                                />
+                                                            </td>
 
-                                                    <td>
-                                                        <input
-                                                            className="form-control"
-                                                            value={nombre}
-                                                            onChange={(e) => handleEditChange(item._id, "nombre", e.target.value)}
-                                                        />
-                                                    </td>
+                                                            <td>
+                                                                <input
+                                                                    className="form-control"
+                                                                    value={nombre}
+                                                                    onChange={(e) => handleEditChange(item._id, "nombre", e.target.value)}
+                                                                />
+                                                            </td>
 
-                                                    <td>
-                                                        <input
-                                                            className="form-control"
-                                                            value={prixAchat}
-                                                            onChange={(e) => handleEditChange(item._id, "prixAchat", e.target.value)}
-                                                        />
-                                                    </td>
+                                                            <td>
+                                                                <input
+                                                                    className="form-control"
+                                                                    value={prixAchat}
+                                                                    onChange={(e) => handleEditChange(item._id, "prixAchat", e.target.value)}
+                                                                />
+                                                            </td>
 
-                                                    <td>
-                                                        <textarea
-                                                            className="form-control"
-                                                            rows={3}
-                                                            value={observation}
-                                                            onChange={(e) => handleEditChange(item._id, "observation", e.target.value)}
-                                                        />
-                                                    </td>
+                                                            <td>
+                                                                <textarea
+                                                                    className="form-control"
+                                                                    rows={3}
+                                                                    value={observation}
+                                                                    onChange={(e) => handleEditChange(item._id, "observation", e.target.value)}
+                                                                />
+                                                            </td>
 
-                                                    <td className="text-center">
-                                                        <button
-                                                            className="btn btn-light mt-2 ml-1"
-                                                            onClick={() => handleSaveRow(item)}
-                                                            title="Sauvegarder"
-                                                        >
-                                                            💾
-                                                        </button>
+                                                            <td className="text-center">
+                                                                <button
+                                                                    className="btn btn-light mt-2 ml-1"
+                                                                    onClick={() => handleSaveRow(item)}
+                                                                    title="Sauvegarder"
+                                                                >
+                                                                    💾
+                                                                </button>
 
-                                                        {saveStatus[item._id] && (
-                                                            <span style={{ color: "green", marginLeft: "6px", fontSize: "1.2rem" }}>
-                                                                ✔️
-                                                            </span>
-                                                        )}
+                                                                {saveStatus[item._id] && (
+                                                                    <span style={{ color: "green", marginLeft: "6px", fontSize: "1.2rem" }}>
+                                                                        ✔️
+                                                                    </span>
+                                                                )}
 
-                                                        <button
-                                                            className="btn btn-light mt-2 ml-1"
-                                                            onClick={() => {
-                                                                if (window.confirm("Voulez-vous vraiment supprimer cet achat ?")) {
-                                                                    deleteDetailAchat(item._id);
-                                                                }
-                                                            }}
-                                                            title="Supprimer"
-                                                        >
-                                                            🗑️
-                                                        </button>
-                                                    </td>
+                                                                <button
+                                                                    className="btn btn-light mt-2 ml-1"
+                                                                    onClick={() => {
+                                                                        if (window.confirm("Voulez-vous vraiment supprimer cet achat ?")) {
+                                                                            deleteDetailAchat(item._id);
+                                                                        }
+                                                                    }}
+                                                                    title="Supprimer"
+                                                                >
+                                                                    🗑️
+                                                                </button>
+                                                            </td>
+                                                        </tr>
+                                                    );
+                                                })}
+                                                <tr className="table-warning">
+                                                    <th></th>
+                                                    <th></th>
+                                                    <th>Sous-total {group.stockage || "(sans stockage)"}</th>
+                                                    <th className="ps-3">{formatNumber12(group.totalNombre)}</th>
+                                                    <th className="ps-3">{formatCurrency12(group.moyennePrixGroupe)}</th>
+                                                    <th></th>
+                                                    <th></th>
                                                 </tr>
-                                            );
-                                        })}
+                                            </React.Fragment>
+                                        ))}
                                     </tbody>
                                     <tfoot>
-                                        <tr>
+                                        <tr className="table-success">
                                             <th></th>
                                             <th></th>
                                             <th className="text-center">Total</th>
-
-                                            <th className="ps-3">{formatNumber8(totalNombreDetail)}</th>
+                                            <th className="ps-3">{formatNumber12(totalNombreDetail)}</th>
                                             <th className="ps-3">{formatCurrency12(moyennePrix)}</th>
+                                            <th></th>
+                                            <th></th>
                                         </tr>
                                     </tfoot>
                                 </table>
@@ -1223,7 +1300,8 @@ const Wallet = ({ search = '' }) => {
                                                         <td className="text-center">{formatCurrency12B(c.valeur)}</td>
                                                         <td className="text-center">{formatCurrency12B(c.gainPerte)}</td>
                                                         <td className="text-center">{formatNumber2(c.pourcGP)} %</td>
-                                                        <td className="text-center">{c.venteI}</td>
+                                                        <td className={`text-center ${c.venteI === "oui" ? "bg-success text-white" : "bg-danger text-white"
+                                                            }`}>{c.venteI}</td>
                                                     </tr>
                                                 );
                                             })}

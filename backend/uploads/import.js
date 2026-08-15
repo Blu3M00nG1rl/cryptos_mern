@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const Coin = require("../models/coin.model");
 const History = require("../models/history.model");
 const Params = require("../models/params.model");
-
+const writeLog = require("../utils/logger");
 const axios = require("axios");
 const jnee = new Date().toISOString().slice(0, 10);
 
@@ -13,7 +13,7 @@ const getMaxDiff = async () => {
         const response = await axios.get(endpoint);
         return response.data.diff || 0;
     } catch (error) {
-        console.log("Erreur récupération max_diff :", error.message);
+        writeLog("Erreur récupération max_diff :", error.message);
         return 0;
     }
 };
@@ -23,7 +23,7 @@ const coinNF = async (coinData) => {
     try {
         const response = await axios.post(endpoint, coinData);
     } catch (error) {
-        //console.log("Erreur lors de la création du coin non trouvé :", error.message);
+        //writeLog("Erreur lors de la création du coin non trouvé :", error.message);
     }
 }
 
@@ -32,7 +32,7 @@ const coinNI = async (coinData) => {
     try {
         const response = await axios.post(endpoint, coinData);
     } catch (error) {
-        //console.log("Erreur lors de la création du coin non importé :", error.message);
+        //writeLog("Erreur lors de la création du coin non importé :", error.message);
     }
 }
 
@@ -41,7 +41,7 @@ const history = async (historyData) => {
     try {
         const response = await axios.put(endpoint, historyData);
     } catch (error) {
-        //console.log("Erreur lors de la création de l'historique :", error.message);
+        //writeLog("Erreur lors de la création de l'historique :", error.message);
     }
 }
 
@@ -51,9 +51,9 @@ const deleteHistory = async (jneeCible) => {
         const response = await axios.delete(endpoint, {
             data: { jneeCible }
         });
-        console.log(response.data);
+        writeLog(response.data);
     } catch (error) {
-        console.log("Erreur lors de suppression de l'historique :", error.message);
+        writeLog("Erreur lors de suppression de l'historique :", error.message);
     }
 }
 
@@ -61,16 +61,16 @@ const deleteCoinsNF = async () => {
     const endpoint = process.env.API_URL + "/coins_non_trouve/delete";
     try {
         const response = await axios.delete(endpoint);
-        console.log("Suppression coins_non_trouvés réussie");
+        writeLog("Suppression coins_non_trouvés réussie");
     } catch (error) {
-        //console.log("Erreur lors de suppréssion du coin non trouvé :", error.message);
+        //writeLog("Erreur lors de suppréssion du coin non trouvé :", error.message);
     }
 }
 
 async function connectDB() {
     try {
         await mongoose.connect(process.env.MONGO_URI);
-        console.log("MongoDB connecté ✔");
+        writeLog("MongoDB connecté ✔");
     } catch (err) {
         console.error("Erreur connexion MongoDB :", err);
         process.exit(1);
@@ -78,7 +78,7 @@ async function connectDB() {
 }
 
 async function importCrypto() {
-    console.log("=== DEBUT IMPORT PRIX DU JOUR ===");
+    writeLog("=== DEBUT IMPORT PRIX DU JOUR ===");
     const maxDiff = await getMaxDiff();
     const jneeCible = new Date(Date.now() - maxDiff * 24 * 60 * 60 * 1000);
     jneeCible.setUTCHours(0, 0, 0, 0);
@@ -167,14 +167,22 @@ async function importCrypto() {
     }
 
     // 👉 total final
-    console.log("IMPORTED_COUNT=" + importedCount);
-    console.log(new Date().toLocaleTimeString() + " - Fin de la mise à jour.");
-    console.log("=== FIN IMPORT PRIX DU JOUR ===");
+
+    writeLog("IMPORTED_COUNT=" + importedCount);
+    writeLog("=== FIN IMPORT PRIX DU JOUR ===");
+
+    return { success: true, importedCount };
 }
 
-(async () => {
-    await connectDB();
-    await importCrypto();
-    mongoose.connection.close();
-})();
+async function runImportPrix() {
+    try {
+        await connectDB();
+        const result = await importCrypto();
+        return result;
+    } catch (err) {
+        return { success: false, error: err.message };
+    } 
+}
+
+module.exports = runImportPrix;
 

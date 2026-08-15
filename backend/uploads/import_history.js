@@ -9,6 +9,7 @@ const csv = require("csv-parser");
 const History = require("../models/history.model");
 const Coin = require("../models/coin.model");
 const CoinsNonImporte = require("../models/coins_non_importe.model");
+const writeLog = require("../utils/logger");
 
 const historiquePath = path.join(__dirname, "../storage/historique");
 
@@ -16,14 +17,15 @@ const deleteCoinsNI = async () => {
     const endpoint = process.env.API_URL + "/coins_non_importe/delete";
     try {
         const response = await axios.delete(endpoint);
-        console.log("Suppression coins_non_importes réussie");
+        writeLog("Suppression coins_non_importes réussie");
     } catch (error) {
-        console.log("Erreur lors de suppréssion des coins non importés :", error.message);
+        writeLog("Erreur lors de suppression des coins non importés :", error.message);
     }
 }
 
 const runImport = async () => {
-    console.log("=== DEBUT IMPORT HISTORIQUE ===");
+    writeLog("=== DEBUT IMPORT HISTORIQUE ===");
+    writeLog("HISTORY BITCOIN PATH: " + path.join(__dirname, "../storage/historique/btc-usd-max.csv"));
     await connectDB();
     await deleteCoinsNI();
 
@@ -33,11 +35,10 @@ const runImport = async () => {
 
     if (!usdToEur) {
         console.error("❌ Impossible de récupérer le taux USD/EUR");
-        mongoose.connection.close();
         return;
     }
 
-    console.log("Taux USD → EUR :", usdToEur);
+    writeLog("Taux USD → EUR :", usdToEur);
 
     const files = fs.readdirSync(historiquePath).filter(f => f.endsWith("-usd-max.csv"));
     // 🔍 Liste des symbols présents dans les fichiers CSV
@@ -53,7 +54,7 @@ const runImport = async () => {
         sym => !symbolsInFilesLower.includes(sym.toLowerCase())
     );
 
-    console.log("Coins sans historique :", missingSymbols);
+    writeLog("Coins sans historique :", missingSymbols);
 
     // 📝 Ajout dans coins_non_importes
     for (const symbol of missingSymbols) {
@@ -64,8 +65,8 @@ const runImport = async () => {
         );
     }
 
-    console.log(`📌 ${missingSymbols.length} coins ajoutés dans coins_non_importes`);
-    console.log(`Fichiers trouvés: ${files.length}`);
+    writeLog(`📌 ${missingSymbols.length} coins ajoutés dans coins_non_importes`);
+    writeLog(`Fichiers trouvés: ${files.length}`);
     let importedCount = 0;
 
     for (const file of files) {
@@ -84,12 +85,29 @@ const runImport = async () => {
             fs.createReadStream(path.join(historiquePath, file))
                 .pipe(csv())
                 .on("data", (row) => {
+
+                    const keys = Object.keys(row);
+
+                    const dateCol =
+                        keys.includes("snapped_at") ? "snapped_at" :
+                            keys.includes("event_date") ? "event_date" :
+                                keys[0];
+
+                    const rawDate = row[dateCol];
+                    const journee = (!rawDate || rawDate === "NULL") ? null : new Date(rawDate);
+
                     results.push({
-                        coinId: coin.coinId, // <-- UTILISATION DU coinId DE LA COLLECTION COINS
-                        journee: row.snapped_at === "NULL" ? null : new Date(row.snapped_at),
-                        prix: row.price === "NULL" ? null : Number(row.price) * usdToEur,
-                        market_cap: row.market_cap === "NULL" ? null : Number(row.market_cap),
-                        total_volume: row.total_volume === "NULL" ? null : Number(row.total_volume)
+                        coinId: coin.coinId,
+                        journee,
+                        prix: row.price ? Number(row.price) * usdToEur :
+                            row.close_price_usd ? Number(row.close_price_usd) * usdToEur :
+                                null,
+                        market_cap: row.market_cap ? Number(row.market_cap) :
+                            row.market_cap_usd ? Number(row.market_cap_usd) :
+                                null,
+                        total_volume: row.total_volume ? Number(row.total_volume) :
+                            row.volume_usd ? Number(row.volume_usd) :
+                                null
                     });
                 })
                 .on("end", async () => {
@@ -104,7 +122,7 @@ const runImport = async () => {
 
                         await History.bulkWrite(bulkOps, { ordered: false });
                         importedCount += results.length;
-                        console.log(`✅ ${file}: ${results.length} lignes importées/mises à jour`);
+                        writeLog(`✅ ${file}: ${results.length} lignes importées/mises à jour`);
                         resolve();
                     } catch (err) {
                         console.error(`❌ Erreur import ${file}:`, err.message);
@@ -115,16 +133,23 @@ const runImport = async () => {
         });
     }
 
-    mongoose.connection.close();
-    console.log("Import terminé");
-    console.log("=== FIN IMPORT HISTORIQUE ===");
-    console.log(`IMPORTED_COUNT=${importedCount}`);
+    writeLog("Import terminé");
+    writeLog("=== FIN IMPORT HISTORIQUE ===");
+    writeLog(`IMPORTED_COUNT=${importedCount}`);
 };
 
-runImport().catch(err => {
-    console.error("Erreur:", err);
-    mongoose.connection.close();
-});
+async function runImportHistory() {
+    try {
+        const result = await runImport();
+        return { success: true };
+    } catch (err) {
+        return { success: false, error: err.message };
+    }
+}
+
+module.exports = runImportHistory;
+
+
 
 
 

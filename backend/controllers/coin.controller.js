@@ -114,7 +114,7 @@ exports.getAllCoins = async (req, res) => {
                     nombre: achat ? achat.totalNombre : 0,
                     prixCoin: achat ? achat.prixAchatMoyen : 0,
                     prixHistory: mapHistory.get(c.coinId) || null,
-                    dateCible: cibleDate.toLocaleDateString("fr-FR"),
+                    dateCible: cibleDate,
                     evolution,
                     capitalisation: todayHistory?.market_cap || null,
                 };
