@@ -665,7 +665,7 @@ exports.getAchatsData = async (req, res) => {
                     const min = minHistory.prix;
                     const max = maxHistory.prix;
                     fibAchat = (max - min) * 0.382 + min;
-                    fibAchatBtc = fibAchat / prixAujBtc;
+                    fibAchatBtc = fibAchat / btcToday.prix;
                 }
 
                 return {
@@ -676,6 +676,7 @@ exports.getAchatsData = async (req, res) => {
                     prixCibleBtc,
                     evolutionBtc,
                     evolution24hBtc,
+                    fibAchat,
                     fibAchatBtc,
                     btcToday,
                     btcYesterday,
