@@ -34,7 +34,7 @@ const Coins = ({ search = '' }) => {
         c.symbol.toLowerCase().includes(normalizedSearch) ||
         c.name.toLowerCase().includes(normalizedSearch)
     );
-
+    console.log(filteredData);
     const formatNumber = (v) =>
         v === null || v === undefined ? "-" : v.toLocaleString("fr-FR", { maximumFractionDigits: 4 });
 
@@ -199,7 +199,7 @@ const Coins = ({ search = '' }) => {
                                                     ) : "-"}
                                                 </td>
                                                 <td className="text-center">
-                                                    {coin.min ? (
+                                                    {coin.minBTC ? (
                                                         <>
                                                             {formatCurrency12B(coin.min.prix / coin.minBTC.prix)}<br />
                                                             <small>{formatDate(coin.min.date)}</small>
