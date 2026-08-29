@@ -118,6 +118,14 @@ const Achats = ({ search = '' }) => {
             maximumFractionDigits: 6
         }).format(n);
 
+    const formatCurrency12 = (n) =>
+        new Intl.NumberFormat('fr-FR', {
+            style: 'currency',
+            currency: 'EUR',
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 12
+        }).format(n);
+
     const formatCurrency0 = (n) =>
         new Intl.NumberFormat('fr-FR', {
             style: 'currency',
@@ -211,7 +219,7 @@ const Achats = ({ search = '' }) => {
                                             const prixDuJour = Number(coin.prixAuj);
                                             const tranche = stables / 10;
                                             const eurConvertit = coin.prixAuj / prixStable;
-                                            
+
                                             const dominanceCoin = dominance > 0
                                                 ? (coin.market_cap / dominanceCalculee) * 1000000
                                                 : 0;
@@ -235,8 +243,8 @@ const Achats = ({ search = '' }) => {
                                                     </td>
 
                                                     <td className='text-center'>{coin.name}</td>
-                                                    <td className='text-center'>{formatCurrency6(coin.prixAuj)}</td>
-                                                    <td className='text-center'>{formatCurrency6(coin.prixHier)}</td>
+                                                    <td className='text-center'>{formatCurrency12(coin.prixAuj)}</td>
+                                                    <td className='text-center'>{formatCurrency12(coin.prixHier)}</td>
                                                     <td className='text-center'>
                                                         {coin.evolution === null ? "-" : `${formatNumber0(coin.evolution)} %`}
                                                     </td>
@@ -298,7 +306,7 @@ const Achats = ({ search = '' }) => {
                                         const valeur = nombre * prixDuJour;
 
                                         const invBase = valeurAchat > valeur ? valeurAchat / btcPriceToday : valeur / btcPriceToday;
-                                        const invCalcul = (dominanceCoin/btcPriceToday) - invBase;
+                                        const invCalcul = (dominanceCoin / btcPriceToday) - invBase;
                                         const invReel = invCalcul > tranche ? tranche : invCalcul;
                                         const invReelFinal = invReel > 0 ? invReel : 0;
 

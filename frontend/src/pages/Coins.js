@@ -34,7 +34,7 @@ const Coins = ({ search = '' }) => {
         c.symbol.toLowerCase().includes(normalizedSearch) ||
         c.name.toLowerCase().includes(normalizedSearch)
     );
-    console.log(filteredData);
+
     const formatNumber = (v) =>
         v === null || v === undefined ? "-" : v.toLocaleString("fr-FR", { maximumFractionDigits: 4 });
 
