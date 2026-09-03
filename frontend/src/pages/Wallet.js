@@ -69,6 +69,7 @@ const Wallet = ({ search = '' }) => {
         return oldest;
     }, null);
 
+    const totalCoins = new Set(owned.map(c => c.symbol)).size;
     const totalNombre = owned.reduce((sum, c) => sum + (Number(c.nombre) || 0), 0);
     const totalValeur = owned.reduce((sum, c) => sum + ((Number(c.nombre) || 0) * (Number(c.prixHistory) || 0)), 0);
     const totalValeurAchat = owned.reduce((sum, c) => sum + ((Number(c.nombre) || 0) * (Number(c.prixCoin) || 0)), 0);
@@ -999,7 +1000,7 @@ const Wallet = ({ search = '' }) => {
                                     </tbody>
                                     <tfoot>
                                         <tr className="table-success">
-                                            <th></th>
+                                            <th className="ps-3">{formatNumber12(totalCoins)} Coins</th>
                                             <th></th>
                                             <th className="text-center">Total</th>
                                             <th className="text-center">{formatNumber0(totalNombre)}</th>

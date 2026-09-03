@@ -22,7 +22,7 @@ const CoinsAdmin = ({ search = '' }) => {
 
     const createCoin = async () => {
         await axios.post(`${process.env.REACT_APP_API_URL}/backend/coin/create`, form);
-        setForm({ no: "", coinId: "", symbol: "", name: "" });
+        setForm({ no: "", coinId: "", symbol: "", name: "", rank: "" });
         loadCoins();
     };
 
