@@ -1016,7 +1016,7 @@ const Wallet = ({ search = '' }) => {
                                         </tr>
                                     </tfoot>
                                 </table>
-                                {owned.length === 0 && <div className="text-muted">Aucune crypto possédée (nombre &gt; 0).</div>}
+                                {owned.length === 0 && <div className="text-muted">Aucune crypto possédée.</div>}
                             </div>
                         )}
                     </>

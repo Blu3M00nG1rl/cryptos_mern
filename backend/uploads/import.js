@@ -21,37 +21,18 @@ const getMaxDiff = async () => {
 const coinNF = async (coinData) => {
     const endpoint = process.env.API_URL + "/coins_non_trouve/create";
     try {
-        const response = await axios.post(endpoint, coinData);
+        await axios.post(endpoint, coinData);
     } catch (error) {
         //writeLog("Erreur lors de la création du coin non trouvé :", error.message);
-    }
-}
-
-const coinNI = async (coinData) => {
-    const endpoint = process.env.API_URL + "/coins_non_importe/create";
-    try {
-        const response = await axios.post(endpoint, coinData);
-    } catch (error) {
-        //writeLog("Erreur lors de la création du coin non importé :", error.message);
-    }
-}
-
-const history = async (historyData) => {
-    const endpoint = process.env.API_URL + "/history/update";
-    try {
-        const response = await axios.put(endpoint, historyData);
-    } catch (error) {
-        //writeLog("Erreur lors de la création de l'historique :", error.message);
     }
 }
 
 const deleteHistory = async (jneeCible) => {
     const endpoint = process.env.API_URL + "/history/delete";
     try {
-        const response = await axios.delete(endpoint, {
+        await axios.delete(endpoint, {
             data: { jneeCible }
         });
-        writeLog(response.data);
     } catch (error) {
         writeLog("Erreur lors de suppression de l'historique :", error.message);
     }
@@ -60,10 +41,10 @@ const deleteHistory = async (jneeCible) => {
 const deleteCoinsNF = async () => {
     const endpoint = process.env.API_URL + "/coins_non_trouve/delete";
     try {
-        const response = await axios.delete(endpoint);
+        await axios.delete(endpoint);
         writeLog("Suppression coins_non_trouvés réussie");
     } catch (error) {
-        //writeLog("Erreur lors de suppréssion du coin non trouvé :", error.message);
+        writeLog("Erreur lors de suppréssion du coin non trouvé :", error.message);
     }
 }
 

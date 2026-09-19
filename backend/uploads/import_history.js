@@ -34,15 +34,26 @@ const runImport = async () => {
     const usdToEur = fxRes.data.rates.EUR;
 
     if (!usdToEur) {
-        console.error("❌ Impossible de récupérer le taux USD/EUR");
+        writeLog(`❌ Impossible de récupérer le taux USD/EUR`);
         return;
     }
 
     writeLog("Taux USD → EUR :", usdToEur);
 
-    const files = fs.readdirSync(historiquePath).filter(f => f.endsWith("-usd-max.csv"));
+
+    const limiteDate = new Date();
+    limiteDate.setDate(limiteDate.getDate() - 2);
+
+    const files = fs.readdirSync(historiquePath)
+        .filter(file => {
+            const stats = fs.statSync(path.join(historiquePath, file));
+            return stats.mtime > limiteDate;
+        });
+
+    const filesAll = fs.readdirSync(historiquePath);
+
     // 🔍 Liste des symbols présents dans les fichiers CSV
-    const symbolsInFiles = files.map(f => f.replace("-usd-max.csv", ""));
+    const symbolsInFiles = filesAll.map(f => f.replace("-usd-max.csv", ""));
     const symbolsInFilesLower = symbolsInFiles.map(s => s.toLowerCase());
 
     // 🔍 Liste des symbols présents dans la collection coins
@@ -75,7 +86,7 @@ const runImport = async () => {
         // 🔍 Récupération du coin dans la base
         const coin = await Coin.findOne({ symbol }).lean();
         if (!coin) {
-            console.error(`❌ Aucun coin trouvé pour le symbole : ${symbol}`);
+            writeLog(`❌ Aucun coin trouvé pour le symbole : ${symbol}`);
             continue;
         }
 
@@ -125,7 +136,7 @@ const runImport = async () => {
                         writeLog(`✅ ${file}: ${results.length} lignes importées/mises à jour`);
                         resolve();
                     } catch (err) {
-                        console.error(`❌ Erreur import ${file}:`, err.message);
+                        writeLog(`❌ Erreur import ${file}: ${err.message}`);
                         resolve();
                     }
                 })
@@ -140,16 +151,13 @@ const runImport = async () => {
 
 async function runImportHistory() {
     try {
-        const result = await runImport();
+        await runImport();
         return { success: true };
     } catch (err) {
         return { success: false, error: err.message };
+    } finally {
+        await mongoose.connection.close();
     }
 }
 
 module.exports = runImportHistory;
-
-
-
-
-
