@@ -88,6 +88,14 @@ const Recap = ({ search = '' }) => {
         return value;
     };
 
+    const formatNumber8 = (value) => {
+        if (value === null || value === undefined) return '-';
+        if (typeof value === 'number') {
+            return value.toLocaleString('fr-FR', { maximumFractionDigits: 8 });
+        }
+        return value;
+    };
+
     const formatNumberE = (value) => {
         if (value === null || value === undefined) return '-';
         if (typeof value === 'number') {
@@ -124,8 +132,6 @@ const Recap = ({ search = '' }) => {
     // Estimation Wallet
     const estimationWallet = (btcPrix / dominance) * 100;
     const totalNombre = filteredData.reduce((sum, c) => sum + (Number(c.nombre) || 0), 0);
-    const totalInvMin = filteredData.reduce((sum, c) => sum + (Number(c.investissement) || 0), 0);
-    const totalEcart = filteredData.reduce((sum, c) => sum + (Number(c.evolution) || 0), 0);
     const totalDominanceCoin = filteredData.reduce((sum, c) => sum + ((c.capitalisation / dominanceCalculee) * 1000000), 0);
 
     useEffect(() => {
@@ -293,7 +299,7 @@ const Recap = ({ search = '' }) => {
                                                     <td className="text-center">{coin.rank}</td>
                                                     <td className="text-center">{coin.name}</td>
                                                     <td className="text-center"><strong>{coin.symbol}</strong></td>
-                                                    <td className="text-center">{formatNumber(coin.nombre)}</td>
+                                                    <td className="text-center">{formatNumber8(coin.nombre)}</td>
                                                     <td className="text-center">{formatCurrency12(coin.prixDuJour)}</td>
                                                     <td className="text-center">{formatCurrency0(coin.capitalisation)}</td>
                                                     <td className="text-center">{formatCurrency0(coin.volume24h)}</td>
@@ -302,7 +308,7 @@ const Recap = ({ search = '' }) => {
                                                     <td className="text-center">{formatCurrency0(investMin)}</td>
                                                     <td className="text-center">{formatCurrency0((coin.nombre * coin.prixDuJour) - (investMin))}</td>
                                                     <td className="text-center">{formatCurrency0(dominanceCoin)}</td>
-                                                    <td className="text-center">{formatNumber(hodl)}</td>
+                                                    <td className="text-center">{formatNumber8(hodl)}</td>
                                                 </tr>
                                             );
                                         })}

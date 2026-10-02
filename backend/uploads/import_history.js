@@ -97,6 +97,14 @@ const runImport = async () => {
                 .pipe(csv())
                 .on("data", (row) => {
 
+                    // Ignorer les lignes dont close_price_usd est vide
+                    if (
+                        Object.prototype.hasOwnProperty.call(row, "close_price_usd") &&
+                        (!row.close_price_usd || row.close_price_usd.trim() === "")
+                    ) {
+                        return;
+                    }
+
                     const keys = Object.keys(row);
 
                     const dateCol =
