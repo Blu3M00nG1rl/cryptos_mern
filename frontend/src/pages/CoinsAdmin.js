@@ -130,10 +130,12 @@ const CoinsAdmin = ({ search = '' }) => {
                 <table className="table table-striped mt-3">
                     <thead>
                         <tr>
-                            <th>No - Rang</th>
-                            <th>Id - Stockage</th>
-                            <th>Symbole - Date d'Achat</th>
-                            <th>Nom - Observations</th>
+                            <th>No</th>
+                            <th>Id</th>
+                            <th>Symbole</th>
+                            <th>Nom</th>
+                            <th>Rang</th>
+                            <th>Observations</th>
                             <th>Date Vérif</th>
                             <th>Actions</th>
                         </tr>
@@ -141,7 +143,6 @@ const CoinsAdmin = ({ search = '' }) => {
                     <tbody>
                         {filteredData.map((c) => (
                             <React.Fragment key={c._id}>
-                                {/* Première ligne */}
                                 <tr>
                                     <td>
                                         <input
@@ -150,7 +151,6 @@ const CoinsAdmin = ({ search = '' }) => {
                                             onChange={(e) => handleLocalChange(c._id, "no", e.target.value)}
                                         />
                                     </td>
-
                                     <td>
                                         <input
                                             className="form-control"
@@ -177,6 +177,21 @@ const CoinsAdmin = ({ search = '' }) => {
 
                                     <td>
                                         <input
+                                            className="form-control"
+                                            value={editedCoins[c._id]?.rank ?? c.rank ?? ""}
+                                            onChange={(e) => handleLocalChange(c._id, "rank", e.target.value)}
+                                        />
+                                    </td>
+                                    <td style={{ minWidth: "400px" }}>
+                                        <textarea
+                                            className="form-control"
+                                            rows={10}
+                                            value={editedCoins[c._id]?.observation ?? c.observation ?? ""}
+                                            onChange={(e) => handleLocalChange(c._id, "observation", e.target.value)}
+                                        />
+                                    </td>
+                                    <td>
+                                        <input
                                             type="date"
                                             className="form-control"
                                             value={
@@ -189,8 +204,6 @@ const CoinsAdmin = ({ search = '' }) => {
                                             onChange={(e) => handleLocalChange(c._id, "dateVerif", e.target.value)}
                                         />
                                     </td>
-
-
                                     <td>
                                         <button
                                             className="btn btn-light mt-2"
@@ -216,52 +229,6 @@ const CoinsAdmin = ({ search = '' }) => {
                                         >
                                             🗑️
                                         </button>
-                                    </td>
-                                </tr>
-
-                                {/* Deuxième ligne */}
-                                <tr>
-
-
-                                    <td>
-                                        <input
-                                            className="form-control"
-                                            value={editedCoins[c._id]?.rank ?? c.rank ?? ""}
-                                            onChange={(e) => handleLocalChange(c._id, "rank", e.target.value)}
-                                        />
-                                    </td>
-
-                                    <td style={{ minWidth: "250px" }}>
-                                        <textarea
-                                            className="form-control"
-                                            rows={5}
-                                            value={editedCoins[c._id]?.stockage ?? c.stockage ?? ""}
-                                            onChange={(e) => handleLocalChange(c._id, "stockage", e.target.value)}
-                                        />
-                                    </td>
-
-                                    <td>
-                                        <input
-                                            type="date"
-                                            className="form-control"
-                                            value={
-                                                editedCoins[c._id]?.dateAchat
-                                                    ? editedCoins[c._id].dateAchat.slice(0, 10)
-                                                    : c.dateAchat
-                                                        ? c.dateAchat.slice(0, 10)
-                                                        : ""
-                                            }
-                                            onChange={(e) => handleLocalChange(c._id, "dateAchat", e.target.value)}
-                                        />
-                                    </td>
-
-                                    <td style={{ minWidth: "400px" }}>
-                                        <textarea
-                                            className="form-control"
-                                            rows={10}
-                                            value={editedCoins[c._id]?.observation ?? c.observation ?? ""}
-                                            onChange={(e) => handleLocalChange(c._id, "observation", e.target.value)}
-                                        />
                                     </td>
                                 </tr>
                             </React.Fragment>

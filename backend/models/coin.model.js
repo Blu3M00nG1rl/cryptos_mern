@@ -28,12 +28,6 @@ const coinSchema = new mongoose.Schema(
             type: String,
             default: "./random-coin.jpg"
         },
-        dateAchat: {
-            type: Date
-        },
-        stockage: {
-            type: String
-        },
         dateVerif: {
             type: Date
         },

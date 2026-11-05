@@ -1,38 +1,28 @@
-require('dotenv').config({ path: '../config/.env' });
-const mongoose = require("mongoose");
-const Coin = require("../models/coin.model");
-const History = require("../models/history.model");
-const Params = require("../models/params.model");
-
 const axios = require("axios");
-const jnee = new Date().toISOString().slice(0, 10);
 
-const getMaxDiff = async () => {
-    const endpoint = process.env.API_URL + "/bitcoin/max-diff";
+async function runImport() {
     try {
-        const response = await axios.get(endpoint);
-        console.log("Max diff récupéré :", response.data.diff);
-        return response.data.diff || 0;
-    } catch (error) {
-        console.log("Erreur récupération max_diff :", error.message);
-        return 0;
+        const API = process.env.API_URL;
+
+        console.log("➡️  Appel import Bitcoin :", `${API}/bitcoin/importB`);
+        const r1 = await axios.post(`${API}/bitcoin/importB`);
+        console.log("✔️ Import Bitcoin OK");
+
+        res.status(200).json({
+            message: "Mise à jour complète terminée",
+            bitcoin: r1.data
+        });
+
+    } catch (err) {
+        console.error("❌ Erreur MAJ :", err.message);
+
+        // 🔥 LOG COMPLET POUR DEBUG
+        if (err.response) {
+            console.error("➡️ Status :", err.response.status);
+            console.error("➡️ URL :", err.config.url);
+            console.error("➡️ Data :", err.response.data);
+        }
     }
 };
 
-
-async function connectDB() {
-    try {
-        await mongoose.connect(process.env.MONGO_URI);
-        console.log("MongoDB connecté ✔");
-    } catch (err) {
-        console.error("Erreur connexion MongoDB :", err);
-        process.exit(1);
-
-}
-
-(async () => {
-    await connectDB();
-    await getMaxDiff();
-    mongoose.connection.close();
-})();
-}
+runImport();

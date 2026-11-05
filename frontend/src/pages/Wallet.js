@@ -957,7 +957,6 @@ const Wallet = ({ search = '' }) => {
                                     <tbody>
                                         {sortData(ownedEnriched)
                                             .map((c) => {
-
                                                 return (
                                                     <tr
                                                         key={c.symbol}

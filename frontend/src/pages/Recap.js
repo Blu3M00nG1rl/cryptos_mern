@@ -274,7 +274,7 @@ const Recap = ({ search = '' }) => {
                                             const investMin = (coin.evolution > 0 && coin.evolution >= btcEvolution) ? hodl * coin.prixDuJour : 0;
                                             totalInvestMin += investMin;
                                             totalRestant += (coin.nombre * coin.prixDuJour) - investMin;
-
+                                            console.table(coin);
                                             return (
                                                 <tr
                                                     key={index}

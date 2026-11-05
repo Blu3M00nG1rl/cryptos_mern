@@ -5,13 +5,13 @@ const connectDB = require("../config/db");
 const mongoose = require("mongoose");
 const fs = require("fs");
 const path = require("path");
-const csv = require("csv-parser");
+const cheerio = require("cheerio");
 const History = require("../models/history.model");
 const Coin = require("../models/coin.model");
 const CoinsNonImporte = require("../models/coins_non_importe.model");
 const writeLog = require("../utils/logger");
 
-const historiquePath = path.join(__dirname, "../storage/historique");
+const historiquePath = path.join(__dirname, "../storage/html");
 
 const deleteCoinsNI = async () => {
     const endpoint = process.env.API_URL + "/coins_non_importe/delete";
@@ -25,7 +25,7 @@ const deleteCoinsNI = async () => {
 
 const runImport = async () => {
     writeLog("=== DEBUT IMPORT HISTORIQUE ===");
-    writeLog("HISTORY BITCOIN PATH: " + path.join(__dirname, "../storage/historique/btc-usd-max.csv"));
+    //writeLog("HISTORY BITCOIN PATH: " + path.join(__dirname, "../storage/historique/btc.csv"));
     await connectDB();
     await deleteCoinsNI();
 
@@ -52,8 +52,8 @@ const runImport = async () => {
 
     const filesAll = fs.readdirSync(historiquePath);
 
-    // 🔍 Liste des symbols présents dans les fichiers CSV
-    const symbolsInFiles = filesAll.map(f => f.replace("-usd-max.csv", ""));
+    // 🔍 Liste des symbols présents dans les fichiers HTML
+    const symbolsInFiles = filesAll.map(f => f.replace(".html", ""));
     const symbolsInFilesLower = symbolsInFiles.map(s => s.toLowerCase());
 
     // 🔍 Liste des symbols présents dans la collection coins
@@ -81,80 +81,171 @@ const runImport = async () => {
     let importedCount = 0;
 
     for (const file of files) {
-        const symbol = file.replace("-usd-max.csv", "");
+        const symbol = file.replace(".html", "");
 
-        // 🔍 Récupération du coin dans la base
+        writeLog(`📂 Traitement de ${file}`);
+
+        // Recherche du coin
         const coin = await Coin.findOne({ symbol }).lean();
+
         if (!coin) {
             writeLog(`❌ Aucun coin trouvé pour le symbole : ${symbol}`);
             continue;
         }
 
+        const html = fs.readFileSync(
+            path.join(historiquePath, file),
+            "utf8"
+        );
+
+        const $ = cheerio.load(html);
+
         const results = [];
 
-        await new Promise((resolve, reject) => {
-            fs.createReadStream(path.join(historiquePath, file))
-                .pipe(csv())
-                .on("data", (row) => {
+        $("table tbody tr").each((index, element) => {
 
-                    // Ignorer les lignes dont close_price_usd est vide
-                    if (
-                        Object.prototype.hasOwnProperty.call(row, "close_price_usd") &&
-                        (!row.close_price_usd || row.close_price_usd.trim() === "")
-                    ) {
-                        return;
+            try {
+
+                const tds = $(element).find("td");
+
+                if (tds.length < 7) {
+                    return;
+                }
+
+                // Colonne 1
+                const rawDate = $(tds[0]).text().trim();
+
+                // Colonne 6 (Adj Close)
+                const rawPrice = $(tds[5]).text().trim();
+
+                // Colonne 7 (Volume)
+                const rawVolume = $(tds[6]).text().trim();
+
+                if (!rawPrice) {
+                    writeLog(
+                        `⚠️ ${file} : prix absent (${rawDate})`
+                    );
+                    return;
+                }
+
+                const months = {
+                    Jan: 0,
+                    Feb: 1,
+                    Mar: 2,
+                    Apr: 3,
+                    May: 4,
+                    Jun: 5,
+                    Jul: 6,
+                    Aug: 7,
+                    Sep: 8,
+                    Oct: 9,
+                    Nov: 10,
+                    Dec: 11
+                };
+
+                const [month, day, year] =
+                    rawDate.replace(",", "").split(" ");
+
+                const journee = new Date(
+                    Date.UTC(
+                        Number(year),
+                        months[month],
+                        Number(day)
+                    )
+                );
+
+                if (isNaN(journee.getTime())) {
+                    writeLog(
+                        `❌ ${file} : date invalide "${rawDate}"`
+                    );
+                    return;
+                }
+
+                const prix = Number(
+                    rawPrice.replace(/,/g, "")
+                );
+
+                if (isNaN(prix)) {
+                    writeLog(
+                        `❌ ${file} : prix invalide "${rawPrice}"`
+                    );
+                    return;
+                }
+
+                let total_volume = null;
+
+                if (rawVolume) {
+
+                    const volume = Number(
+                        rawVolume.replace(/,/g, "")
+                    );
+
+                    if (!isNaN(volume)) {
+                        total_volume = volume;
                     }
+                }
 
-                    const keys = Object.keys(row);
+                results.push({
+                    coinId: coin.coinId,
+                    journee,
+                    prix: prix * usdToEur,
+                    total_volume
+                });
 
-                    const dateCol =
-                        keys.includes("snapped_at") ? "snapped_at" :
-                            keys.includes("event_date") ? "event_date" :
-                                keys[0];
+            } catch (err) {
 
-                    const rawDate = row[dateCol];
-                    const journee = (!rawDate || rawDate === "NULL") ? null : new Date(rawDate);
-
-                    results.push({
-                        coinId: coin.coinId,
-                        journee,
-                        prix: row.price ? Number(row.price) * usdToEur :
-                            row.close_price_usd ? Number(row.close_price_usd) * usdToEur :
-                                null,
-                        market_cap: row.market_cap ? Number(row.market_cap) :
-                            row.market_cap_usd ? Number(row.market_cap_usd) :
-                                null,
-                        total_volume: row.total_volume ? Number(row.total_volume) :
-                            row.volume_usd ? Number(row.volume_usd) :
-                                null
-                    });
-                })
-                .on("end", async () => {
-                    try {
-                        const bulkOps = results.map(row => ({
-                            updateOne: {
-                                filter: { coinId: row.coinId, journee: row.journee },
-                                update: { $set: row },
-                                upsert: true
-                            }
-                        }));
-
-                        await History.bulkWrite(bulkOps, { ordered: false });
-                        importedCount += results.length;
-                        writeLog(`✅ ${file}: ${results.length} lignes importées/mises à jour`);
-                        resolve();
-                    } catch (err) {
-                        writeLog(`❌ Erreur import ${file}: ${err.message}`);
-                        resolve();
-                    }
-                })
-                .on("error", reject);
+                writeLog(
+                    `❌ ${file} : ${err.message}`
+                );
+            }
         });
+
+        try {
+
+            writeLog(
+                `✅ ${file} à mettre à jour (${results.length} lignes)`
+            );
+
+            if (results.length === 0) {
+                writeLog(
+                    `⚠️ ${file} : aucune donnée exploitable`
+                );
+                return resolve();
+            }
+
+            const bulkOps = results.map(row => ({
+                updateOne: {
+                    filter: {
+                        coinId: row.coinId,
+                        journee: row.journee
+                    },
+                    update: {
+                        $set: row
+                    },
+                    upsert: true
+                }
+            }));
+
+            await History.bulkWrite(
+                bulkOps,
+                { ordered: false }
+            );
+
+            writeLog(
+                `✅ ${file}: ${results.length} lignes importées/mises à jour`
+            );
+
+        } catch (err) {
+
+            writeLog(
+                `❌ Erreur import ${file}: ${err.stack}`
+            );
+
+            resolve();
+        }
     }
 
-    writeLog("Import terminé");
     writeLog("=== FIN IMPORT HISTORIQUE ===");
-    writeLog(`IMPORTED_COUNT=${importedCount}`);
 };
 
 async function runImportHistory() {
