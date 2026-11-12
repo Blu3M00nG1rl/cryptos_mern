@@ -238,10 +238,45 @@ exports.getAllCoinsEnBtc = async (req, res) => {
 // DETAIL ACHAT
 exports.getDetailAchatCoins = async (req, res) => {
     try {
-        const coinsDetail = await AchatCoin.find()
-            .sort({ dateAchat: -1 }) // tri logique
-            .lean();
-
+        const coinsDetail = await AchatCoin.aggregate([
+            {
+                $lookup: {
+                    from: "coins",
+                    let: {
+                        symbolAchat: { $toLower: "$symbol" }
+                    },
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: {
+                                    $eq: ["$symbol", "$$symbolAchat"]
+                                }
+                            }
+                        }
+                    ],
+                    as: "coin"
+                }
+            },
+            {
+                $unwind: {
+                    path: "$coin",
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+            {
+                $project: {
+                    symbol: 1,
+                    dateAchat: 1,
+                    stockage: 1,
+                    nombre: 1,
+                    prixAchat: 1,
+                    observation: 1,
+                    coinName: "$coin.name",
+                    coinRank: "$coin.rank",
+                    coinPicture: "$coin.picture"
+                }
+            }
+        ]);
         res.status(200).json(coinsDetail);
 
     } catch (err) {

@@ -319,14 +319,16 @@ const Wallet = ({ search = '' }) => {
 
     const filteredDetail = coinsDetail.filter(item =>
         !normalizedSearch ||
-        item.symbol.toLowerCase().includes(normalizedSearch) ||
-        (item.stockage && item.stockage.toLowerCase().includes(normalizedSearch))
+        (item.symbol ?? '').toLowerCase().includes(normalizedSearch) ||
+        (item.coinName ?? '').toLowerCase().includes(normalizedSearch) ||
+        (item.stockage ?? '').toLowerCase().includes(normalizedSearch)
     );
 
     const filteredDetailEnBtc = coinsDetailEnBtc.filter(item =>
         !normalizedSearch ||
-        item.symbol.toLowerCase().includes(normalizedSearch) ||
-        (item.stockage && item.stockage.toLowerCase().includes(normalizedSearch))
+        (item.symbol ?? '').toLowerCase().includes(normalizedSearch) ||
+        (item.coinName ?? '').toLowerCase().includes(normalizedSearch) ||
+        (item.stockage ?? '').toLowerCase().includes(normalizedSearch)
     );
 
     const sortedDetail = sortData(filteredDetail);
@@ -1091,7 +1093,8 @@ const Wallet = ({ search = '' }) => {
                                 <table className="table table-sm">
                                     <thead>
                                         <tr>
-                                            <th>Coin</th>
+                                            <th>Symbole</th>
+                                            <th>Nom</th>
                                             <th>Date Achat</th>
                                             <th>Stockage</th>
                                             <th>Nombre</th>
@@ -1107,6 +1110,7 @@ const Wallet = ({ search = '' }) => {
                                                     const buffer = editBuffer[item._id] || {};
 
                                                     const symbol = buffer.symbol ?? item.symbol ?? "";
+                                                    const name = buffer.coinName ?? item.coinName ?? "";
                                                     const dateAchat = buffer.dateAchat ?? (item.dateAchat ? item.dateAchat.slice(0, 10) : "");
                                                     const stockage = buffer.stockage ?? item.stockage ?? "";
                                                     const nombre = buffer.nombre ?? item.nombre ?? "";
@@ -1120,6 +1124,14 @@ const Wallet = ({ search = '' }) => {
                                                                     className="form-control"
                                                                     value={symbol}
                                                                     onChange={(e) => handleEditChange(item._id, "symbol", e.target.value)}
+                                                                />
+                                                            </td>
+
+                                                            <td>
+                                                                <input
+                                                                    className="form-control"
+                                                                    value={name}
+                                                                    onChange={(e) => handleEditChange(item._id, "name", e.target.value)}
                                                                 />
                                                             </td>
 
